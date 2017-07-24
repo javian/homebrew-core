@@ -59,7 +59,6 @@ class PhpAT71 < Formula
   depends_on "net-snmp"
   depends_on "openssl"
   depends_on "pcre"
-  depends_on "readline"
   depends_on "tidy-html5"
 
   # Fixes the pear .lock permissions issue that keeps it from operating correctly.
@@ -192,10 +191,10 @@ INFO
       --with-png-dir=#{Formula["libpng"].opt_prefix}
       --with-pspell=#{Formula["aspell"].opt_prefix}
       --with-snmp=#{Formula["net-snmp"].opt_prefix}
-      --with-tidy=#{Formula["tidy-html5"].opt_prefix}
+      --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
       --with-xmlrpc
       --with-zlib=/usr
-      --with-readline=#{Formula["readline"].opt_prefix}
+      --with-libedit
       --with-xsl=/usr
       --without-gmp
       --without-snmp
