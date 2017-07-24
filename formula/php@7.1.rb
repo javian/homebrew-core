@@ -52,6 +52,7 @@ class PhpAT71 < Formula
   depends_on "freetype"
   depends_on "gettext"
   depends_on "gmp"
+  depends_on "icu4c"
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "mcrypt"
@@ -174,7 +175,7 @@ INFO
       --with-fpm-user=_www
       --with-fpm-group=_www
       --with-iconv-dir=/usr
-      --with-icu-dir=/usr
+      --with-icu-dir=#{Formula["icu4c"].opt_prefix}
       --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
       --with-kerberos=/usr
       --with-ldap
