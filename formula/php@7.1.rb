@@ -189,14 +189,13 @@ INFO
       --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
       --with-png-dir=#{Formula["libpng"].opt_prefix}
       --with-pspell=#{Formula["aspell"].opt_prefix}
-      --with-snmp=#{Formula["net-snmp"].opt_prefix}
+      --with-snmp
       --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
       --with-xmlrpc
       --with-zlib=/usr
       --with-libedit
       --with-xsl=/usr
       --without-gmp
-      --without-snmp
     ]
 
       # Belongs to fpm config
