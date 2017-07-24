@@ -1,85 +1,70 @@
-class Php71 < Formula
-  desc "PHP Interpreted language"
+class PhpAT71 < Formula
+  desc "General-purpose scripting language"
   homepage "https://php.net"
   url "https://github.com/php/php-src/archive/php-7.1.7.tar.gz"
-  sha256 ""
+  sha256 "fc57fde1df31e34fc6d58ea4ec477429d3663187391e2b307444b532dc18550d"
 
+  # javian: not sure about the origin of this so I'll keep it commented for now
+  # So PHP extensions don't report missing symbols
+  #skip_clean "bin", "sbin"
 
-    # So PHP extensions don't report missing symbols
-    #  skip_clean "bin", "sbin"
+  # TODO
+  # Opcache default config file is included in extension formula, is it needed ?
+  # ldap extension: I have a vague recollection that this caused some issues that were resolved with exluding it. needs to be checked.
+  # According to php docs enchant requires aspell as a dep, should not be an issue since aspell is required.
+  # Need to add tests for all supported SAPIs
+  # Should we remove --with-pdo-dblib from formula ? (mssql support is long gone and as far as I can tell this is the only purpose and would also exclude a dep, freetds)
+
+  option "with-curl", "Use Homebrew's version of cURL library"
+  option "with-debug-symbols", "Compile with debugging symbols"
+  option "with-freetds", "Build MSSQL-DB support extension"
+  option "with-httpd24", "Enable building of shared Apache 2.4 Handler module"
+  option "with-httpd22", "Enable building of shared Apache 2.2 Handler module"
+  option "with-imap-uw", "Build IMAP extension"
+  option "with-thread-safety", "Build with thread safety"
+  option "with-dtrace", "Build with DTrace support"
+
+  # javian: Not yet checked these options
+  option "with-homebrew-libxml2", "Include Libxml2 support via Homebrew"
+  option "with-pdo-oci", "Include Oracle databases (requries ORACLE_HOME be set)"
+  option "without-ldap", "Build without LDAP support"
+  option "without-mysql", "Remove MySQL/MariaDB support" # Mysql is optional below, should it be part of the default build ? Can we rely on osx mysql ?
+  option "without-unixodbc", "Build without unixODBC support"
 
   depends_on "autoconf" => :build
   depends_on "bison@2.7" => :build
   depends_on "flex" => :build
   depends_on "re2c" => :build
-
-  depends_on "curl" if build.include?("with-homebrew-curl") || MacOS.version < :lion
+  depends_on "curl" => :optional # || MacOS.version < :lion
   depends_on "enchant" => :optional
-  depends_on "freetds" if build.include?("with-mssql")
+  depends_on "homebrew/apache/httpd24" => :optional
+  depends_on "homebrew/apache/httpd22" => :optional
+  depends_on "imap-uw" => :optional
+  depends_on "libxml2" => :optional # || MacOS.version < :lion || MacOS.version >= :el_capitan
+  depends_on "mysql" => :optional
+  depends_on :postgresql => :optional
+  depends_on "webp" => :optional
+
+  depends_on "unixodbc" => :recommended # Uncertain why this option is here?
+  depends_on "libtool" => :run #mcrypt requirement
+  depends_on "aspell"
+  depends_on "freetds"
   depends_on "freetype"
   depends_on "gettext"
   depends_on "gmp"
   depends_on "icu4c"
-  depends_on "imap-uw" if build.include?("with-imap")
   depends_on "jpeg"
-  depends_on "webp" => :optional
   depends_on "libpng"
-  depends_on "libxml2" if build.include?("with-homebrew-libxml2") || MacOS.version < :lion || MacOS.version >= :el_capitan
-  depends_on "unixodbc" unless build.include?("without-unixodbc")
+  depends_on "mcrypt"
+  depends_on "net-snmp"
+  depends_on "openssl"
+  depends_on "pcre"
   depends_on "readline"
-  depends_on "mysql" if build.include?("with-libmysql")
-
-    # ssl
-    if build.include?("with-homebrew-libressl")
-      depends_on "libressl"
-    else
-      depends_on "openssl"
-    end
-
-    deprecated_option "with-pgsql" => "with-postgresql"
-    depends_on :postgresql => :optional
-
-    # Sanity Checks
-
-    if build.include?("with-cgi") && build.include?("with-fpm")
-      raise "Cannot specify more than one CGI executable to build."
-    end
-
-    option "with-httpd24", "Enable building of shared Apache 2.4 Handler module"
-    option "with-httpd22", "Enable building of shared Apache 2.2 Handler module"
-    deprecated_option "homebrew-apxs" => "with-homebrew-apxs"
-    deprecated_option "with-homebrew-apxs" => "with-httpd24"
-    deprecated_option "with-apache" => "with-httpd24"
-    deprecated_option "with-apache22" => "with-httpd22"
-
-    depends_on "homebrew/apache/httpd24" => :optional
-    depends_on "homebrew/apache/httpd22" => :optional
-
-    option "with-cgi", "Enable building of the CGI executable (implies --without-fpm)"
-    option "with-debug", "Compile with debugging symbols"
-    option "with-homebrew-curl", "Include Curl support via Homebrew"
-    option "with-homebrew-libressl", "Include LibreSSL instead of OpenSSL via Homebrew"
-    option "with-homebrew-libxslt", "Include LibXSLT support via Homebrew"
-    option "with-homebrew-libxml2", "Include Libxml2 support via Homebrew"
-    option "with-imap", "Include IMAP extension"
-    option "with-libmysql", "Include (old-style) libmysql support instead of mysqlnd"
-    option "with-mssql", "Include MSSQL-DB support"
-    option "with-pear", "Build with PEAR"
-    option "with-pdo-oci", "Include Oracle databases (requries ORACLE_HOME be set)"
-    unless name.split("::")[2].casecmp("php53").zero?
-      option "with-phpdbg", "Enable building of the phpdbg SAPI executable"
-    end
-    option "with-thread-safety", "Build with thread safety"
-    option "without-bz2", "Build without bz2 support"
-    option "without-fpm", "Disable building of the fpm SAPI executable"
-    option "without-ldap", "Build without LDAP support"
-    option "without-mysql", "Remove MySQL/MariaDB support"
-    option "without-legacy-mysql", "Do not include the deprecated mysql_ functions"
-    option "without-pcntl", "Build without Process Control support"
-    option "without-unixodbc", "Build without unixODBC support"
+  depends_on "tidy-html5"
 
   # Fixes the pear .lock permissions issue that keeps it from operating correctly.
   # Thanks mistym & #machomebrew
+  # javian: is this still needed ?
   skip_clean "lib/php/.lock"
 
   def config_path
@@ -90,22 +75,19 @@ class Php71 < Formula
     File.expand_path("~")
   end
 
-  def build_fpm?
-    true unless build.without?("fpm") || build.with?("cgi")
-  end
-
   def php_version
-    raise "Unspecified php version"
+    version.to_s[0..2]
   end
 
   def php_version_path
-    raise "Unspecified php version path"
+    version.to_s[0..2].gsub(/\./,'')
   end
 
   def install
+
     # Ensure this php has a version specified
-    php_version
-    php_version_path
+    ohai php_version
+    ohai php_version_path
 
     # Not removing all pear.conf and .pearrc files from PHP path results in
     # the PHP configure not properly setting the pear binary to be installed
@@ -153,64 +135,84 @@ INFO
     end
   end
 
-  def default_config
-    "./php.ini-development"
-  end
-
-  def skip_pear_config_set?
-    build.without? "pear"
-  end
-
   def install_args
     # Prevent PHP from harcoding sed shim path
     ENV["lt_cv_path_SED"] = "sed"
 
-    args = [
-      "--prefix=#{prefix}",
-      "--localstatedir=#{var}",
-      "--sysconfdir=#{config_path}",
-      "--with-config-file-path=#{config_path}",
-      "--with-config-file-scan-dir=#{config_path}/conf.d",
-      "--mandir=#{man}",
-      "--enable-bcmath",
-      "--enable-calendar",
-      "--enable-dba",
-      "--enable-exif",
-      "--enable-ftp",
-      "--enable-gd-native-ttf",
-      "--enable-mbregex",
-      "--enable-mbstring",
-      "--enable-shmop",
-      "--enable-soap",
-      "--enable-sockets",
-      "--enable-sysvmsg",
-      "--enable-sysvsem",
-      "--enable-sysvshm",
-      "--enable-wddx",
-      "--enable-zip",
-      "--with-freetype-dir=#{Formula["freetype"].opt_prefix}",
-      "--with-gd",
-      "--with-gettext=#{Formula["gettext"].opt_prefix}",
-      ("--with-iconv-dir=/usr" if OS.mac?),
-      "--with-icu-dir=#{Formula["icu4c"].opt_prefix}",
-      "--with-jpeg-dir=#{Formula["jpeg"].opt_prefix}",
-      ("--with-kerberos=/usr" if OS.mac?),
-      "--with-mhash",
-      ("--with-ndbm=/usr" if OS.mac?),
-      "--with-png-dir=#{Formula["libpng"].opt_prefix}",
-      "--with-xmlrpc",
-      "--with-zlib=/usr",
-      "--with-readline=#{Formula["readline"].opt_prefix}",
-      "--without-gmp",
-      "--without-snmp",
+    args = %W[
+      --prefix=#{prefix}
+      --localstatedir=#{var}
+      --sysconfdir=#{config_path}
+      --with-config-file-path=#{config_path}
+      --with-config-file-scan-dir=#{config_path}/conf.d
+      --mandir=#{man}
+      --enable-bcmath
+      --enable-cgi
+      --enable-calendar
+      --enable-dba
+      --enable-exif
+      --enable-ftp
+      --enable-fpm
+      --enable-gd-native-ttf
+      --enable-intl
+      --enable-mbregex
+      --enable-mbstring
+      --enable-pcntl
+      --enable-phpdbg
+      --enable-phpdbg-webhelper
+      --enable-shmop
+      --enable-soap
+      --enable-sockets
+      --enable-sysvmsg
+      --enable-sysvsem
+      --enable-sysvshm
+      --enable-wddx
+      --enable-zip
+      --with-bz2=/usr
+      --with-freetype-dir=#{Formula["freetype"].opt_prefix}
+      --with-gmp=#{Formula["gmp"].opt_prefix}
+      --with-gd
+      --with-gettext=#{Formula["gettext"].opt_prefix}
+      --with-fpm-user=_www
+      --with-fpm-group=_www
+      --with-iconv-dir=/usr
+      --with-icu-dir=#{Formula["icu4c"].opt_prefix}
+      --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
+      --with-kerberos=/usr
+      --with-ldap
+      --with-ldap-sasl=/usr
+      --with-mhash
+      --with-mcrypt=#{Formula["mcrypt"].opt_prefix}
+      --with-mysql-sock=/tmp/mysql.sock
+      --with-mysqli=mysqlnd
+      --with-pdo-mysql=mysqlnd
+      --with-ndbm=/usr
+      --with-openssl=#{Formula["openssl"].opt_prefix}
+      --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
+      --with-png-dir=#{Formula["libpng"].opt_prefix}
+      --with-pspell=#{Formula["aspell"].opt_prefix}
+      --with-snmp=#{Formula["net-snmp"].opt_prefix}
+      --with-tidy=#{Formula["tidy-html5"].opt_prefix}
+      --with-xmlrpc
+      --with-zlib=/usr
+      --with-readline=#{Formula["readline"].opt_prefix}
+      --with-xsl=/usr
+      --without-gmp
+      --without-snmp
     ]
 
-    if build.include?("with-homebrew-libxml2") || MacOS.version < :lion || MacOS.version >= :el_capitan
+      # Belongs to fpm config
+      (prefix+"var/log").mkpath
+      touch prefix+"var/log/php-fpm.log"
+      plist_path.write plist
+      plist_path.chmod 0644
+
+    if build.with?("homebrew-libxml2") #|| MacOS.version < :lion || MacOS.version >= :el_capitan
       args << "--with-libxml-dir=#{Formula["libxml2"].opt_prefix}"
     end
 
     # Build PDO ODBC with unixODBC by default
-    unless build.without? "unixodbc"
+    if build.with? "unixodbc"
       args << "--with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}"
       args << "--with-unixODBC=#{Formula["unixodbc"].opt_prefix}"
     end
@@ -221,81 +223,27 @@ INFO
       args << "--libexecdir=#{libexec}"
     end
 
-    if build.with? "bz2"
-      args << "--with-bz2=/usr" if OS.mac?
+    if build.with? "debug-symbols"
+      args << "--enable-debug"
     end
 
-    if build.with? "debug"
-      args << "--enable-debug"
+    if build.with? "dtrace"
+      args << "--enable-dtrace"
     end
 
     if build.with? "enchant"
       args << "--with-enchant=#{Formula["enchant"].opt_prefix}"
     end
 
-    if build.include?("with-homebrew-libressl")
-      args << "--with-openssl=" + Formula["libressl"].opt_prefix.to_s
-    else
-      args << "--with-openssl=" + Formula["openssl"].opt_prefix.to_s
-    end
-
-    # Build PHP-FPM by default
-    if build_fpm?
-      args << "--enable-fpm"
-      args << "--with-fpm-user=_www"
-      args << "--with-fpm-group=_www"
-      (prefix+"var/log").mkpath
-      touch prefix+"var/log/php-fpm.log"
-      plist_path.write plist
-      plist_path.chmod 0644
-    elsif build.with? "cgi"
-      args << "--enable-cgi"
-    end
-
-    if build.include?("with-homebrew-curl") || MacOS.version < :lion
+    if build.with?("curl") #|| MacOS.version < :lion
       args << "--with-curl=#{Formula["curl"].opt_prefix}"
     else
       args << "--with-curl"
     end
 
-    if build.with? "homebrew-libxslt"
-      args << "--with-xsl=" + Formula["libxslt"].opt_prefix.to_s
-    elsif OS.mac?
-      args << "--with-xsl=/usr"
-    end
-
-    if build.with? "imap"
+    if build.with? "imap-uw"
       args << "--with-imap=#{Formula["imap-uw"].opt_prefix}"
-      args << "--with-imap-ssl=" + Formula["openssl"].opt_prefix.to_s
-    end
-
-    unless build.without? "ldap"
-      args << "--with-ldap"
-      args << "--with-ldap-sasl=/usr"
-    end
-
-    if build.with? "libmysql"
-      args << "--with-mysql-sock=/tmp/mysql.sock"
-      args << "--with-mysqli=#{HOMEBREW_PREFIX}/bin/mysql_config"
-      args << "--with-mysql=#{HOMEBREW_PREFIX}" unless (build.without? "legacy-mysql") || php_version.start_with?("7.")
-      args << "--with-pdo-mysql=#{HOMEBREW_PREFIX}"
-    elsif build.with? "mysql"
-      args << "--with-mysql-sock=/tmp/mysql.sock"
-      args << "--with-mysqli=mysqlnd"
-      args << "--with-mysql=mysqlnd" unless (build.without? "legacy-mysql") || php_version.start_with?("5.5", "5.6", "7.")
-      args << "--with-pdo-mysql=mysqlnd"
-    end
-
-    if build.with? "mssql"
-      args << "--with-mssql=#{Formula["freetds"].opt_prefix}"
-      args << "--with-pdo-dblib=#{Formula["freetds"].opt_prefix}"
-    end
-
-    # Do not build opcache by default; use a "phpxx-opcache" formula
-    args << "--disable-opcache" if php_version.start_with?("5.5", "5.6", "7.")
-
-    if build.with? "pcntl"
-      args << "--enable-pcntl"
+      args << "--with-imap-ssl=#{Formula["openssl"].opt_prefix}"
     end
 
     if build.with? "pdo-oci"
@@ -306,42 +254,20 @@ INFO
       end
     end
 
-    if build.without? "pear"
-      args << "--without-pear"
-    end
 
     if build.with? "postgresql"
-      if Formula["postgresql"].opt_prefix.directory?
-        args << "--with-pgsql=#{Formula["postgresql"].opt_prefix}"
-        args << "--with-pdo-pgsql=#{Formula["postgresql"].opt_prefix}"
-      else
-        args << "--with-pgsql=#{`pg_config --includedir`}"
-        args << "--with-pdo-pgsql=#{`which pg_config`}"
-      end
+      args << "--with-pgsql=#{Formula["postgresql"].opt_prefix}"
+      args << "--with-pdo-pgsql=#{Formula["postgresql"].opt_prefix}"
     end
 
-    unless php_version.start_with?("5.3")
-      # dtrace is not compatible with phpdbg: https://github.com/krakjoe/phpdbg/issues/38
-      if build.without? "phpdbg"
-        args << "--enable-dtrace"
-        args << "--disable-phpdbg"
-      else
-        args << "--enable-phpdbg"
-
-        if build.with? "debug"
-          args << "--enable-phpdbg-debug"
-        end
-      end
-
-      args << "--enable-zend-signals"
+    if build.with? "debug-symbols"
+      args << "--enable-phpdbg-debug"
+    else 
+       args << "--enable-phpdbg"
     end
 
     if build.with? "webp"
       args << "--with-webp-dir=#{Formula['webp'].opt_prefix}"
-    end
-
-    if build.with? "libvpx"
-      args << "--with-vpx-dir=#{Formula['libvpx'].opt_prefix}"
     end
 
     if build.with? "thread-safety"
@@ -352,7 +278,7 @@ INFO
   end
 
   def _install
-    system "./buildconf", "--force" if build.head?
+    system "./buildconf", "--force"
     system "./configure", *install_args
 
     if build.with?("httpd24") || build.with?("httpd22")
@@ -362,23 +288,26 @@ INFO
         "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4"
     end
 
+    # https://github.com/phpbrew/phpbrew/commit/18ef766d0e013ee87ac7d86e338ebec89fbeb445
+    # Unsure if this is still needed
     inreplace "Makefile" do |s|
       s.change_make_var! "EXTRA_LIBS", "\\1 -lstdc++"
     end
 
     system "make"
+    raise
     ENV.deparallelize # parallel install fails on some systems
-    system "make install"
+    system "make", "install"
 
     # Prefer relative symlink instead of absolute for relocatable bottles
     ln_s "phar.phar", bin+"phar", :force => true if File.exist? bin+"phar.phar"
 
     # Install new php.ini unless one exists
-    config_path.install default_config => "php.ini" unless File.exist? config_path+"php.ini"
+    config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
 
     chmod_R 0775, lib+"php"
 
-    system bin+"pear", "config-set", "php_ini", config_path+"php.ini", "system" unless skip_pear_config_set?
+    system bin+"pear", "config-set", "php_ini", config_path+"php.ini", "system"
 
     if build_fpm?
       if File.exist?("sapi/fpm/init.d.php-fpm")
@@ -406,12 +335,6 @@ INFO
 
         inreplace config_path+"php-fpm.conf" do |s|
           s.sub!(/^;?daemonize\s*=.+$/, "daemonize = no")
-          s.sub!(/^;include\s*=.+$/, ";include=#{config_path}/fpm.d/*.conf") if php_version.start_with?("5")
-          s.sub!(/^;?listen\.mode\s*=.+$/, "listen.mode = 0666") if php_version.start_with?("5")
-          s.sub!(/^;?pm\.max_children\s*=.+$/, "pm.max_children = 10") if php_version.start_with?("5")
-          s.sub!(/^;?pm\.start_servers\s*=.+$/, "pm.start_servers = 3") if php_version.start_with?("5")
-          s.sub!(/^;?pm\.min_spare_servers\s*=.+$/, "pm.min_spare_servers = 2") if php_version.start_with?("5")
-          s.sub!(/^;?pm\.max_spare_servers\s*=.+$/, "pm.max_spare_servers = 5") if php_version.start_with?("5")
         end
       end
     end
@@ -428,7 +351,6 @@ INFO
         EOS
       end
 
-      if php_version.start_with?("7.")
         s << <<-EOS.undent
           To enable PHP in Apache add the following to httpd.conf and restart Apache:
               LoadModule php7_module #{HOMEBREW_PREFIX}/opt/php#{php_version_path}/libexec/apache2/libphp7.so
@@ -440,12 +362,6 @@ INFO
           Finally, check DirectoryIndex includes index.php
               DirectoryIndex index.php index.html
         EOS
-      else
-        s << <<-EOS.undent
-          To enable PHP in Apache add the following to httpd.conf and restart Apache:
-              LoadModule php5_module #{HOMEBREW_PREFIX}/opt/php#{php_version_path}/libexec/apache2/libphp5.so
-        EOS
-      end
     end
 
     s << <<-EOS.undent
@@ -474,52 +390,7 @@ INFO
       PHP#{php_version_path} Extensions will always be compiled against this PHP. Please install them using --without-homebrew-php to enable compiling against system PHP.
     EOS
 
-    s << <<-EOS.undent
-      ✩✩✩✩ PHP CLI ✩✩✩✩
 
-      If you wish to swap the PHP you use on the command line, you should add the following to ~/.bashrc, ~/.zshrc, ~/.profile or your shell's equivalent configuration file:
-        export PATH="$(brew --prefix homebrew/php/php#{php_version.delete(".")})/bin:$PATH"
-    EOS
-
-    if build.include?("with-mcrypt")
-      s << <<-EOS.undent
-      ✩✩✩✩  Mcrypt ✩✩✩✩
-
-      mcrypt is no longer included by default, install it as a separate extension:
-
-          brew install php#{php_version_path}-mcrypt
-    EOS
-    end
-
-    if build.include?("enable-opcache")
-      s << <<-EOS.undent
-      ✩✩✩✩ Opcache ✩✩✩✩
-
-      opcache (PHP 5.5 and 5.6) is no longer included by default, install it as a separate extension:
-
-          brew install php#{php_version_path}-opcache
-    EOS
-    end
-
-    if build.include?("with-gmp")
-      s << <<-EOS.undent
-        GMP has moved to its own formula, please install it by running: brew install php#{php_version_path}-gmp
-      EOS
-    end
-
-    if build.include?("with-snmp")
-      s << <<-EOS.undent
-        SNMP has moved to its own formula, please install it by running: brew install php#{php_version_path}-snmp
-      EOS
-    end
-
-    if build.include?("with-tidy")
-      s << <<-EOS.undent
-        Tidy has moved to its own formula, please install it by running: brew install php#{php_version_path}-tidy
-      EOS
-    end
-
-    if build_fpm?
       s << <<-EOS.undent
         ✩✩✩✩ FPM ✩✩✩✩
 
@@ -530,33 +401,9 @@ INFO
 
         The control script is located at #{opt_sbin}/php#{php_version_path}-fpm
       EOS
-
-      if MacOS.version >= :mountain_lion
-        s << <<-EOS.undent
-          OS X 10.8 and newer come with php-fpm pre-installed, to ensure you are using the brew version you need to make sure #{HOMEBREW_PREFIX}/sbin is before /usr/sbin in your PATH:
-
-            PATH="#{HOMEBREW_PREFIX}/sbin:$PATH"
-        EOS
-      end
-
-      s << <<-EOS.undent
-        You may also need to edit the plist to use the correct "UserName".
-
-        Please note that the plist was called 'homebrew-php.josegonzalez.php#{php_version.delete(".")}.plist' in old versions of this formula.
-
-        With the release of macOS Sierra the Apache module is now not built by default. If you want to build it on your system you have to install php with the --with-httpd24 option. See  brew options php#{php_version_path} for more details.
-      EOS
-    end
+  
 
     s.join "\n"
-  end
-
-  test do
-    system "#{bin}/php -i"
-
-    if build_fpm?
-      system "#{sbin}/php-fpm -y #{config_path}/php-fpm.conf -t"
-    end
   end
 
   def plist; <<-EOPLIST.undent
@@ -588,5 +435,10 @@ INFO
     </dict>
     </plist>
     EOPLIST
+  end
+
+  test do
+    system "#{bin}/php", "-i"
+    system "#{sbin}/php-fpm", "-y", "#{config_path}/php-fpm.conf -t"
   end
 end
