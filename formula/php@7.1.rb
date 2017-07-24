@@ -44,7 +44,6 @@ class PhpAT71 < Formula
   depends_on "mysql" => :optional
   depends_on :postgresql => :optional
   depends_on "webp" => :optional
-
   depends_on "unixodbc" => :recommended # Uncertain why this option is here?
   depends_on "libtool" => :run #mcrypt requirement
   depends_on "aspell"
