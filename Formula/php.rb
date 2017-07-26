@@ -45,6 +45,7 @@ class Php < Formula
   depends_on "unixodbc" => :recommended # javian: Uncertain why this option is here?
   depends_on "libtool" => :run # javian: mcrypt requirement
   depends_on "aspell"
+  depends_on "argon2"
   depends_on "curl" if MacOS.version < :lion
   depends_on "freetds"
   depends_on "freetype"
@@ -155,6 +156,7 @@ INFO
         --with-pdo-mysql=mysqlnd
         --with-ndbm=/usr
         --with-openssl=#{Formula["openssl"].opt_prefix}
+        --with-password-argon2=#{Formula["argon2"].opt_prefix}
         --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
         --with-png-dir=#{Formula["libpng"].opt_prefix}
         --with-pspell=#{Formula["aspell"].opt_prefix}
