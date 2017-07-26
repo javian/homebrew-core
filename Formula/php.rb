@@ -1,4 +1,4 @@
-class PhpAT71 < Formula
+class Php < Formula
   desc "General-purpose scripting language"
   homepage "https://php.net"
   url "https://github.com/php/php-src/archive/php-7.1.7.tar.gz"
@@ -254,7 +254,6 @@ INFO
       end
     end
 
-
     if build.with? "postgresql"
       args << "--with-pgsql=#{Formula["postgresql"].opt_prefix}"
       args << "--with-pdo-pgsql=#{Formula["postgresql"].opt_prefix}"
@@ -406,33 +405,35 @@ INFO
     s.join "\n"
   end
 
+  plist_options :manual => "php-fpm --nodaemonize --fpm-config #{config_path}/php-fpm.conf"
+
   def plist; <<-EOPLIST.undent
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
-    <dict>
-      <key>KeepAlive</key>
-      <true/>
-      <key>Label</key>
-      <string>#{plist_name}</string>
-      <key>ProgramArguments</key>
-      <array>
-        <string>#{opt_sbin}/php-fpm</string>
-        <string>--nodaemonize</string>
-        <string>--fpm-config</string>
-        <string>#{config_path}/php-fpm.conf</string>
-      </array>
-      <key>RunAtLoad</key>
-      <true/>
-      <key>LaunchOnlyOnce</key>
-      <true/>
-      <key>UserName</key>
-      <string>#{`whoami`.chomp}</string>
-      <key>WorkingDirectory</key>
-      <string>#{var}</string>
-      <key>StandardErrorPath</key>
-      <string>#{opt_prefix}/var/log/php-fpm.log</string>
-    </dict>
+      <dict>
+        <key>KeepAlive</key>
+        <true/>
+        <key>Label</key>
+        <string>#{plist_name}</string>
+        <key>ProgramArguments</key>
+        <array>
+          <string>#{opt_sbin}/php-fpm</string>
+          <string>--nodaemonize</string>
+          <string>--fpm-config</string>
+          <string>#{config_path}/php-fpm.conf</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>LaunchOnlyOnce</key>
+        <true/>
+        <key>UserName</key>
+        <string>#{`whoami`.chomp}</string>
+        <key>WorkingDirectory</key>
+        <string>#{var}</string>
+        <key>StandardErrorPath</key>
+        <string>#{opt_prefix}/var/log/php-fpm.log</string>
+      </dict>
     </plist>
     EOPLIST
   end
