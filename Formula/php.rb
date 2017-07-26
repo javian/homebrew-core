@@ -369,19 +369,6 @@ INFO
       PHP#{php_version_path} Extensions will always be compiled against this PHP. Please install them using --without-homebrew-php to enable compiling against system PHP.
     EOS
 
-
-      s << <<-EOS.undent
-        ✩✩✩✩ FPM ✩✩✩✩
-
-        To launch php-fpm on startup:
-            mkdir -p ~/Library/LaunchAgents
-            cp #{opt_prefix}/#{plist_name}.plist ~/Library/LaunchAgents/
-            launchctl load -w ~/Library/LaunchAgents/#{plist_name}.plist
-
-        The control script is located at #{opt_sbin}/php#{php_version_path}-fpm
-      EOS
-  
-
     s.join "\n"
   end
 
