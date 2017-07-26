@@ -67,23 +67,12 @@ class Php < Formula
   # javian: is this still needed ?
   skip_clean "lib/php/.lock"
 
-  def config_path
-    etc+"php"+php_version
-  end
-
-  def home_path
-    File.expand_path("~")
-  end
-
-  def php_version
-    version.to_s[0..2]
-  end
-
-  def php_version_path
-    version.to_s[0..2].gsub(/\./,'')
-  end
-
   def install
+    php_version = version.to_s[0..2]
+    php_version_path = version.to_s[0..2].gsub(/\./,'')
+    config_path = etc+"php"+php_version
+    home_path = File.expand_path("~")
+
     # Not removing all pear.conf and .pearrc files from PHP path results in
     # the PHP configure not properly setting the pear binary to be installed
     config_pear = "#{config_path}/pear.conf"
@@ -104,201 +93,169 @@ INFO
     end
 
     begin
-      _install
-      rm_f("#{config_pear}-backup") if File.exist? "#{config_pear}-backup"
-      rm_f("#{user_pear}-backup") if File.exist? "#{user_pear}-backup"
-      rm_f("#{config_pearrc}-backup") if File.exist? "#{config_pearrc}-backup"
-      rm_f("#{user_pearrc}-backup") if File.exist? "#{user_pearrc}-backup"
-    rescue StandardError
-      mv("#{config_pear}-backup", config_pear) if File.exist? "#{config_pear}-backup"
-      mv("#{user_pear}-backup", user_pear) if File.exist? "#{user_pear}-backup"
-      mv("#{config_pearrc}-backup", config_pearrc) if File.exist? "#{config_pearrc}-backup"
-      mv("#{user_pearrc}-backup", user_pearrc) if File.exist? "#{user_pearrc}-backup"
-      raise
-    end
-  end
+      # Prevent PHP from harcoding sed shim path
+      ENV["lt_cv_path_SED"] = "sed"
 
-  def apache_apxs
-    if build.with?("httpd24") || build.with?("httpd22")
-      ["sbin", "bin"].each do |dir|
-        if File.exist?(location = "#{HOMEBREW_PREFIX}/#{dir}/apxs")
-          return location
+      args = %W[
+        --prefix=#{prefix}
+        --localstatedir=#{var}
+        --sysconfdir=#{config_path}
+        --with-config-file-path=#{config_path}
+        --with-config-file-scan-dir=#{config_path}/conf.d
+        --mandir=#{man}
+        --enable-bcmath
+        --enable-cgi
+        --enable-calendar
+        --enable-dba
+        --enable-exif
+        --enable-ftp
+        --enable-fpm
+        --enable-gd-native-ttf
+        --enable-intl
+        --enable-mbregex
+        --enable-mbstring
+        --enable-pcntl
+        --enable-phpdbg
+        --enable-phpdbg-webhelper
+        --enable-shmop
+        --enable-soap
+        --enable-sockets
+        --enable-sysvmsg
+        --enable-sysvsem
+        --enable-sysvshm
+        --enable-wddx
+        --enable-zip
+        --with-bz2=/usr
+        --with-freetype-dir=#{Formula["freetype"].opt_prefix}
+        --with-gmp=#{Formula["gmp"].opt_prefix}
+        --with-gd
+        --with-gettext=#{Formula["gettext"].opt_prefix}
+        --with-fpm-user=_www
+        --with-fpm-group=_www
+        --with-iconv-dir=/usr
+        --with-icu-dir=#{Formula["icu4c"].opt_prefix}
+        --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
+        --with-kerberos=/usr
+        --with-ldap
+        --with-ldap-sasl=/usr
+        --with-libxml-dir=/usr
+        --with-mhash
+        --with-mcrypt=#{Formula["mcrypt"].opt_prefix}
+        --with-mysql-sock=/tmp/mysql.sock
+        --with-mysqli=mysqlnd
+        --with-pdo-mysql=mysqlnd
+        --with-ndbm=/usr
+        --with-openssl=#{Formula["openssl"].opt_prefix}
+        --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
+        --with-png-dir=#{Formula["libpng"].opt_prefix}
+        --with-pspell=#{Formula["aspell"].opt_prefix}
+        --with-snmp
+        --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
+        --with-xmlrpc
+        --with-zlib=/usr
+        --with-libedit
+        --with-xsl=/usr
+        --without-gmp
+      ]
+
+        # Belongs to fpm config
+        (prefix+"var/log").mkpath
+        touch prefix+"var/log/php-fpm.log"
+        plist_path.write plist
+        plist_path.chmod 0644
+
+      # Build PDO ODBC with unixODBC by default
+      if build.with? "unixodbc"
+        args << "--with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}"
+        args << "--with-unixODBC=#{Formula["unixodbc"].opt_prefix}"
+      end
+
+      # Build Apache module by default
+      if build.with?("httpd24") || build.with?("httpd22")
+        args << "--with-apxs2=#{apache_apxs}"
+        args << "--libexecdir=#{libexec}"
+      end
+
+      if build.with? "debug-symbols"
+        args << "--enable-debug"
+      end
+
+      if build.with? "dtrace"
+        args << "--enable-dtrace"
+      end
+
+      if build.with? "enchant"
+        args << "--with-enchant=#{Formula["enchant"].opt_prefix}"
+      end
+
+      if build.with?("curl") #|| MacOS.version < :lion
+        args << "--with-curl=#{Formula["curl"].opt_prefix}"
+      else
+        args << "--with-curl"
+      end
+
+      if build.with? "imap-uw"
+        args << "--with-imap=#{Formula["imap-uw"].opt_prefix}"
+        args << "--with-imap-ssl=#{Formula["openssl"].opt_prefix}"
+      end
+
+      if build.with? "pdo-oci"
+        if ENV.key?("ORACLE_HOME")
+          args << "--with-pdo-oci=#{ENV["ORACLE_HOME"]}"
+        else
+          raise "Environmental variable ORACLE_HOME must be set to use --with-pdo-oci option."
         end
       end
-    else
-      "/usr/sbin/apxs"
-    end
-  end
 
-  def install_args
-    # Prevent PHP from harcoding sed shim path
-    ENV["lt_cv_path_SED"] = "sed"
-
-    args = %W[
-      --prefix=#{prefix}
-      --localstatedir=#{var}
-      --sysconfdir=#{config_path}
-      --with-config-file-path=#{config_path}
-      --with-config-file-scan-dir=#{config_path}/conf.d
-      --mandir=#{man}
-      --enable-bcmath
-      --enable-cgi
-      --enable-calendar
-      --enable-dba
-      --enable-exif
-      --enable-ftp
-      --enable-fpm
-      --enable-gd-native-ttf
-      --enable-intl
-      --enable-mbregex
-      --enable-mbstring
-      --enable-pcntl
-      --enable-phpdbg
-      --enable-phpdbg-webhelper
-      --enable-shmop
-      --enable-soap
-      --enable-sockets
-      --enable-sysvmsg
-      --enable-sysvsem
-      --enable-sysvshm
-      --enable-wddx
-      --enable-zip
-      --with-bz2=/usr
-      --with-freetype-dir=#{Formula["freetype"].opt_prefix}
-      --with-gmp=#{Formula["gmp"].opt_prefix}
-      --with-gd
-      --with-gettext=#{Formula["gettext"].opt_prefix}
-      --with-fpm-user=_www
-      --with-fpm-group=_www
-      --with-iconv-dir=/usr
-      --with-icu-dir=#{Formula["icu4c"].opt_prefix}
-      --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
-      --with-kerberos=/usr
-      --with-ldap
-      --with-ldap-sasl=/usr
-      --with-libxml-dir=/usr
-      --with-mhash
-      --with-mcrypt=#{Formula["mcrypt"].opt_prefix}
-      --with-mysql-sock=/tmp/mysql.sock
-      --with-mysqli=mysqlnd
-      --with-pdo-mysql=mysqlnd
-      --with-ndbm=/usr
-      --with-openssl=#{Formula["openssl"].opt_prefix}
-      --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
-      --with-png-dir=#{Formula["libpng"].opt_prefix}
-      --with-pspell=#{Formula["aspell"].opt_prefix}
-      --with-snmp
-      --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
-      --with-xmlrpc
-      --with-zlib=/usr
-      --with-libedit
-      --with-xsl=/usr
-      --without-gmp
-    ]
-
-      # Belongs to fpm config
-      (prefix+"var/log").mkpath
-      touch prefix+"var/log/php-fpm.log"
-      plist_path.write plist
-      plist_path.chmod 0644
-
-    # Build PDO ODBC with unixODBC by default
-    if build.with? "unixodbc"
-      args << "--with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}"
-      args << "--with-unixODBC=#{Formula["unixodbc"].opt_prefix}"
-    end
-
-    # Build Apache module by default
-    if build.with?("httpd24") || build.with?("httpd22")
-      args << "--with-apxs2=#{apache_apxs}"
-      args << "--libexecdir=#{libexec}"
-    end
-
-    if build.with? "debug-symbols"
-      args << "--enable-debug"
-    end
-
-    if build.with? "dtrace"
-      args << "--enable-dtrace"
-    end
-
-    if build.with? "enchant"
-      args << "--with-enchant=#{Formula["enchant"].opt_prefix}"
-    end
-
-    if build.with?("curl") #|| MacOS.version < :lion
-      args << "--with-curl=#{Formula["curl"].opt_prefix}"
-    else
-      args << "--with-curl"
-    end
-
-    if build.with? "imap-uw"
-      args << "--with-imap=#{Formula["imap-uw"].opt_prefix}"
-      args << "--with-imap-ssl=#{Formula["openssl"].opt_prefix}"
-    end
-
-    if build.with? "pdo-oci"
-      if ENV.key?("ORACLE_HOME")
-        args << "--with-pdo-oci=#{ENV["ORACLE_HOME"]}"
-      else
-        raise "Environmental variable ORACLE_HOME must be set to use --with-pdo-oci option."
+      if build.with? "postgresql"
+        args << "--with-pgsql=#{Formula["postgresql"].opt_prefix}"
+        args << "--with-pdo-pgsql=#{Formula["postgresql"].opt_prefix}"
       end
-    end
 
-    if build.with? "postgresql"
-      args << "--with-pgsql=#{Formula["postgresql"].opt_prefix}"
-      args << "--with-pdo-pgsql=#{Formula["postgresql"].opt_prefix}"
-    end
+      if build.with? "debug-symbols"
+        args << "--enable-phpdbg-debug"
+      else 
+         args << "--enable-phpdbg"
+      end
 
-    if build.with? "debug-symbols"
-      args << "--enable-phpdbg-debug"
-    else 
-       args << "--enable-phpdbg"
-    end
+      if build.with? "webp"
+        args << "--with-webp-dir=#{Formula['webp'].opt_prefix}"
+      end
 
-    if build.with? "webp"
-      args << "--with-webp-dir=#{Formula['webp'].opt_prefix}"
-    end
+      if build.with? "thread-safety"
+        args << "--enable-maintainer-zts"
+      end
 
-    if build.with? "thread-safety"
-      args << "--enable-maintainer-zts"
-    end
+      system "./buildconf", "--force"
+      system "./configure", args
 
-    args
-  end
+      if build.with?("httpd24") || build.with?("httpd22")
+        # Use Homebrew prefix for the Apache libexec folder
+        inreplace "Makefile",
+          /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+)$/,
+          "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4"
+      end
 
-  def _install
-    system "./buildconf", "--force"
-    system "./configure", *install_args
+      # https://github.com/phpbrew/phpbrew/commit/18ef766d0e013ee87ac7d86e338ebec89fbeb445
+      # Unsure if this is still needed
+      inreplace "Makefile" do |s|
+        s.change_make_var! "EXTRA_LIBS", "\\1 -lstdc++"
+      end
 
-    if build.with?("httpd24") || build.with?("httpd22")
-      # Use Homebrew prefix for the Apache libexec folder
-      inreplace "Makefile",
-        /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+)$/,
-        "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4"
-    end
+      system "make"
+      ENV.deparallelize # parallel install fails on some systems
+      system "make", "install"
 
-    # https://github.com/phpbrew/phpbrew/commit/18ef766d0e013ee87ac7d86e338ebec89fbeb445
-    # Unsure if this is still needed
-    inreplace "Makefile" do |s|
-      s.change_make_var! "EXTRA_LIBS", "\\1 -lstdc++"
-    end
+      # Prefer relative symlink instead of absolute for relocatable bottles
+      ln_s "phar.phar", bin+"phar", :force => true if File.exist? bin+"phar.phar"
 
-    system "make"
-    ENV.deparallelize # parallel install fails on some systems
-    system "make", "install"
+      # Install new php.ini unless one exists
+      config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
 
-    # Prefer relative symlink instead of absolute for relocatable bottles
-    ln_s "phar.phar", bin+"phar", :force => true if File.exist? bin+"phar.phar"
+      chmod_R 0775, lib+"php"
 
-    # Install new php.ini unless one exists
-    config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
+      system bin+"pear", "config-set", "php_ini", config_path+"php.ini", "system"
 
-    chmod_R 0775, lib+"php"
-
-    system bin+"pear", "config-set", "php_ini", config_path+"php.ini", "system"
-
-    if build_fpm?
       if File.exist?("sapi/fpm/init.d.php-fpm")
         chmod 0755, "sapi/fpm/init.d.php-fpm"
         sbin.install "sapi/fpm/init.d.php-fpm" => "php#{php_version_path}-fpm"
@@ -326,6 +283,29 @@ INFO
           s.sub!(/^;?daemonize\s*=.+$/, "daemonize = no")
         end
       end
+
+      rm_f("#{config_pear}-backup") if File.exist? "#{config_pear}-backup"
+      rm_f("#{user_pear}-backup") if File.exist? "#{user_pear}-backup"
+      rm_f("#{config_pearrc}-backup") if File.exist? "#{config_pearrc}-backup"
+      rm_f("#{user_pearrc}-backup") if File.exist? "#{user_pearrc}-backup"
+    rescue StandardError
+      mv("#{config_pear}-backup", config_pear) if File.exist? "#{config_pear}-backup"
+      mv("#{user_pear}-backup", user_pear) if File.exist? "#{user_pear}-backup"
+      mv("#{config_pearrc}-backup", config_pearrc) if File.exist? "#{config_pearrc}-backup"
+      mv("#{user_pearrc}-backup", user_pearrc) if File.exist? "#{user_pearrc}-backup"
+      raise
+    end
+  end
+
+  def apache_apxs
+    if build.with?("httpd24") || build.with?("httpd22")
+      ["sbin", "bin"].each do |dir|
+        if File.exist?(location = "#{HOMEBREW_PREFIX}/#{dir}/apxs")
+          return location
+        end
+      end
+    else
+      "/usr/sbin/apxs"
     end
   end
 
@@ -395,7 +375,7 @@ INFO
     s.join "\n"
   end
 
-  plist_options :manual => "php-fpm --nodaemonize --fpm-config #{config_path}/php-fpm.conf"
+  plist_options :manual => "php-fpm --nodaemonize" # needed ? --fpm-config #{config_path}/php-fpm.conf
 
   def plist; <<-EOPLIST.undent
     <?xml version="1.0" encoding="UTF-8"?>
