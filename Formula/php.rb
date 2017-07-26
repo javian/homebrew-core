@@ -28,7 +28,6 @@ class Php < Formula
   option "with-dtrace", "Build with DTrace support"
 
   # javian: Not yet checked these options
-  option "with-homebrew-libxml2", "Include Libxml2 support via Homebrew"
   option "with-pdo-oci", "Include Oracle databases (requries ORACLE_HOME be set)"
   option "without-ldap", "Build without LDAP support"
   option "without-mysql", "Remove MySQL/MariaDB support" # Mysql is optional below, should it be part of the default build ? Can we rely on osx mysql ?
@@ -75,10 +74,15 @@ class Php < Formula
     version.to_s[0..2]
   end
 
-  def install
-    php_version_path = version.to_s[0..2].gsub(/\./,'')
-    home_path = File.expand_path("~")
+  def php_version_path
+    version.to_s[0..2].gsub(/\./,'')
+  end
 
+  def home_path
+    File.expand_path("~")
+  end
+
+  def install
     # Not removing all pear.conf and .pearrc files from PHP path results in
     # the PHP configure not properly setting the pear binary to be installed
     config_pear = "#{config_path}/pear.conf"
