@@ -67,10 +67,16 @@ class Php < Formula
   # javian: is this still needed ?
   skip_clean "lib/php/.lock"
 
+  def config_path
+    etc+"php"+php_version
+  end
+
+  def php_version
+    version.to_s[0..2]
+  end
+
   def install
-    php_version = version.to_s[0..2]
     php_version_path = version.to_s[0..2].gsub(/\./,'')
-    config_path = etc+"php"+php_version
     home_path = File.expand_path("~")
 
     # Not removing all pear.conf and .pearrc files from PHP path results in
@@ -158,11 +164,11 @@ INFO
         --without-gmp
       ]
 
-        # Belongs to fpm config
-        (prefix+"var/log").mkpath
-        touch prefix+"var/log/php-fpm.log"
-        plist_path.write plist
-        plist_path.chmod 0644
+      # Belongs to fpm config
+      (prefix+"var/log").mkpath
+      touch prefix+"var/log/php-fpm.log"
+      plist_path.write plist
+      plist_path.chmod 0644
 
       # Build PDO ODBC with unixODBC by default
       if build.with? "unixodbc"
@@ -227,7 +233,7 @@ INFO
       end
 
       system "./buildconf", "--force"
-      system "./configure", args
+      system "./configure", *args
 
       if build.with?("httpd24") || build.with?("httpd22")
         # Use Homebrew prefix for the Apache libexec folder
