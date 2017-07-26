@@ -48,7 +48,7 @@ class Php < Formula
   depends_on "unixodbc" => :recommended # javian: Uncertain why this option is here?
   depends_on "libtool" => :run # javian: mcrypt requirement
   depends_on "aspell"
-  depends_on "curl" => if MacOS.version < :lion
+  depends_on "curl" if MacOS.version < :lion
   depends_on "freetds"
   depends_on "freetype"
   depends_on "gettext"
@@ -56,7 +56,6 @@ class Php < Formula
   depends_on "icu4c"
   depends_on "jpeg"
   depends_on "libpng"
-  depends_on "libxml2"
   depends_on "mcrypt"
   depends_on "net-snmp"
   depends_on "openssl"
@@ -177,7 +176,7 @@ INFO
       --with-kerberos=/usr
       --with-ldap
       --with-ldap-sasl=/usr
-      --with-libxml-dir=#{Formula["libxml2"].opt_prefix}
+      --with-libxml-dir=/usr
       --with-mhash
       --with-mcrypt=#{Formula["mcrypt"].opt_prefix}
       --with-mysql-sock=/tmp/mysql.sock
