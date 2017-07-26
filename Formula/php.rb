@@ -42,7 +42,6 @@ class Php < Formula
   depends_on "homebrew/apache/httpd24" => :optional
   depends_on "homebrew/apache/httpd22" => :optional
   depends_on "imap-uw" => :optional
-  depends_on "libxml2" => :optional # || MacOS.version < :lion || MacOS.version >= :el_capitan
   depends_on "mysql" => :optional
   depends_on :postgresql => :optional
   depends_on "webp" => :optional
@@ -57,6 +56,7 @@ class Php < Formula
   depends_on "icu4c"
   depends_on "jpeg"
   depends_on "libpng"
+  depends_on "libxml2"
   depends_on "mcrypt"
   depends_on "net-snmp"
   depends_on "openssl"
@@ -177,6 +177,7 @@ INFO
       --with-kerberos=/usr
       --with-ldap
       --with-ldap-sasl=/usr
+      --with-libxml-dir=#{Formula["libxml2"].opt_prefix}
       --with-mhash
       --with-mcrypt=#{Formula["mcrypt"].opt_prefix}
       --with-mysql-sock=/tmp/mysql.sock
@@ -201,10 +202,6 @@ INFO
       touch prefix+"var/log/php-fpm.log"
       plist_path.write plist
       plist_path.chmod 0644
-
-    if build.with?("homebrew-libxml2") #|| MacOS.version < :lion || MacOS.version >= :el_capitan
-      args << "--with-libxml-dir=#{Formula["libxml2"].opt_prefix}"
-    end
 
     # Build PDO ODBC with unixODBC by default
     if build.with? "unixodbc"
