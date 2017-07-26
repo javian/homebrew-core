@@ -4,7 +4,7 @@ class PhpAT71 < Formula
   url "https://github.com/php/php-src/archive/php-7.1.7.tar.gz"
   sha256 "fc57fde1df31e34fc6d58ea4ec477429d3663187391e2b307444b532dc18550d"
 
-  # javian: not sure about the origin of this so I'll keep it commented for now
+  # javian: not sure about the origin of this so I'll keep it commented for now. Could it have something to do with building extensions ?
   # So PHP extensions don't report missing symbols
   #skip_clean "bin", "sbin"
 
@@ -13,7 +13,10 @@ class PhpAT71 < Formula
   # ldap extension: I have a vague recollection that this caused some issues that were resolved with exluding it. needs to be checked.
   # According to php docs enchant requires aspell as a dep, should not be an issue since aspell is required.
   # Need to add tests for all supported SAPIs
-  # Should we remove --with-pdo-dblib from formula ? (mssql support is long gone and as far as I can tell this is the only purpose and would also exclude a dep, freetds)
+  # Should we remove --with-pdo-dblib from formula ? (mssql support is long gone and as far as I can tell this is the 
+  #  only purpose and would also exclude a dep, freetds)
+  # How should the Formula handle the apache module ? Sierra (have not checked high sierra) can't support building it for the OS 
+  #   (without manually fiddling with link in the file system) with the bundles tools
 
   option "with-curl", "Use Homebrew's version of cURL library"
   option "with-debug-symbols", "Compile with debugging symbols"
