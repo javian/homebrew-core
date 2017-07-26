@@ -38,7 +38,6 @@ class Php < Formula
   depends_on "bison@2.7" => :build
   depends_on "flex" => :build
   depends_on "re2c" => :build
-  depends_on "curl" => :optional # || MacOS.version < :lion
   depends_on "enchant" => :optional
   depends_on "homebrew/apache/httpd24" => :optional
   depends_on "homebrew/apache/httpd22" => :optional
@@ -50,6 +49,7 @@ class Php < Formula
   depends_on "unixodbc" => :recommended # javian: Uncertain why this option is here?
   depends_on "libtool" => :run # javian: mcrypt requirement
   depends_on "aspell"
+  depends_on "curl" => if MacOS.version < :lion
   depends_on "freetds"
   depends_on "freetype"
   depends_on "gettext"
