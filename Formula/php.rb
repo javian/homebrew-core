@@ -24,7 +24,6 @@ class Php < Formula
   option "with-httpd22", "Enable building of shared Apache 2.2 Handler module"
   option "with-imap-uw", "Build IMAP extension"
   option "with-thread-safety", "Build with thread safety"
-  option "with-dtrace", "Build with DTrace support"
 
   # javian: Not yet checked these options
   option "with-pdo-oci", "Include Oracle databases (requries ORACLE_HOME be set)"
@@ -116,6 +115,7 @@ INFO
         --enable-cgi
         --enable-calendar
         --enable-dba
+        --enable-dtrace
         --enable-exif
         --enable-ftp
         --enable-fpm
@@ -187,10 +187,6 @@ INFO
 
       if build.with? "debug-symbols"
         args << "--enable-debug"
-      end
-
-      if build.with? "dtrace"
-        args << "--enable-dtrace"
       end
 
       if build.with? "enchant"
