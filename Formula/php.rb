@@ -18,7 +18,6 @@ class Php < Formula
   # How should the Formula handle the apache module ? Sierra (have not checked high sierra) can't support building it for the OS 
   #   (without manually fiddling with link in the file system) with the bundles tools
 
-  option "with-curl", "Use Homebrew's version of cURL library"
   option "with-debug-symbols", "Compile with debugging symbols"
   option "with-freetds", "Build MSSQL-DB support extension"
   option "with-httpd24", "Enable building of shared Apache 2.4 Handler module"
