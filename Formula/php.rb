@@ -85,11 +85,6 @@ class Php < Formula
   end
 
   def install
-
-    # Ensure this php has a version specified
-    ohai php_version
-    ohai php_version_path
-
     # Not removing all pear.conf and .pearrc files from PHP path results in
     # the PHP configure not properly setting the pear binary to be installed
     config_pear = "#{config_path}/pear.conf"
@@ -294,7 +289,6 @@ INFO
     end
 
     system "make"
-    raise
     ENV.deparallelize # parallel install fails on some systems
     system "make", "install"
 
