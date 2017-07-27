@@ -42,7 +42,6 @@ class Php < Formula
   depends_on :mysql => :optional
   depends_on :postgresql => :optional
   depends_on "webp" => :optional
-  depends_on "unixodbc" => :recommended # javian: Uncertain why this option is here?
   depends_on "libtool" => :run # javian: mcrypt requirement
   depends_on "aspell"
   depends_on "argon2"
@@ -59,6 +58,7 @@ class Php < Formula
   depends_on "openssl"
   depends_on "pcre"
   depends_on "tidy-html5"
+  depends_on "unixodbc"
 
   # Fixes the pear .lock permissions issue that keeps it from operating correctly.
   # Thanks mistym & #machomebrew
@@ -154,6 +154,7 @@ INFO
         --with-mysql-sock=/tmp/mysql.sock
         --with-mysqli=mysqlnd
         --with-pdo-mysql=mysqlnd
+        --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
         --with-ndbm=/usr
         --with-openssl=#{Formula["openssl"].opt_prefix}
         --with-password-argon2=#{Formula["argon2"].opt_prefix}
@@ -162,6 +163,7 @@ INFO
         --with-pspell=#{Formula["aspell"].opt_prefix}
         --with-snmp
         --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
+        --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
         --with-xmlrpc
         --with-zlib=/usr
         --with-libedit
@@ -174,12 +176,6 @@ INFO
       touch prefix+"var/log/php-fpm.log"
       plist_path.write plist
       plist_path.chmod 0644
-
-      # Build PDO ODBC with unixODBC by default
-      if build.with? "unixodbc"
-        args << "--with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}"
-        args << "--with-unixODBC=#{Formula["unixodbc"].opt_prefix}"
-      end
 
       # Build Apache module by default
       if build.with?("httpd24") || build.with?("httpd22")
