@@ -39,7 +39,6 @@ class Php < Formula
   depends_on "homebrew/apache/httpd24" => :optional
   depends_on "homebrew/apache/httpd22" => :optional
   depends_on "imap-uw" => :optional
-  depends_on :mysql => :optional
   depends_on :postgresql => :optional
   depends_on "webp" => :optional
   depends_on "libtool" => :run # javian: mcrypt requirement
@@ -124,6 +123,7 @@ INFO
         --enable-intl
         --enable-mbregex
         --enable-mbstring
+        --enable-mysqlnd
         --enable-pcntl
         --enable-phpdbg
         --enable-phpdbg-webhelper
