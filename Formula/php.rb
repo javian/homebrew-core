@@ -28,7 +28,6 @@ class Php < Formula
   # javian: Not yet checked these options
   option "with-pdo-oci", "Include Oracle databases (requries ORACLE_HOME be set)"
   option "without-ldap", "Build without LDAP support"
-  option "without-mysql", "Remove MySQL/MariaDB support" # Mysql is optional below, should it be part of the default build ? Can we rely on osx mysql ?
   option "without-unixodbc", "Build without unixODBC support"
 
   depends_on "autoconf" => :build
