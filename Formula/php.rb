@@ -38,7 +38,6 @@ class Php < Formula
   depends_on "homebrew/apache/httpd24" => :optional
   depends_on "homebrew/apache/httpd22" => :optional
   depends_on "imap-uw" => :optional
-  depends_on :postgresql => :optional
   depends_on "webp" => :optional
   depends_on "libtool" => :run # javian: mcrypt requirement
   depends_on "aspell"
@@ -57,6 +56,11 @@ class Php < Formula
   depends_on "pcre"
   depends_on "tidy-html5"
   depends_on "unixodbc"
+
+  resource "libpq" do
+    url "https://ftp.postgresql.org/pub/source/v9.6.3/postgresql-9.6.3.tar.bz2"
+    sha256 "1645b3736901f6d854e695a937389e68ff2066ce0cde9d73919d6ab7c995b9c6"
+  end
 
   # Fixes the pear .lock permissions issue that keeps it from operating correctly.
   # Thanks mistym & #machomebrew
@@ -102,6 +106,16 @@ INFO
     begin
       # Prevent PHP from harcoding sed shim path
       ENV["lt_cv_path_SED"] = "sed"
+
+      resource("libpq").stage do
+        system "./configure", "--disable-debug",
+                              "--prefix=#{libexec}/libpq",
+                              "--with-openssl"
+        system "make"
+        system "make", "-C", "src/bin", "install"
+        system "make", "-C", "src/include", "install"
+        system "make", "-C", "src/interfaces", "install"
+      end
 
       args = %W[
         --prefix=#{prefix}
@@ -158,6 +172,8 @@ INFO
         --with-openssl=#{Formula["openssl"].opt_prefix}
         --with-password-argon2=#{Formula["argon2"].opt_prefix}
         --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
+        --with-pdo-pgsql=#{libexec}/libpq
+        --with-pgsql=#{libexec}/libpq
         --with-png-dir=#{Formula["libpng"].opt_prefix}
         --with-pspell=#{Formula["aspell"].opt_prefix}
         --with-snmp
@@ -207,11 +223,6 @@ INFO
         else
           raise "Environmental variable ORACLE_HOME must be set to use --with-pdo-oci option."
         end
-      end
-
-      if build.with? "postgresql"
-        args << "--with-pgsql=#{Formula["postgresql"].opt_prefix}"
-        args << "--with-pdo-pgsql=#{Formula["postgresql"].opt_prefix}"
       end
 
       if build.with? "debug-symbols"
