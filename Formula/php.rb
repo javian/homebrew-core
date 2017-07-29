@@ -19,7 +19,6 @@ class Php < Formula
   #   (without manually fiddling with link in the file system) with the bundles tools
 
   option "with-debug-symbols", "Compile with debugging symbols"
-  option "with-freetds", "Build MSSQL-DB support extension"
   option "with-httpd24", "Enable building of shared Apache 2.4 Handler module"
   option "with-httpd22", "Enable building of shared Apache 2.2 Handler module"
   option "with-imap-uw", "Build IMAP extension"
