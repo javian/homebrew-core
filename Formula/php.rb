@@ -25,7 +25,7 @@ class Php < Formula
   option "with-thread-safety", "Build with thread safety"
 
   # javian: Not yet checked these options
-  option "with-pdo-oci", "Include Oracle databases (requries ORACLE_HOME be set)"
+  option "with-pdo-oci", "Include Oracle databases (requries ORACLE_HOME to be set)"
   option "without-ldap", "Build without LDAP support"
   option "without-unixodbc", "Build without unixODBC support"
 
