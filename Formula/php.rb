@@ -34,7 +34,6 @@ class Php < Formula
   depends_on "bison" => :build
   depends_on "flex" => :build
   depends_on "re2c" => :build
-  depends_on "enchant" => :optional
   depends_on "homebrew/apache/httpd24" => :optional
   depends_on "homebrew/apache/httpd22" => :optional
   depends_on "imap-uw" => :optional
@@ -42,6 +41,7 @@ class Php < Formula
   depends_on "aspell"
   depends_on "argon2"
   depends_on "curl" if MacOS.version < :lion
+  depends_on "enchant"
   depends_on "freetds"
   depends_on "freetype"
   depends_on "gettext"
@@ -149,6 +149,7 @@ INFO
         --enable-wddx
         --enable-zip
         --with-bz2=/usr
+        --with-enchant=#{Formula["enchant"].opt_prefix}
         --with-freetype-dir=#{Formula["freetype"].opt_prefix}
         --with-gmp=#{Formula["gmp"].opt_prefix}
         --with-gd
@@ -203,11 +204,7 @@ INFO
         args << "--enable-debug"
       end
 
-      if build.with? "enchant"
-        args << "--with-enchant=#{Formula["enchant"].opt_prefix}"
-      end
-
-      if build.with?("curl") #|| MacOS.version < :lion
+      if MacOS.version < :lion
         args << "--with-curl=#{Formula["curl"].opt_prefix}"
       else
         args << "--with-curl"
