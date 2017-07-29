@@ -38,7 +38,6 @@ class Php < Formula
   depends_on "homebrew/apache/httpd24" => :optional
   depends_on "homebrew/apache/httpd22" => :optional
   depends_on "imap-uw" => :optional
-  depends_on "webp" => :optional
   depends_on "libtool" => :run # javian: mcrypt requirement
   depends_on "aspell"
   depends_on "argon2"
@@ -56,6 +55,7 @@ class Php < Formula
   depends_on "pcre"
   depends_on "tidy-html5"
   depends_on "unixodbc"
+  depends_on "webp"
 
   resource "libpq" do
     url "https://ftp.postgresql.org/pub/source/v9.6.3/postgresql-9.6.3.tar.bz2"
@@ -179,6 +179,7 @@ INFO
         --with-snmp
         --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
         --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
+        --with-webp-dir=#{Formula["webp"].opt_prefix}
         --with-xmlrpc
         --with-zlib=/usr
         --with-libedit
@@ -229,10 +230,6 @@ INFO
         args << "--enable-phpdbg-debug"
       else 
          args << "--enable-phpdbg"
-      end
-
-      if build.with? "webp"
-        args << "--with-webp-dir=#{Formula['webp'].opt_prefix}"
       end
 
       if build.with? "thread-safety"
