@@ -6,16 +6,16 @@ class Php < Formula
 
   # javian: not sure about the origin of this so I'll keep it commented for now. Could it have something to do with building extensions ?
   # So PHP extensions don't report missing symbols
-  #skip_clean "bin", "sbin"
+  # skip_clean "bin", "sbin"
 
   # TODO
   # Opcache default config file is included in extension formula, is it needed ?
   # ldap extension: I have a vague recollection that this caused some issues that were resolved with exluding it. needs to be checked.
   # According to php docs enchant requires aspell as a dep, should not be an issue since aspell is required.
   # Need to add tests for all supported SAPIs
-  # Should we remove --with-pdo-dblib from formula ? (mssql support is long gone and as far as I can tell this is the 
+  # Should we remove --with-pdo-dblib from formula ? (mssql support is long gone and as far as I can tell this is the
   #  only purpose and would also exclude a dep, freetds)
-  # How should the Formula handle the apache module ? Sierra (have not checked high sierra) can't support building it for the OS 
+  # How should the Formula handle the apache module ? Sierra (have not checked high sierra) can't support building it for the OS
   #   (without manually fiddling with link in the file system) with the bundles tools
 
   option "with-httpd24", "Enable building of shared Apache 2.4 Handler module"
@@ -74,7 +74,7 @@ class Php < Formula
   end
 
   def php_version_path
-    version.to_s[0..2].gsub(/\./,'')
+    version.to_s[0..2].delete(".")
   end
 
   def home_path
@@ -91,9 +91,9 @@ class Php < Formula
     if File.exist?(config_pear) || File.exist?(user_pear) || File.exist?(config_pearrc) || File.exist?(user_pearrc)
       opoo "Backing up all known pear.conf and .pearrc files"
       opoo <<-INFO
-If you have a pre-existing pear install outside
-         of homebrew-php, or you are using a non-standard
-         pear.conf location, installation may fail.
+        If you have a pre-existing pear install outside
+        of homebrew-php, or you are using a non-standard
+        pear.conf location, installation may fail.
 INFO
       mv(config_pear, "#{config_pear}-backup") if File.exist? config_pear
       mv(user_pear, "#{user_pear}-backup") if File.exist? user_pear
@@ -217,9 +217,7 @@ INFO
         end
       end
 
-      if build.with? "thread-safety"
-        args << "--enable-maintainer-zts"
-      end
+      args << "--enable-maintainer-zts" if build.with? "thread-safety"
 
       system "./buildconf", "--force"
       system "./configure", *args
@@ -315,17 +313,17 @@ INFO
         EOS
       end
 
-        s << <<-EOS.undent
-          To enable PHP in Apache add the following to httpd.conf and restart Apache:
-              LoadModule php7_module #{HOMEBREW_PREFIX}/opt/php#{php_version_path}/libexec/apache2/libphp7.so
+      s << <<-EOS.undent
+        To enable PHP in Apache add the following to httpd.conf and restart Apache:
+            LoadModule php7_module #{HOMEBREW_PREFIX}/opt/php#{php_version_path}/libexec/apache2/libphp7.so
 
-              <FilesMatch \.php$>
-                  SetHandler application/x-httpd-php
-              </FilesMatch>
+            <FilesMatch \.php$>
+                SetHandler application/x-httpd-php
+            </FilesMatch>
 
-          Finally, check DirectoryIndex includes index.php
-              DirectoryIndex index.php index.html
-        EOS
+        Finally, check DirectoryIndex includes index.php
+            DirectoryIndex index.php index.html
+      EOS
     end
 
     s << <<-EOS.undent
