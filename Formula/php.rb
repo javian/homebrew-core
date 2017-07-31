@@ -19,7 +19,6 @@ class Php < Formula
   #   (without manually fiddling with link in the file system) with the bundles tools
 
   option "with-httpd24", "Enable building of shared Apache 2.4 Handler module"
-  option "with-httpd22", "Enable building of shared Apache 2.2 Handler module"
   option "with-imap-uw", "Build IMAP extension"
   option "with-thread-safety", "Build with thread safety"
 
@@ -32,8 +31,6 @@ class Php < Formula
   depends_on "bison" => :build
   depends_on "flex" => :build
   depends_on "re2c" => :build
-  depends_on "homebrew/apache/httpd24" => :optional
-  depends_on "homebrew/apache/httpd22" => :optional
   depends_on "imap-uw" => :optional
   depends_on "libtool" => :run # javian: mcrypt requirement
   depends_on "aspell"
@@ -44,6 +41,7 @@ class Php < Formula
   depends_on "freetype"
   depends_on "gettext"
   depends_on "gmp"
+  depends_on "homebrew/apache/httpd24"
   depends_on "icu4c"
   depends_on "jpeg"
   depends_on "libpng"
@@ -193,7 +191,7 @@ INFO
       plist_path.chmod 0644
 
       # Build Apache module by default
-      if build.with?("httpd24") || build.with?("httpd22")
+      if build.with?("httpd24")
         args << "--with-apxs2=#{apache_apxs}"
         args << "--libexecdir=#{libexec}"
       end
@@ -222,7 +220,7 @@ INFO
       system "./buildconf", "--force"
       system "./configure", *args
 
-      if build.with?("httpd24") || build.with?("httpd22")
+      if build.with?("httpd24")
         # Use Homebrew prefix for the Apache libexec folder
         inreplace "Makefile",
           /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+)$/,
@@ -291,7 +289,7 @@ INFO
   end
 
   def apache_apxs
-    if build.with?("httpd24") || build.with?("httpd22")
+    if build.with?("httpd24")
       ["sbin", "bin"].each do |dir|
         if File.exist?(location = "#{HOMEBREW_PREFIX}/#{dir}/apxs")
           return location
@@ -305,14 +303,7 @@ INFO
   def caveats
     s = []
 
-    if build.with?("httpd24") || build.with?("httpd22")
-      if MacOS.version <= :leopard
-        s << <<-EOS.undent
-          For 10.5 and Apache:
-              Apache needs to run in 32-bit mode. You can either force Apache to start in 32-bit mode or you can thin the Apache executable.
-        EOS
-      end
-
+    if build.with?("httpd24")
       s << <<-EOS.undent
         To enable PHP in Apache add the following to httpd.conf and restart Apache:
             LoadModule php7_module #{HOMEBREW_PREFIX}/opt/php#{php_version_path}/libexec/apache2/libphp7.so
