@@ -18,7 +18,6 @@ class Php < Formula
   # How should the Formula handle the apache module ? Sierra (have not checked high sierra) can't support building it for the OS 
   #   (without manually fiddling with link in the file system) with the bundles tools
 
-  option "with-debug-symbols", "Compile with debugging symbols"
   option "with-httpd24", "Enable building of shared Apache 2.4 Handler module"
   option "with-httpd22", "Enable building of shared Apache 2.2 Handler module"
   option "with-imap-uw", "Build IMAP extension"
@@ -199,10 +198,6 @@ INFO
         args << "--libexecdir=#{libexec}"
       end
 
-      if build.with? "debug-symbols"
-        args << "--enable-debug"
-      end
-
       if MacOS.version < :lion
         args << "--with-curl=#{Formula["curl"].opt_prefix}"
       else
@@ -220,12 +215,6 @@ INFO
         else
           raise "Environmental variable ORACLE_HOME must be set to use --with-pdo-oci option."
         end
-      end
-
-      if build.with? "debug-symbols"
-        args << "--enable-phpdbg-debug"
-      else 
-         args << "--enable-phpdbg"
       end
 
       if build.with? "thread-safety"
