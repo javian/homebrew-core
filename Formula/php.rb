@@ -18,7 +18,7 @@ class Php < Formula
   # How should the Formula handle the apache module ? Sierra (have not checked high sierra) can't support building it for the OS
   #   (without manually fiddling with link in the file system) with the bundles tools
 
-  option "with-imap-uw", "Build IMAP extension"
+  option "with-imap-uw", "Build PHP IMAP extension"
   option "with-thread-safety", "Build with thread safety"
 
   # javian: Not yet checked these options
