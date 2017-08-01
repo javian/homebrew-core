@@ -18,7 +18,6 @@ class Php < Formula
   # How should the Formula handle the apache module ? Sierra (have not checked high sierra) can't support building it for the OS
   #   (without manually fiddling with link in the file system) with the bundles tools
 
-  option "with-httpd24", "Enable building of shared Apache 2.4 Handler module"
   option "with-imap-uw", "Build IMAP extension"
   option "with-thread-safety", "Build with thread safety"
 
@@ -345,7 +344,7 @@ INFO
     s.join "\n"
   end
 
-  plist_options :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}}/php-fpm.conf"
+  plist_options :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}/php-fpm.conf"
 
   def plist; <<-EOPLIST.undent
     <?xml version="1.0" encoding="UTF-8"?>
