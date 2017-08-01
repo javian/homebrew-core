@@ -29,7 +29,6 @@ class Php < Formula
 
   depends_on "autoconf" => :build
   depends_on "bison" => :build
-  depends_on "flex" => :build
   depends_on "re2c" => :build
   depends_on "imap-uw" => :optional
   depends_on "libtool" => :run # javian: mcrypt requirement
