@@ -345,7 +345,7 @@ INFO
     s.join "\n"
   end
 
-  plist_options :manual => "php-fpm --nodaemonize" # needed ? --fpm-config #{config_path}/php-fpm.conf
+  plist_options :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}}/php-fpm.conf"
 
   def plist; <<-EOPLIST.undent
     <?xml version="1.0" encoding="UTF-8"?>
