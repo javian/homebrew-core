@@ -380,6 +380,6 @@ INFO
 
   test do
     system "#{bin}/php", "-i"
-    system "#{sbin}/php-fpm", "-y", "#{config_path}/php-fpm.conf -t"
+    system "#{sbin}/php-fpm", "-y", "#{config_path}/php-fpm.conf", "-t"
   end
 end
