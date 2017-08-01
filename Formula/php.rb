@@ -1,8 +1,8 @@
 class Php < Formula
   desc "General-purpose scripting language"
   homepage "https://php.net"
-  url "https://github.com/php/php-src/archive/php-7.1.7.tar.gz"
-  sha256 "fc57fde1df31e34fc6d58ea4ec477429d3663187391e2b307444b532dc18550d"
+  url "https://github.com/php/php-src/archive/php-7.1.8.tar.gz"
+  sha256 "f3be4262203fa9db3d126832a1632e9a80e52e313f4230218c392d6a9178c368"
 
   # javian: not sure about the origin of this so I'll keep it commented for now. Could it have something to do with building extensions ?
   # So PHP extensions don't report missing symbols
