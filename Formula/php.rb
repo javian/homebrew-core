@@ -142,6 +142,8 @@ INFO
         --enable-sysvshm
         --enable-wddx
         --enable-zip
+        --libexecdir=#{libexec}
+        --with-apxs2=#{Formula["httpd24"].opt_prefix}/bin/apxs
         --with-bz2=/usr
         --with-enchant=#{Formula["enchant"].opt_prefix}
         --with-freetype-dir=#{Formula["freetype"].opt_prefix}
@@ -188,12 +190,6 @@ INFO
       plist_path.write plist
       plist_path.chmod 0644
 
-      # Build Apache module by default
-      if build.with?("httpd24")
-        args << "--with-apxs2=#{apache_apxs}"
-        args << "--libexecdir=#{libexec}"
-      end
-
       if MacOS.version < :lion
         args << "--with-curl=#{Formula["curl"].opt_prefix}"
       else
@@ -218,12 +214,9 @@ INFO
       system "./buildconf", "--force"
       system "./configure", *args
 
-      if build.with?("httpd24")
-        # Use Homebrew prefix for the Apache libexec folder
-        inreplace "Makefile",
-          /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+)$/,
-          "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4"
-      end
+      inreplace "Makefile",
+        /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+)$/,
+        "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4"
 
       # https://github.com/phpbrew/phpbrew/commit/18ef766d0e013ee87ac7d86e338ebec89fbeb445
       # Unsure if this is still needed
@@ -286,34 +279,20 @@ INFO
     end
   end
 
-  def apache_apxs
-    if build.with?("httpd24")
-      ["sbin", "bin"].each do |dir|
-        if File.exist?(location = "#{HOMEBREW_PREFIX}/#{dir}/apxs")
-          return location
-        end
-      end
-    else
-      "/usr/sbin/apxs"
-    end
-  end
-
   def caveats
     s = []
 
-    if build.with?("httpd24")
-      s << <<-EOS.undent
-        To enable PHP in Apache add the following to httpd.conf and restart Apache:
-            LoadModule php7_module #{HOMEBREW_PREFIX}/opt/php#{php_version_path}/libexec/apache2/libphp7.so
+    s << <<-EOS.undent
+      To enable PHP in Apache add the following to httpd.conf and restart Apache:
+          LoadModule php7_module #{HOMEBREW_PREFIX}/opt/php#{php_version_path}/libexec/apache2/libphp7.so
 
-            <FilesMatch \.php$>
-                SetHandler application/x-httpd-php
-            </FilesMatch>
+          <FilesMatch \.php$>
+              SetHandler application/x-httpd-php
+          </FilesMatch>
 
-        Finally, check DirectoryIndex includes index.php
-            DirectoryIndex index.php index.html
-      EOS
-    end
+      Finally, check DirectoryIndex includes index.php
+          DirectoryIndex index.php index.html
+    EOS
 
     s << <<-EOS.undent
       The php.ini file can be found in:
