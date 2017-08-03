@@ -13,7 +13,6 @@ class Php < Formula
   # ldap extension: I have a vague recollection that this caused some issues that were resolved with exluding it. needs to be checked.
   # Need to add tests for all supported SAPIs
 
-
   option "with-imap-uw", "Build PHP IMAP extension"
   option "with-thread-safety", "Build with thread safety"
 
