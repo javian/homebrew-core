@@ -11,12 +11,8 @@ class Php < Formula
   # TODO
   # Opcache default config file is included in extension formula, is it needed ?
   # ldap extension: I have a vague recollection that this caused some issues that were resolved with exluding it. needs to be checked.
-  # According to php docs enchant requires aspell as a dep, should not be an issue since aspell is required.
   # Need to add tests for all supported SAPIs
-  # Should we remove --with-pdo-dblib from formula ? (mssql support is long gone and as far as I can tell this is the
-  #  only purpose and would also exclude a dep, freetds)
-  # How should the Formula handle the apache module ? Sierra (have not checked high sierra) can't support building it for the OS
-  #   (without manually fiddling with link in the file system) with the bundles tools
+
 
   option "with-imap-uw", "Build PHP IMAP extension"
   option "with-thread-safety", "Build with thread safety"
