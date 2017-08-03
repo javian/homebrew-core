@@ -61,29 +61,14 @@ class Php < Formula
   # javian: is this still needed ?
   skip_clean "lib/php/.lock"
 
-  def config_path
-    etc+"php"+php_version
-  end
-
-  def php_version
-    version.to_s[0..2]
-  end
-
-  def php_version_path
-    version.to_s[0..2].delete(".")
-  end
-
-  def home_path
-    File.expand_path("~")
-  end
-
   def install
+    config_path = etc+"php"+version.to_s[0..2]
     # Not removing all pear.conf and .pearrc files from PHP path results in
     # the PHP configure not properly setting the pear binary to be installed
     config_pear = "#{config_path}/pear.conf"
-    user_pear = "#{home_path}/pear.conf"
+    user_pear = "#{File.expand_path("~")}/pear.conf"
     config_pearrc = "#{config_path}/.pearrc"
-    user_pearrc = "#{home_path}/.pearrc"
+    user_pearrc = "#{File.expand_path("~")}/.pearrc"
     if File.exist?(config_pear) || File.exist?(user_pear) || File.exist?(config_pearrc) || File.exist?(user_pearrc)
       opoo "Backing up all known pear.conf and .pearrc files"
       opoo <<-INFO
@@ -240,12 +225,12 @@ INFO
 
       if File.exist?("sapi/fpm/init.d.php-fpm")
         chmod 0755, "sapi/fpm/init.d.php-fpm"
-        sbin.install "sapi/fpm/init.d.php-fpm" => "php#{php_version_path}-fpm"
+        sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
       end
 
       if File.exist?("sapi/cgi/fpm/php-fpm")
         chmod 0755, "sapi/cgi/fpm/php-fpm"
-        sbin.install "sapi/cgi/fpm/php-fpm" => "php#{php_version_path}-fpm"
+        sbin.install "sapi/cgi/fpm/php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
       end
 
       if !File.exist?(config_path+"php-fpm.d/www.conf") && File.exist?(config_path+"php-fpm.d/www.conf.default")
@@ -284,7 +269,7 @@ INFO
 
     s << <<-EOS.undent
       To enable PHP in Apache add the following to httpd.conf and restart Apache:
-          LoadModule php7_module #{HOMEBREW_PREFIX}/opt/php#{php_version_path}/libexec/apache2/libphp7.so
+          LoadModule php7_module #{HOMEBREW_PREFIX}/opt/php#{version.to_s[0..2].delete(".")}/libexec/apache2/libphp7.so
 
           <FilesMatch \.php$>
               SetHandler application/x-httpd-php
@@ -296,7 +281,7 @@ INFO
 
     s << <<-EOS.undent
       The php.ini file can be found in:
-          #{config_path}/php.ini
+          #{etc}/php/#{version.to_s[0..2]}/php.ini
     EOS
 
     if build.with? "pear"
@@ -306,7 +291,7 @@ INFO
         If PEAR complains about permissions, 'fix' the default PEAR permissions and config:
 
             chmod -R ug+w #{lib}/php
-            pear config-set php_ini #{etc}/php/#{php_version}/php.ini system
+            pear config-set php_ini #{etc}/php/#{version.to_s[0..2]}/php.ini system
       EOS
     end
 
@@ -317,7 +302,7 @@ INFO
 
             PATH="#{HOMEBREW_PREFIX}/bin:$PATH"
 
-      PHP#{php_version_path} Extensions will always be compiled against this PHP. Please install them using --without-homebrew-php to enable compiling against system PHP.
+      PHP#{version.to_s[0..2].delete(".")} Extensions will always be compiled against this PHP. Please install them using --without-homebrew-php to enable compiling against system PHP.
     EOS
 
     s.join "\n"
@@ -339,7 +324,7 @@ INFO
           <string>#{opt_sbin}/php-fpm</string>
           <string>--nodaemonize</string>
           <string>--fpm-config</string>
-          <string>#{config_path}/php-fpm.conf</string>
+          <string>#{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}/php-fpm.conf</string>
         </array>
         <key>RunAtLoad</key>
         <true/>
@@ -358,6 +343,6 @@ INFO
 
   test do
     system "#{bin}/php", "-i"
-    system "#{sbin}/php-fpm", "-y", "#{config_path}/php-fpm.conf", "-t"
+    system "#{sbin}/php-fpm", "-y", "#{etc}/php/#{version.to_s[0..2]}/php-fpm.conf", "-t"
   end
 end
