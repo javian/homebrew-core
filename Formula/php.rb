@@ -165,8 +165,8 @@ INFO
       ]
 
       # Belongs to fpm config
-      (prefix+"var/log").mkpath
-      touch prefix+"var/log/php-fpm.log"
+      (prefix/"var/log").mkpath
+      touch prefix/"var/log/php-fpm.log"
       plist_path.write plist
       plist_path.chmod 0644
 
