@@ -167,8 +167,6 @@ INFO
       # Belongs to fpm config
       (prefix/"var/log").mkpath
       touch prefix/"var/log/php-fpm.log"
-      plist_path.write plist
-      plist_path.chmod 0644
 
       if MacOS.version < :lion
         args << "--with-curl=#{Formula["curl"].opt_prefix}"
