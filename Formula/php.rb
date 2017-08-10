@@ -5,6 +5,7 @@ class Php < Formula
   sha256 "f3be4262203fa9db3d126832a1632e9a80e52e313f4230218c392d6a9178c368"
 
   # javian: not sure about the origin of this so I'll keep it commented for now. Could it have something to do with building extensions ?
+  # javian: This has been in the formula for 8+ years but have found no proof that it is needed anymore
   # So PHP extensions don't report missing symbols
   # skip_clean "bin", "sbin"
 
