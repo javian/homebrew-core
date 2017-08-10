@@ -164,9 +164,7 @@ INFO
         --without-gmp
       ]
 
-      # Belongs to fpm config
-      (prefix/"var/log").mkpath
-      touch prefix/"var/log/php-fpm.log"
+
 
       if MacOS.version < :lion
         args << "--with-curl=#{Formula["curl"].opt_prefix}"
@@ -300,6 +298,13 @@ INFO
 
     s.join "\n"
   end
+
+  def post_install 
+    # Belongs to fpm config
+    (prefix/"var/log").mkpath
+    touch prefix/"var/log/php-fpm.log"
+  end
+
 
   plist_options :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}/php-fpm.conf"
 
