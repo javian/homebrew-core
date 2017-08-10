@@ -164,8 +164,6 @@ INFO
         --without-gmp
       ]
 
-
-
       if MacOS.version < :lion
         args << "--with-curl=#{Formula["curl"].opt_prefix}"
       else
