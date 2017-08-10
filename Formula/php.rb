@@ -212,10 +212,8 @@ INFO
 
       system bin+"pear", "config-set", "php_ini", config_path+"php.ini", "system"
 
-      if File.exist?("sapi/fpm/init.d.php-fpm")
-        chmod 0755, "sapi/fpm/init.d.php-fpm"
-        sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
-      end
+      chmod 0755, "sapi/fpm/init.d.php-fpm"
+      sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
 
       if File.exist?("sapi/cgi/fpm/php-fpm")
         chmod 0755, "sapi/cgi/fpm/php-fpm"
