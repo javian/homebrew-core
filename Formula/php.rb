@@ -54,7 +54,7 @@ class Php < Formula
   skip_clean "lib/php/.lock"
 
   def install
-    config_path = etc/"php#{version.to_s[0..2]}"
+    config_path = etc/"php/#{version.to_s[0..2]}"
     # Not removing all pear.conf and .pearrc files from PHP path results in
     # the PHP configure not properly setting the pear binary to be installed
     config_pear = "#{config_path}/pear.conf"
