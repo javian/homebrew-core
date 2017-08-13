@@ -195,7 +195,7 @@ INFO
       # Install new php.ini unless one exists
       config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
 
-      chmod_R 0775, lib+"php"
+      #chmod_R 0775, lib+"php"
 
       system bin+"pear", "config-set", "php_ini", config_path+"php.ini", "system"
 
@@ -286,8 +286,20 @@ INFO
     # Belongs to fpm config
     (prefix/"var/log").mkpath
     touch prefix/"var/log/php-fpm.log"
-  end
 
+    # Fix pecl/pear permissions
+    %w[
+      php/.channels/.alias/pear.txt
+      php/.channels/pear.php.net.reg
+      php/.channels/.alias/pecl.txt
+      php/.channels/pecl.php.net.reg
+      php/.depdblock
+      php/.filemap
+      php/.depdb
+    ].each do |f|
+      chmod 0644, lib/f
+    end
+  end
 
   plist_options :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}/php-fpm.conf"
 
