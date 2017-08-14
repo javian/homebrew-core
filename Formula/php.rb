@@ -195,7 +195,7 @@ INFO
       # Install new php.ini unless one exists
       config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
 
-      #chmod_R 0775, lib+"php"
+      # chmod_R 0775, lib+"php"
 
       system bin+"pear", "config-set", "php_ini", config_path+"php.ini", "system"
 
@@ -282,7 +282,7 @@ INFO
     s.join "\n"
   end
 
-  def post_install 
+  def post_install
     # Belongs to fpm config
     (prefix/"var/log").mkpath
     touch prefix/"var/log/php-fpm.log"
