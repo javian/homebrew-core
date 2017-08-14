@@ -48,12 +48,15 @@ class Php < Formula
   depends_on "unixodbc"
   depends_on "webp"
 
+  needs :cxx11
+
   # Fixes the pear .lock permissions issue that keeps it from operating correctly.
   # Thanks mistym & #machomebrew
   # javian: is this still needed ?
   skip_clean "lib/php/.lock"
 
   def install
+    ENV.cxx11
     config_path = etc/"php/#{version.to_s[0..2]}"
     # Not removing all pear.conf and .pearrc files from PHP path results in
     # the PHP configure not properly setting the pear binary to be installed
