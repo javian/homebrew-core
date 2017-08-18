@@ -151,7 +151,6 @@ INFO
         --with-zlib=/usr
         --with-libedit
         --with-xsl=/usr
-        --without-gmp
       ]
 
       if MacOS.version < :lion
