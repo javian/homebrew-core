@@ -118,7 +118,6 @@ INFO
         --with-gmp=#{Formula["gmp"].opt_prefix}
         --with-gd
         --with-gettext=#{Formula["gettext"].opt_prefix}
-        --with-fpm-acl
         --with-fpm-user=_www
         --with-fpm-group=_www
         --with-iconv-dir=/usr
