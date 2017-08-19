@@ -146,6 +146,7 @@ INFO
         --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
         --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
         --with-webp-dir=#{Formula["webp"].opt_prefix}
+        --with-pic
         --with-xmlrpc
         --with-zlib=/usr
         --with-libedit
