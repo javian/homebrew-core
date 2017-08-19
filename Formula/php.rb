@@ -125,11 +125,11 @@ INFO
         --with-icu-dir=#{Formula["icu4c"].opt_prefix}
         --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
         --with-kerberos=/usr
-        --with-ldap
+        --with-ldap=shared
         --with-ldap-sasl=/usr
         --with-libxml-dir=/usr
         --with-mhash
-        --with-mcrypt=#{Formula["mcrypt"].opt_prefix}
+        --with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}
         --with-mysql-sock=/tmp/mysql.sock
         --with-mysqli=mysqlnd
         --with-pdo-mysql=mysqlnd
