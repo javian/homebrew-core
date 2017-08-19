@@ -89,7 +89,6 @@ INFO
         --with-config-file-scan-dir=#{config_path}/conf.d
         --mandir=#{man}
         --enable-bcmath
-        --enable-cgi
         --enable-calendar
         --enable-dba
         --enable-dtrace
