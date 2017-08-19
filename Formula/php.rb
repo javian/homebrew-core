@@ -18,7 +18,6 @@ class Php < Formula
   option "with-thread-safety", "Build with thread safety"
 
   # javian: Not yet checked these options
-  option "with-pdo-oci", "Include Oracle databases (requries ORACLE_HOME to be set)"
   option "without-ldap", "Build without LDAP support"
   option "without-unixodbc", "Build without unixODBC support"
 
@@ -163,14 +162,6 @@ INFO
       if build.with? "imap-uw"
         args << "--with-imap=#{Formula["imap-uw"].opt_prefix}"
         args << "--with-imap-ssl=#{Formula["openssl"].opt_prefix}"
-      end
-
-      if build.with? "pdo-oci"
-        if ENV.key?("ORACLE_HOME")
-          args << "--with-pdo-oci=#{ENV["ORACLE_HOME"]}"
-        else
-          raise "Environmental variable ORACLE_HOME must be set to use --with-pdo-oci option."
-        end
       end
 
       args << "--enable-maintainer-zts" if build.with? "thread-safety"
