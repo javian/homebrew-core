@@ -188,8 +188,6 @@ INFO
       # Install new php.ini unless one exists
       config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
 
-      # chmod_R 0775, lib+"php"
-
       system bin+"pear", "config-set", "php_ini", config_path+"php.ini", "system"
 
       chmod 0755, "sapi/fpm/init.d.php-fpm"
@@ -281,11 +279,10 @@ INFO
     touch prefix/"var/log/php-fpm.log"
 
     # Fix pecl/pear permissions
+    chmod 0755, lib/"php/.channels"
+    chmod 0644, Dir.glob(lib/"php/.channels/**/*")
+
     %w[
-      php/.channels/.alias/pear.txt
-      php/.channels/pear.php.net.reg
-      php/.channels/.alias/pecl.txt
-      php/.channels/pecl.php.net.reg
       php/.depdblock
       php/.filemap
       php/.depdb
