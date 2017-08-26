@@ -188,8 +188,6 @@ INFO
       # Install new php.ini unless one exists
       config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
 
-      system bin+"pear", "config-set", "php_ini", config_path+"php.ini", "system"
-
       chmod 0755, "sapi/fpm/init.d.php-fpm"
       sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
 
@@ -289,6 +287,8 @@ INFO
     ].each do |f|
       chmod 0644, lib/f
     end
+
+    system bin+"pear", "config-set", "php_ini", etc/"php/#{version.to_s[0..2]}"/"php.ini", "system"
   end
 
   plist_options :startup => true, :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}/php-fpm.conf"
