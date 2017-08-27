@@ -247,27 +247,6 @@ INFO
           #{etc}/php/#{version.to_s[0..2]}/php.ini
     EOS
 
-    if build.with? "pear"
-      s << <<-EOS.undent
-        ✩✩✩✩ PEAR ✩✩✩✩
-
-        If PEAR complains about permissions, 'fix' the default PEAR permissions and config:
-
-            chmod -R ug+w #{lib}/php
-            pear config-set php_ini #{etc}/php/#{version.to_s[0..2]}/php.ini system
-      EOS
-    end
-
-    s << <<-EOS.undent
-      ✩✩✩✩ Extensions ✩✩✩✩
-
-      If you are having issues with custom extension compiling, ensure that you are using the brew version, by placing #{HOMEBREW_PREFIX}/bin before /usr/sbin in your PATH:
-
-            PATH="#{HOMEBREW_PREFIX}/bin:$PATH"
-
-      PHP#{version.to_s[0..2].delete(".")} Extensions will always be compiled against this PHP. Please install them using --without-homebrew-php to enable compiling against system PHP.
-    EOS
-
     s.join "\n"
   end
 
