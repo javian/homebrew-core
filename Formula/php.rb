@@ -268,11 +268,11 @@ INFO
       opcache
     ].each do |e|
       config_path = (etc/"php/#{version.to_s.split(".")[0..1].join(".")}/conf.d/ext-#{e}.ini")
-      extension_type = e == "opcache" ? "zend_extension" : "extension"
+      extension_type = (e == "opcache") ? "zend_extension" : "extension"
       if File.exist? config_path
         inreplace config_path, /^#{extension_type}=.*$/, "#{extension_type}=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
       else
-      config_path.write <<-EOS.undent
+        config_path.write <<-EOS.undent
         [#{e}]
         #{extension_type}="#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
       EOS
