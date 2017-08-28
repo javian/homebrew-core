@@ -267,34 +267,23 @@ INFO
       chmod 0644, lib/f
     end
 
-    system bin+"pear", "config-set", "php_ini", etc/"php/#{version.to_s[0..2]}"/"php.ini", "system"
+    php_ini = "#{etc}/php/#{version.to_s.split(".")[0..1].join(".")}"
+    system bin/"pear", "config-set", "php_ini", php_ini, "system"
 
     %w[
       ldap
       mcrypt
       tidy
-    ].each do |e|
-      config_path = (etc/"php/#{version.to_s[0..2]}/conf.d/ext-#{e}.ini")
-      if File.exist? config_path
-        inreplace config_path, /^extension=.*$/, "extension=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
-      else
-      config_path.write <<-EOS.undent
-        [#{e}]
-        extension="#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
-      EOS
-      end
-    end
-
-    %w[
       opcache
     ].each do |e|
       config_path = (etc/"php/#{version.to_s[0..2]}/conf.d/ext-#{e}.ini")
+      extension_type = e == "opcache" ? "zend_extension" : "extension"
       if File.exist? config_path
-        inreplace config_path, /^zend_extension=.*$/, "zend_extension=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+        inreplace config_path, /^#{extension_type}=.*$/, "#{extension_type}=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
       else
       config_path.write <<-EOS.undent
         [#{e}]
-        zend_extension="#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+        #{extension_type}="#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
       EOS
       end
     end
