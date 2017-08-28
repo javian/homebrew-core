@@ -272,12 +272,17 @@ INFO
     %w[
       ldap
       mcrypt
-      tiny
+      tidy
     ].each do |e|
-      (etc/"php/#{version.to_s[0..2]}/conf.d/ext-#{e}.ini").write <<-EOS.undent
+      config_path = (etc/"php/#{version.to_s[0..2]}/conf.d/ext-#{e}.ini")
+      if File.exist? config_path
+        inreplace config_path, /^extension=.*$/, "extension=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+      else
+      config_path.write <<-EOS.undent
         [#{e}]
         extension="#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
       EOS
+      end
     end
   end
 
