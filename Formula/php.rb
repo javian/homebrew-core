@@ -9,17 +9,8 @@ class Php < Formula
   # So PHP extensions don't report missing symbols
   # skip_clean "bin", "sbin"
 
-  # TODO
-  # Opcache default config file is included in extension formula, is it needed ?
-  # ldap extension: I have a vague recollection that this caused some issues that were resolved with exluding it. needs to be checked.
-  # Need to add tests for all supported SAPIs
-
   option "with-imap-uw", "Build PHP IMAP extension"
   option "with-thread-safety", "Build with thread safety"
-
-  # javian: Not yet checked these options
-  option "without-ldap", "Build without LDAP support"
-  option "without-unixodbc", "Build without unixODBC support"
 
   depends_on "autoconf" => :build
   depends_on "bison" => :build
