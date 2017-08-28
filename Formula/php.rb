@@ -268,6 +268,17 @@ INFO
     end
 
     system bin+"pear", "config-set", "php_ini", etc/"php/#{version.to_s[0..2]}"/"php.ini", "system"
+
+    %w[
+      ldap
+      mcrypt
+      tiny
+    ].each do |e|
+      (etc/"php/#{version.to_s[0..2]}/conf.d/ext-#{e}.ini").write <<-EOS.undent
+        [#{e}]
+        extension="#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+      EOS
+    end
   end
 
   plist_options :startup => true, :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}/php-fpm.conf"
