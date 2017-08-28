@@ -56,7 +56,7 @@ class Php < Formula
 
   def install
     ENV.cxx11
-    config_path = etc/"php/#{version.to_s[0..2]}"
+    config_path = etc/"php/#{version.to_s.split(".")[0..1].join(".")}"
     # Not removing all pear.conf and .pearrc files from PHP path results in
     # the PHP configure not properly setting the pear binary to be installed
     config_pear = "#{config_path}/pear.conf"
@@ -244,7 +244,7 @@ INFO
 
     s << <<-EOS.undent
       The php.ini file can be found in:
-          #{etc}/php/#{version.to_s[0..2]}/php.ini
+          #{etc}/php/#{version.to_s.split(".")[0..1].join(".")}/php.ini
     EOS
 
     s.join "\n"
@@ -276,7 +276,7 @@ INFO
       tidy
       opcache
     ].each do |e|
-      config_path = (etc/"php/#{version.to_s[0..2]}/conf.d/ext-#{e}.ini")
+      config_path = (etc/"php/#{version.to_s.split(".")[0..1].join(".")}/conf.d/ext-#{e}.ini")
       extension_type = e == "opcache" ? "zend_extension" : "extension"
       if File.exist? config_path
         inreplace config_path, /^#{extension_type}=.*$/, "#{extension_type}=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
@@ -289,7 +289,7 @@ INFO
     end
   end
 
-  plist_options :startup => true, :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}/php-fpm.conf"
+  plist_options :startup => true, :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s.split(".")[0..1].join(".")}/php-fpm.conf"
 
   def plist; <<-EOPLIST.undent
     <?xml version="1.0" encoding="UTF-8"?>
@@ -305,7 +305,7 @@ INFO
           <string>#{opt_sbin}/php-fpm</string>
           <string>--nodaemonize</string>
           <string>--fpm-config</string>
-          <string>#{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}/php-fpm.conf</string>
+          <string>#{HOMEBREW_PREFIX}/etc/php/#{version.to_s.split(".")[0..1].join(".")}/php-fpm.conf</string>
         </array>
         <key>RunAtLoad</key>
         <true/>
@@ -320,6 +320,6 @@ INFO
 
   test do
     system "#{bin}/php", "-i"
-    system "#{sbin}/php-fpm", "-y", "#{etc}/php/#{version.to_s[0..2]}/php-fpm.conf", "-t"
+    system "#{sbin}/php-fpm", "-y", "#{etc}/php/#{version.to_s.split(".")[0..1].join(".")}/php-fpm.conf", "-t"
   end
 end
