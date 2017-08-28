@@ -284,6 +284,20 @@ INFO
       EOS
       end
     end
+
+    %w[
+      opcache
+    ].each do |e|
+      config_path = (etc/"php/#{version.to_s[0..2]}/conf.d/ext-#{e}.ini")
+      if File.exist? config_path
+        inreplace config_path, /^zend_extension=.*$/, "zend_extension=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+      else
+      config_path.write <<-EOS.undent
+        [#{e}]
+        zend_extension="#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+      EOS
+      end
+    end
   end
 
   plist_options :startup => true, :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s[0..2]}/php-fpm.conf"
