@@ -34,11 +34,6 @@ class Php < Formula
 
   needs :cxx11
 
-  # Fixes the pear .lock permissions issue that keeps it from operating correctly.
-  # Thanks mistym & #machomebrew
-  # javian: is this still needed ?
-  skip_clean "lib/php/.lock"
-
   def install
     ENV.cxx11
     config_path = etc/"php/#{version.to_s.split(".")[0..1].join(".")}"
@@ -203,12 +198,14 @@ class Php < Formula
     touch prefix/"var/log/php-fpm.log"
 
     chmod 0755, lib/"php/.channels"
-    chmod 0644, Dir.glob(lib/"php/.channels/**/*")
+    chmod 0755, lib/"php/.channels/.alias"
+    chmod 0644, (Dir.glob(lib/"php/.channels/**/*", File::FNM_DOTMATCH).reject { |a| a =~ /\/\.{1,2}$/ || File.directory?(a)})
 
     %w[
       php/.depdblock
       php/.filemap
       php/.depdb
+      php/.lock
     ].each do |f|
       chmod 0644, lib/f
     end
