@@ -42,7 +42,6 @@ class Php < Formula
   def install
     ENV.cxx11
     config_path = etc/"php/#{version.to_s.split(".")[0..1].join(".")}"
-    # Prevent PHP from harcoding sed shim path
     ENV["lt_cv_path_SED"] = "sed"
 
     args = %W[
@@ -141,10 +140,9 @@ class Php < Formula
     end
 
     system "make"
-    ENV.deparallelize # parallel install fails on some systems
+    ENV.deparallelize
     system "make", "install"
 
-    # Prefer relative symlink instead of absolute for relocatable bottles
     ln_s "phar.phar", bin+"phar", :force => true
 
     # Install new php.ini unless one exists
@@ -204,7 +202,6 @@ class Php < Formula
     (prefix/"var/log").mkpath
     touch prefix/"var/log/php-fpm.log"
 
-    # Fix pecl/pear permissions
     chmod 0755, lib/"php/.channels"
     chmod 0644, Dir.glob(lib/"php/.channels/**/*")
 
