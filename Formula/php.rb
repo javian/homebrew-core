@@ -174,7 +174,7 @@ INFO
       system "make", "install"
 
       # Prefer relative symlink instead of absolute for relocatable bottles
-      ln_s "phar.phar", bin+"phar", :force => true if File.exist? bin+"phar.phar"
+      ln_s "phar.phar", bin+"phar", :force => true
 
       # Install new php.ini unless one exists
       config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
