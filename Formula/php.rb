@@ -270,7 +270,9 @@ INFO
       config_path = (etc/"php/#{version.to_s.split(".")[0..1].join(".")}/conf.d/ext-#{e}.ini")
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
       if File.exist? config_path
-        inreplace config_path, /^#{extension_type}=.*$/, "#{extension_type}=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+        inreplace config_path do |s|
+          s.gsub /#{extension_type}=.*$/, "#{extension_type}=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+        end
       else
         config_path.write <<-EOS.undent
         [#{e}]
