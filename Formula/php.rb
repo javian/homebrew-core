@@ -4,11 +4,6 @@ class Php < Formula
   url "https://github.com/php/php-src/archive/php-7.1.8.tar.gz"
   sha256 "f3be4262203fa9db3d126832a1632e9a80e52e313f4230218c392d6a9178c368"
 
-  # javian: not sure about the origin of this so I'll keep it commented for now. Could it have something to do with building extensions ?
-  # javian: This has been in the formula for 8+ years but have found no proof that it is needed anymore
-  # So PHP extensions don't report missing symbols
-  # skip_clean "bin", "sbin"
-
   option "with-imap-uw", "Build PHP IMAP extension"
   option "with-thread-safety", "Build with thread safety"
 
@@ -16,7 +11,7 @@ class Php < Formula
   depends_on "bison" => :build
   depends_on "re2c" => :build
   depends_on "imap-uw" => :optional
-  depends_on "libtool" => :run # javian: mcrypt requirement
+  depends_on "libtool" => :run
   depends_on "aspell"
   depends_on "argon2"
   depends_on "curl" if MacOS.version < :lion
@@ -210,7 +205,6 @@ class Php < Formula
   end
 
   def post_install
-    # Belongs to fpm config
     (prefix/"var/log").mkpath
     touch prefix/"var/log/php-fpm.log"
 
