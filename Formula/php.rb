@@ -4,13 +4,11 @@ class Php < Formula
   url "https://github.com/php/php-src/archive/php-7.1.8.tar.gz"
   sha256 "f3be4262203fa9db3d126832a1632e9a80e52e313f4230218c392d6a9178c368"
 
-  option "with-imap-uw", "Build PHP IMAP extension"
   option "with-thread-safety", "Build with thread safety"
 
   depends_on "autoconf" => :build
   depends_on "bison" => :build
   depends_on "re2c" => :build
-  depends_on "imap-uw" => :optional
   depends_on "libtool" => :run
   depends_on "aspell"
   depends_on "argon2"
@@ -21,6 +19,7 @@ class Php < Formula
   depends_on "gettext"
   depends_on "gmp"
   depends_on "homebrew/apache/httpd24"
+  depends_on "imap-uw"
   depends_on "icu4c"
   depends_on "jpeg"
   depends_on "libpng"
@@ -93,6 +92,8 @@ class Php < Formula
       --with-ldap=shared
       --with-ldap-sasl=/usr
       --with-libxml-dir=/usr
+      --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
+      --with-imap-ssl=#{Formula["openssl"].opt_prefix}
       --with-mhash
       --with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}
       --with-mysql-sock=/tmp/mysql.sock
@@ -122,11 +123,6 @@ class Php < Formula
       args << "--with-curl=#{Formula["curl"].opt_prefix}"
     else
       args << "--with-curl"
-    end
-
-    if build.with? "imap-uw"
-      args << "--with-imap=#{Formula["imap-uw"].opt_prefix}"
-      args << "--with-imap-ssl=#{Formula["openssl"].opt_prefix}"
     end
 
     args << "--enable-maintainer-zts" if build.with? "thread-safety"
@@ -227,6 +223,7 @@ class Php < Formula
       ldap
       mcrypt
       tidy
+      imap
       opcache
     ].each do |e|
       config_path = (etc/"php/#{version.to_s.split(".")[0..1].join(".")}/conf.d/ext-#{e}.ini")
