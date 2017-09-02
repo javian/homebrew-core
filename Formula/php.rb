@@ -48,173 +48,141 @@ class Php < Formula
   def install
     ENV.cxx11
     config_path = etc/"php/#{version.to_s.split(".")[0..1].join(".")}"
-    # Not removing all pear.conf and .pearrc files from PHP path results in
-    # the PHP configure not properly setting the pear binary to be installed
-    config_pear = "#{config_path}/pear.conf"
-    user_pear = "#{File.expand_path("~")}/pear.conf"
-    config_pearrc = "#{config_path}/.pearrc"
-    user_pearrc = "#{File.expand_path("~")}/.pearrc"
-    if File.exist?(config_pear) || File.exist?(user_pear) || File.exist?(config_pearrc) || File.exist?(user_pearrc)
-      opoo "Backing up all known pear.conf and .pearrc files"
-      opoo <<-INFO
-        If you have a pre-existing pear install outside
-        of homebrew-php, or you are using a non-standard
-        pear.conf location, installation may fail.
-INFO
-      mv(config_pear, "#{config_pear}-backup") if File.exist? config_pear
-      mv(user_pear, "#{user_pear}-backup") if File.exist? user_pear
-      mv(config_pearrc, "#{config_pearrc}-backup") if File.exist? config_pearrc
-      mv(user_pearrc, "#{user_pearrc}-backup") if File.exist? user_pearrc
+    # Prevent PHP from harcoding sed shim path
+    ENV["lt_cv_path_SED"] = "sed"
+
+    args = %W[
+      --prefix=#{prefix}
+      --localstatedir=#{var}
+      --sysconfdir=#{config_path}
+      --with-config-file-path=#{config_path}
+      --with-config-file-scan-dir=#{config_path}/conf.d
+      --mandir=#{man}
+      --enable-bcmath
+      --enable-calendar
+      --enable-dba
+      --enable-dtrace
+      --enable-exif
+      --enable-ftp
+      --enable-fpm
+      --enable-gd-native-ttf
+      --enable-intl
+      --enable-mbregex
+      --enable-mbstring
+      --enable-mysqlnd
+      --enable-pcntl
+      --enable-phpdbg
+      --enable-phpdbg-webhelper
+      --enable-shmop
+      --enable-soap
+      --enable-sockets
+      --enable-sysvmsg
+      --enable-sysvsem
+      --enable-sysvshm
+      --enable-wddx
+      --enable-zip
+      --libexecdir=#{libexec}
+      --with-apxs2=#{Formula["httpd24"].opt_prefix}/bin/apxs
+      --with-bz2=/usr
+      --with-enchant=#{Formula["enchant"].opt_prefix}
+      --with-freetype-dir=#{Formula["freetype"].opt_prefix}
+      --with-gmp=#{Formula["gmp"].opt_prefix}
+      --with-gd
+      --with-gettext=#{Formula["gettext"].opt_prefix}
+      --with-fpm-user=_www
+      --with-fpm-group=_www
+      --with-iconv-dir=/usr
+      --with-icu-dir=#{Formula["icu4c"].opt_prefix}
+      --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
+      --with-kerberos=/usr
+      --with-ldap=shared
+      --with-ldap-sasl=/usr
+      --with-libxml-dir=/usr
+      --with-mhash
+      --with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}
+      --with-mysql-sock=/tmp/mysql.sock
+      --with-mysqli=mysqlnd
+      --with-pdo-mysql=mysqlnd
+      --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
+      --with-ndbm=/usr
+      --with-openssl=#{Formula["openssl"].opt_prefix}
+      --with-password-argon2=#{Formula["argon2"].opt_prefix}
+      --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
+      --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
+      --with-pgsql=#{Formula["libpq"].opt_prefix}
+      --with-png-dir=#{Formula["libpng"].opt_prefix}
+      --with-pspell=#{Formula["aspell"].opt_prefix}
+      --with-snmp
+      --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
+      --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
+      --with-webp-dir=#{Formula["webp"].opt_prefix}
+      --with-pic
+      --with-xmlrpc
+      --with-zlib=/usr
+      --with-libedit
+      --with-xsl=/usr
+    ]
+
+    if MacOS.version < :lion
+      args << "--with-curl=#{Formula["curl"].opt_prefix}"
+    else
+      args << "--with-curl"
     end
 
-    begin
-      # Prevent PHP from harcoding sed shim path
-      ENV["lt_cv_path_SED"] = "sed"
+    if build.with? "imap-uw"
+      args << "--with-imap=#{Formula["imap-uw"].opt_prefix}"
+      args << "--with-imap-ssl=#{Formula["openssl"].opt_prefix}"
+    end
 
-      args = %W[
-        --prefix=#{prefix}
-        --localstatedir=#{var}
-        --sysconfdir=#{config_path}
-        --with-config-file-path=#{config_path}
-        --with-config-file-scan-dir=#{config_path}/conf.d
-        --mandir=#{man}
-        --enable-bcmath
-        --enable-calendar
-        --enable-dba
-        --enable-dtrace
-        --enable-exif
-        --enable-ftp
-        --enable-fpm
-        --enable-gd-native-ttf
-        --enable-intl
-        --enable-mbregex
-        --enable-mbstring
-        --enable-mysqlnd
-        --enable-pcntl
-        --enable-phpdbg
-        --enable-phpdbg-webhelper
-        --enable-shmop
-        --enable-soap
-        --enable-sockets
-        --enable-sysvmsg
-        --enable-sysvsem
-        --enable-sysvshm
-        --enable-wddx
-        --enable-zip
-        --libexecdir=#{libexec}
-        --with-apxs2=#{Formula["httpd24"].opt_prefix}/bin/apxs
-        --with-bz2=/usr
-        --with-enchant=#{Formula["enchant"].opt_prefix}
-        --with-freetype-dir=#{Formula["freetype"].opt_prefix}
-        --with-gmp=#{Formula["gmp"].opt_prefix}
-        --with-gd
-        --with-gettext=#{Formula["gettext"].opt_prefix}
-        --with-fpm-user=_www
-        --with-fpm-group=_www
-        --with-iconv-dir=/usr
-        --with-icu-dir=#{Formula["icu4c"].opt_prefix}
-        --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
-        --with-kerberos=/usr
-        --with-ldap=shared
-        --with-ldap-sasl=/usr
-        --with-libxml-dir=/usr
-        --with-mhash
-        --with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}
-        --with-mysql-sock=/tmp/mysql.sock
-        --with-mysqli=mysqlnd
-        --with-pdo-mysql=mysqlnd
-        --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
-        --with-ndbm=/usr
-        --with-openssl=#{Formula["openssl"].opt_prefix}
-        --with-password-argon2=#{Formula["argon2"].opt_prefix}
-        --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
-        --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
-        --with-pgsql=#{Formula["libpq"].opt_prefix}
-        --with-png-dir=#{Formula["libpng"].opt_prefix}
-        --with-pspell=#{Formula["aspell"].opt_prefix}
-        --with-snmp
-        --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
-        --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
-        --with-webp-dir=#{Formula["webp"].opt_prefix}
-        --with-pic
-        --with-xmlrpc
-        --with-zlib=/usr
-        --with-libedit
-        --with-xsl=/usr
-      ]
+    args << "--enable-maintainer-zts" if build.with? "thread-safety"
 
-      if MacOS.version < :lion
-        args << "--with-curl=#{Formula["curl"].opt_prefix}"
-      else
-        args << "--with-curl"
+    system "./buildconf", "--force"
+    system "./configure", *args
+
+    inreplace "Makefile",
+      /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+)$/,
+      "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4"
+
+    # https://github.com/phpbrew/phpbrew/commit/18ef766d0e013ee87ac7d86e338ebec89fbeb445
+    # Unsure if this is still needed
+    inreplace "Makefile" do |s|
+      s.change_make_var! "EXTRA_LIBS", "\\1 -lstdc++"
+    end
+
+    system "make"
+    ENV.deparallelize # parallel install fails on some systems
+    system "make", "install"
+
+    # Prefer relative symlink instead of absolute for relocatable bottles
+    ln_s "phar.phar", bin+"phar", :force => true
+
+    # Install new php.ini unless one exists
+    config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
+
+    chmod 0755, "sapi/fpm/init.d.php-fpm"
+    sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
+
+    if File.exist?("sapi/cgi/fpm/php-fpm")
+      chmod 0755, "sapi/cgi/fpm/php-fpm"
+      sbin.install "sapi/cgi/fpm/php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
+    end
+
+    if !File.exist?(config_path+"php-fpm.d/www.conf") && File.exist?(config_path+"php-fpm.d/www.conf.default")
+      mv(config_path+"php-fpm.d/www.conf.default", config_path+"php-fpm.d/www.conf")
+    end
+
+    unless File.exist?(config_path+"php-fpm.conf")
+      if File.exist?("sapi/fpm/php-fpm.conf")
+        config_path.install "sapi/fpm/php-fpm.conf"
       end
 
-      if build.with? "imap-uw"
-        args << "--with-imap=#{Formula["imap-uw"].opt_prefix}"
-        args << "--with-imap-ssl=#{Formula["openssl"].opt_prefix}"
+      if File.exist?("sapi/cgi/fpm/php-fpm.conf")
+        config_path.install "sapi/cgi/fpm/php-fpm.conf"
       end
 
-      args << "--enable-maintainer-zts" if build.with? "thread-safety"
-
-      system "./buildconf", "--force"
-      system "./configure", *args
-
-      inreplace "Makefile",
-        /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+)$/,
-        "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4"
-
-      # https://github.com/phpbrew/phpbrew/commit/18ef766d0e013ee87ac7d86e338ebec89fbeb445
-      # Unsure if this is still needed
-      inreplace "Makefile" do |s|
-        s.change_make_var! "EXTRA_LIBS", "\\1 -lstdc++"
+      inreplace config_path+"php-fpm.conf" do |s|
+        s.sub!(/^;?daemonize\s*=.+$/, "daemonize = no")
       end
-
-      system "make"
-      ENV.deparallelize # parallel install fails on some systems
-      system "make", "install"
-
-      # Prefer relative symlink instead of absolute for relocatable bottles
-      ln_s "phar.phar", bin+"phar", :force => true
-
-      # Install new php.ini unless one exists
-      config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
-
-      chmod 0755, "sapi/fpm/init.d.php-fpm"
-      sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
-
-      if File.exist?("sapi/cgi/fpm/php-fpm")
-        chmod 0755, "sapi/cgi/fpm/php-fpm"
-        sbin.install "sapi/cgi/fpm/php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
-      end
-
-      if !File.exist?(config_path+"php-fpm.d/www.conf") && File.exist?(config_path+"php-fpm.d/www.conf.default")
-        mv(config_path+"php-fpm.d/www.conf.default", config_path+"php-fpm.d/www.conf")
-      end
-
-      unless File.exist?(config_path+"php-fpm.conf")
-        if File.exist?("sapi/fpm/php-fpm.conf")
-          config_path.install "sapi/fpm/php-fpm.conf"
-        end
-
-        if File.exist?("sapi/cgi/fpm/php-fpm.conf")
-          config_path.install "sapi/cgi/fpm/php-fpm.conf"
-        end
-
-        inreplace config_path+"php-fpm.conf" do |s|
-          s.sub!(/^;?daemonize\s*=.+$/, "daemonize = no")
-        end
-      end
-
-      rm_f("#{config_pear}-backup") if File.exist? "#{config_pear}-backup"
-      rm_f("#{user_pear}-backup") if File.exist? "#{user_pear}-backup"
-      rm_f("#{config_pearrc}-backup") if File.exist? "#{config_pearrc}-backup"
-      rm_f("#{user_pearrc}-backup") if File.exist? "#{user_pearrc}-backup"
-    rescue StandardError
-      mv("#{config_pear}-backup", config_pear) if File.exist? "#{config_pear}-backup"
-      mv("#{user_pear}-backup", user_pear) if File.exist? "#{user_pear}-backup"
-      mv("#{config_pearrc}-backup", config_pearrc) if File.exist? "#{config_pearrc}-backup"
-      mv("#{user_pearrc}-backup", user_pearrc) if File.exist? "#{user_pearrc}-backup"
-      raise
     end
   end
 
