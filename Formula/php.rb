@@ -210,7 +210,7 @@ class Php < Formula
       chmod 0644, lib/f
     end
 
-    php_ini = "#{etc}/php/#{version.to_s.split(".")[0..1].join(".")}"
+    php_ini = "#{etc}/php/#{version.to_s.split(".")[0..1].join(".")}/php.ini"
     system bin/"pear", "config-set", "php_ini", php_ini, "system"
 
     %w[
