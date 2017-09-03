@@ -224,12 +224,12 @@ class Php < Formula
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
       if File.exist? config_path
         inreplace config_path do |s|
-          s.gsub /#{extension_type}=.*$/, "#{extension_type}=#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+          s.gsub /#{extension_type}=.*$/, "#{extension_type}=#{e}.so"
         end
       else
         config_path.write <<-EOS.undent
         [#{e}]
-        #{extension_type}="#{Utils.popen_read("php-config --extension-dir").chomp}/#{e}.so"
+        #{extension_type}="#{e}.so"
       EOS
       end
     end
