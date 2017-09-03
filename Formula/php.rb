@@ -146,24 +146,12 @@ class Php < Formula
     chmod 0755, "sapi/fpm/init.d.php-fpm"
     sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
 
-    if File.exist?("sapi/cgi/fpm/php-fpm")
-      chmod 0755, "sapi/cgi/fpm/php-fpm"
-      sbin.install "sapi/cgi/fpm/php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
-    end
-
     if !File.exist?(config_path+"php-fpm.d/www.conf") && File.exist?(config_path+"php-fpm.d/www.conf.default")
       mv(config_path+"php-fpm.d/www.conf.default", config_path+"php-fpm.d/www.conf")
     end
 
     unless File.exist?(config_path+"php-fpm.conf")
-      if File.exist?("sapi/fpm/php-fpm.conf")
-        config_path.install "sapi/fpm/php-fpm.conf"
-      end
-
-      if File.exist?("sapi/cgi/fpm/php-fpm.conf")
-        config_path.install "sapi/cgi/fpm/php-fpm.conf"
-      end
-
+      config_path.install "sapi/fpm/php-fpm.conf"
       inreplace config_path+"php-fpm.conf" do |s|
         s.sub!(/^;?daemonize\s*=.+$/, "daemonize = no")
       end
