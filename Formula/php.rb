@@ -70,7 +70,7 @@ class Php < Formula
       --enable-wddx
       --enable-zip
       --libexecdir=#{libexec}
-      --with-apxs2=#{Formula["httpd24"].opt_prefix}/bin/apxs
+      --with-apxs2=#{Formula["httpd24"].opt_bin}/apxs
       --with-bz2=/usr
       --with-enchant=#{Formula["enchant"].opt_prefix}
       --with-freetype-dir=#{Formula["freetype"].opt_prefix}
@@ -138,10 +138,9 @@ class Php < Formula
     ENV.deparallelize
     system "make", "install"
 
-    ln_s "phar.phar", bin+"phar", :force => true
+    bin.install_symlink "phar.phar" => "phar"
 
-    # Install new php.ini unless one exists
-    config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path+"php.ini"
+    config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path/"php.ini"
 
     chmod 0755, "sapi/fpm/init.d.php-fpm"
     sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
@@ -239,7 +238,7 @@ class Php < Formula
           <string>#{opt_sbin}/php-fpm</string>
           <string>--nodaemonize</string>
           <string>--fpm-config</string>
-          <string>#{HOMEBREW_PREFIX}/etc/php/#{version.to_s.split(".")[0..1].join(".")}/php-fpm.conf</string>
+          <string>#{etc}/php/#{version.to_s.split(".")[0..1].join(".")}/php-fpm.conf</string>
         </array>
         <key>RunAtLoad</key>
         <true/>
