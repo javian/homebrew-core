@@ -199,7 +199,7 @@ class Php < Formula
 
     chmod 0755, lib/"php/.channels"
     chmod 0755, lib/"php/.channels/.alias"
-    chmod 0644, (Dir.glob(lib/"php/.channels/**/*", File::FNM_DOTMATCH).reject { |a| a =~ /\/\.{1,2}$/ || File.directory?(a)})
+    chmod 0644, (Dir.glob(lib/"php/.channels/**/*", File::FNM_DOTMATCH).reject { |a| a =~ %r{\/\.{1,2}$} || File.directory?(a) })
 
     %w[
       php/.depdblock
