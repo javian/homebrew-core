@@ -140,7 +140,7 @@ class Php < Formula
 
     bin.install_symlink "phar.phar" => "phar"
 
-    config_path.install "./php.ini-development" => "php.ini" unless File.exist? config_path/"php.ini"
+    config_path.install "./php.ini-development" => "php.ini"
 
     chmod 0755, "sapi/fpm/init.d.php-fpm"
     sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
