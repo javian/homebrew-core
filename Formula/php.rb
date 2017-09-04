@@ -145,13 +145,13 @@ class Php < Formula
     chmod 0755, "sapi/fpm/init.d.php-fpm"
     sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
 
-    if !File.exist?(config_path+"php-fpm.d/www.conf") && File.exist?(config_path+"php-fpm.d/www.conf.default")
-      mv(config_path+"php-fpm.d/www.conf.default", config_path+"php-fpm.d/www.conf")
+    if !File.exist?(config_path/"php-fpm.d/www.conf") && File.exist?(config_path/"php-fpm.d/www.conf.default")
+      mv(config_path/"php-fpm.d/www.conf.default", config_path/"php-fpm.d/www.conf")
     end
 
-    unless File.exist?(config_path+"php-fpm.conf")
+    unless File.exist?(config_path/"php-fpm.conf")
       config_path.install "sapi/fpm/php-fpm.conf"
-      inreplace config_path+"php-fpm.conf" do |s|
+      inreplace config_path/"php-fpm.conf" do |s|
         s.sub!(/^;?daemonize\s*=.+$/, "daemonize = no")
       end
     end
