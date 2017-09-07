@@ -36,7 +36,7 @@ class Php < Formula
 
   def install
     ENV.cxx11
-    config_path = etc/"php/#{version.to_s.split(".")[0..1].join(".")}"
+    config_path = etc/"php/#{php_version}"
     ENV["lt_cv_path_SED"] = "sed"
 
     args = %W[
@@ -174,7 +174,7 @@ class Php < Formula
 
     s << <<-EOS.undent
       The php.ini file can be found in:
-          #{etc}/php/#{version.to_s.split(".")[0..1].join(".")}/php.ini
+          #{etc}/php/#{php_version}/php.ini
     EOS
 
     s.join "\n"
@@ -197,7 +197,7 @@ class Php < Formula
       chmod 0644, lib/f
     end
 
-    php_ini = "#{etc}/php/#{version.to_s.split(".")[0..1].join(".")}/php.ini"
+    php_ini = "#{etc}/php/#{php_version}/php.ini"
     system bin/"pear", "config-set", "php_ini", php_ini, "system"
 
     %w[
@@ -207,7 +207,7 @@ class Php < Formula
       imap
       opcache
     ].each do |e|
-      config_path = (etc/"php/#{version.to_s.split(".")[0..1].join(".")}/conf.d/ext-#{e}.ini")
+      config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
       if config_path.exist?
         inreplace config_path do |s|
@@ -220,6 +220,10 @@ class Php < Formula
       EOS
       end
     end
+  end
+
+  def php_version
+    version.to_s.split(".")[0..1].join(".")
   end
 
   plist_options :startup => true, :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s.split(".")[0..1].join(".")}/php-fpm.conf"
@@ -238,7 +242,7 @@ class Php < Formula
           <string>#{opt_sbin}/php-fpm</string>
           <string>--nodaemonize</string>
           <string>--fpm-config</string>
-          <string>#{etc}/php/#{version.to_s.split(".")[0..1].join(".")}/php-fpm.conf</string>
+          <string>#{etc}/php/#{php_version}/php-fpm.conf</string>
         </array>
         <key>RunAtLoad</key>
         <true/>
@@ -253,6 +257,6 @@ class Php < Formula
 
   test do
     system "#{bin}/php", "-i"
-    system "#{sbin}/php-fpm", "-y", "#{etc}/php/#{version.to_s.split(".")[0..1].join(".")}/php-fpm.conf", "-t"
+    system "#{sbin}/php-fpm", "-y", "#{etc}/php/#{php_version}/php-fpm.conf", "-t"
   end
 end
