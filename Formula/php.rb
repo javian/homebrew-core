@@ -145,11 +145,11 @@ class Php < Formula
     chmod 0755, "sapi/fpm/init.d.php-fpm"
     sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
 
-    if !File.exist?(config_path/"php-fpm.d/www.conf") && File.exist?(config_path/"php-fpm.d/www.conf.default")
-      mv(config_path/"php-fpm.d/www.conf.default", config_path/"php-fpm.d/www.conf")
+    if !(config_path/"php-fpm.d/www.conf").exist? && (config_path/"php-fpm.d/www.conf.default").exist?
+      mv config_path/"php-fpm.d/www.conf.default", config_path/"php-fpm.d/www.conf"
     end
 
-    unless File.exist?(config_path/"php-fpm.conf")
+    unless (config_path/"php-fpm.conf").exist?
       config_path.install "sapi/fpm/php-fpm.conf"
       inreplace config_path/"php-fpm.conf" do |s|
         s.sub!(/^;?daemonize\s*=.+$/, "daemonize = no")
@@ -181,8 +181,8 @@ class Php < Formula
   end
 
   def post_install
-    (prefix/"var/log").mkpath
-    touch prefix/"var/log/php-fpm.log"
+    (var/"log").mkpath
+    touch var/"log/php-fpm.log"
 
     chmod 0755, lib/"php/.channels"
     chmod 0755, lib/"php/.channels/.alias"
@@ -209,7 +209,7 @@ class Php < Formula
     ].each do |e|
       config_path = (etc/"php/#{version.to_s.split(".")[0..1].join(".")}/conf.d/ext-#{e}.ini")
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
-      if File.exist? config_path
+      if config_path.exist?
         inreplace config_path do |s|
           s.gsub /#{extension_type}=.*$/, "#{extension_type}=#{e}.so"
         end
