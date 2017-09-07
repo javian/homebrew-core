@@ -215,9 +215,9 @@ class Php < Formula
         end
       else
         config_path.write <<-EOS.undent
-        [#{e}]
-        #{extension_type}="#{e}.so"
-      EOS
+          [#{e}]
+          #{extension_type}="#{e}.so"
+        EOS
       end
     end
   end
