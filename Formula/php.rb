@@ -186,8 +186,7 @@ class Php < Formula
       chmod 0644, lib/f
     end
 
-    php_ini = "#{etc}/php/#{php_version}/php.ini"
-    system bin/"pear", "config-set", "php_ini", php_ini, "system"
+    system bin/"pear", "config-set", "php_ini", "#{etc}/php/#{php_version}/php.ini", "system"
 
     %w[
       ldap
