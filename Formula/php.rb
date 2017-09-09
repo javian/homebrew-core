@@ -210,7 +210,7 @@ class Php < Formula
       config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
       if config_path.exist?
-        inreplace config_path, %r{#{extension_type}=.*$}, "#{extension_type}=#{e}.so"
+        inreplace config_path, /#{extension_type}=.*$/, "#{extension_type}=#{e}.so"
       else
         config_path.write <<-EOS.undent
           [#{e}]
