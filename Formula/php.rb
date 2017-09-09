@@ -170,8 +170,8 @@ class Php < Formula
     EOS
 
     s << <<-EOS.undent
-      The php.ini file can be found in:
-          #{etc}/php/#{php_version}/php.ini
+      The php.ini and php-fpm.ini file can be found in:
+          #{etc}/php/#{php_version}/
     EOS
 
     s.join "\n"
