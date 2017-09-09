@@ -142,9 +142,6 @@ class Php < Formula
 
     config_path.install "./php.ini-development" => "php.ini"
 
-    chmod 0755, "sapi/fpm/init.d.php-fpm"
-    sbin.install "sapi/fpm/init.d.php-fpm" => "php#{version.to_s[0..2].delete(".")}-fpm"
-
     if !(config_path/"php-fpm.d/www.conf").exist? && (config_path/"php-fpm.d/www.conf.default").exist?
       mv config_path/"php-fpm.d/www.conf.default", config_path/"php-fpm.d/www.conf"
     end
