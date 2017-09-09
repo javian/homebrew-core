@@ -251,6 +251,8 @@ class Php < Formula
 
   test do
     system "#{bin}/php", "-i"
-    system "#{sbin}/php-fpm", "-y", "#{etc}/php/#{php_version}/php-fpm.conf", "-t"
+    system "#{sbin}/php-fpm", "-t"
+    system "#{bin}/phpdbg", "-V"
+    system "#{bin}/php-cgi", "-m"
   end
 end
