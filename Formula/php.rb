@@ -159,7 +159,7 @@ class Php < Formula
 
     s << <<-EOS.undent
       To enable PHP in Apache add the following to httpd.conf and restart Apache:
-          LoadModule php7_module #{HOMEBREW_PREFIX}/opt/php#{version.to_s[0..2].delete(".")}/libexec/apache2/libphp7.so
+          LoadModule php7_module #{opt_libexec}/apache2/libphp7.so
 
           <FilesMatch \.php$>
               SetHandler application/x-httpd-php
