@@ -141,17 +141,9 @@ class Php < Formula
     bin.install_symlink "phar.phar" => "phar"
 
     config_path.install "./php.ini-development" => "php.ini"
-
-    if !(config_path/"php-fpm.d/www.conf").exist? && (config_path/"php-fpm.d/www.conf.default").exist?
-      mv config_path/"php-fpm.d/www.conf.default", config_path/"php-fpm.d/www.conf"
-    end
-
-    unless (config_path/"php-fpm.conf").exist?
-      config_path.install "sapi/fpm/php-fpm.conf"
-      inreplace config_path/"php-fpm.conf" do |s|
-        s.sub!(/^;?daemonize\s*=.+$/, "daemonize = no")
-      end
-    end
+    (config_path/"php-fpm.d").install "sapi/fpm/www.conf"
+    config_path.install "sapi/fpm/php-fpm.conf"
+    inreplace config_path/"php-fpm.conf", /^;?daemonize\s*=.+$/, "daemonize = no"
   end
 
   def caveats
