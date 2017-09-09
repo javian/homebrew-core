@@ -227,7 +227,6 @@ class Php < Formula
         <array>
           <string>#{opt_sbin}/php-fpm</string>
           <string>--nodaemonize</string>
-          <string>#{etc}/php/#{php_version}/php-fpm.conf</string>
         </array>
         <key>RunAtLoad</key>
         <true/>
