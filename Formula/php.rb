@@ -221,7 +221,7 @@ class Php < Formula
     version.to_s.split(".")[0..1].join(".")
   end
 
-  plist_options :startup => true, :manual => "php-fpm --nodaemonize --fpm-config #{HOMEBREW_PREFIX}/etc/php/#{version.to_s.split(".")[0..1].join(".")}/php-fpm.conf"
+  plist_options :startup => true, :manual => "php-fpm"
 
   def plist; <<-EOPLIST.undent
     <?xml version="1.0" encoding="UTF-8"?>
@@ -236,7 +236,6 @@ class Php < Formula
         <array>
           <string>#{opt_sbin}/php-fpm</string>
           <string>--nodaemonize</string>
-          <string>--fpm-config</string>
           <string>#{etc}/php/#{php_version}/php-fpm.conf</string>
         </array>
         <key>RunAtLoad</key>
