@@ -4,6 +4,14 @@ class Php < Formula
   url "https://github.com/php/php-src/archive/php-7.1.9.tar.gz"
   sha256 "4bb7acacee5034705673004010789d6313e7d7f490a270308ec75d3391c4afea"
 
+  devel do
+    url "https://github.com/php/php-src/archive/php-7.2.0RC1.tar.gz"
+    sha256 "dbd485cd5f60bd272dbc3ec7428a63cf58b849b432ba03ffa30be7b8c7833015"
+
+    depends_on "libsodium"
+    depends_on "argon2"
+  end
+
   option "with-thread-safety", "Build with thread safety"
 
   depends_on "autoconf" => :build
@@ -11,7 +19,6 @@ class Php < Formula
   depends_on "re2c" => :build
   depends_on "libtool" => :run
   depends_on "aspell"
-  depends_on "argon2"
   depends_on "curl" if MacOS.version < :lion
   depends_on "enchant"
   depends_on "freetds"
@@ -96,7 +103,6 @@ class Php < Formula
       --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
       --with-ndbm=/usr
       --with-openssl=#{Formula["openssl"].opt_prefix}
-      --with-password-argon2=#{Formula["argon2"].opt_prefix}
       --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
       --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
       --with-pgsql=#{Formula["libpq"].opt_prefix}
@@ -120,6 +126,13 @@ class Php < Formula
     end
 
     args << "--enable-maintainer-zts" if build.with? "thread-safety"
+
+    if build.devel?
+      args += %W[
+        --with-password-argon2=#{Formula["argon2"].opt_prefix}
+        --with-sodium=#{Formula["libsodium"].opt_prefix}
+      ]
+    end
 
     system "./buildconf", "--force"
     system "./configure", *args
