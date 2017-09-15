@@ -141,12 +141,6 @@ class Php < Formula
       /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+)$/,
       "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4"
 
-    # https://github.com/phpbrew/phpbrew/commit/18ef766d0e013ee87ac7d86e338ebec89fbeb445
-    # Unsure if this is still needed
-    inreplace "Makefile" do |s|
-      s.change_make_var! "EXTRA_LIBS", "\\1 -lstdc++"
-    end
-
     system "make"
     ENV.deparallelize
     system "make", "install"
