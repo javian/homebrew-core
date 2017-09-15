@@ -5,8 +5,8 @@ class Php < Formula
   sha256 "4bb7acacee5034705673004010789d6313e7d7f490a270308ec75d3391c4afea"
 
   devel do
-    url "https://github.com/php/php-src/archive/php-7.2.0RC1.tar.gz"
-    sha256 "dbd485cd5f60bd272dbc3ec7428a63cf58b849b432ba03ffa30be7b8c7833015"
+    url "https://github.com/php/php-src/archive/php-7.2.0RC2.tar.gz"
+    sha256 "a40e0aceb0f389b88883297a5b180a84f345756431057496c7d697f7a0c08013"
 
     depends_on "libsodium"
     depends_on "argon2"
@@ -137,9 +137,25 @@ class Php < Formula
     system "./buildconf", "--force"
     system "./configure", *args
 
-    inreplace "Makefile",
-      /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+)$/,
-      "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4"
+    inreplace "Makefile" do |s|
+      s.gsub! /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
+        "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4 \\5"
+
+        %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
+          system_libs = []
+          other_flags = []
+          s.get_make_var(mk_var).split.each do |f|
+            if f[/^-L\/(?:Applications|usr\/lib)\//]
+              system_libs << f
+              next
+            end
+              other_flags << f
+            end
+          s.change_make_var! mk_var, other_flags.concat(system_libs).join(' ')
+        end
+      end
+
+    ENV.prepend "LDFLAGS", "-L#{Formula["tidy-html5"].opt_lib}"
 
     system "make"
     ENV.deparallelize
