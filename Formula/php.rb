@@ -141,19 +141,19 @@ class Php < Formula
       s.gsub! /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
         "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4 \\5"
 
-        %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
-          system_libs = []
-          other_flags = []
-          s.get_make_var(mk_var).split.each do |f|
-            if f[/^-L\/(?:Applications|usr\/lib)\//]
-              system_libs << f
-              next
-            end
-              other_flags << f
-            end
-          s.change_make_var! mk_var, other_flags.concat(system_libs).join(' ')
+      %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
+        system_libs = []
+        other_flags = []
+        s.get_make_var(mk_var).split.each do |f|
+          if f[%r{^-L\/(?:Applications|usr\/lib)\/}]
+            system_libs << f
+            next
+          end
+          other_flags << f
         end
+        s.change_make_var! mk_var, other_flags.concat(system_libs).join(" ")
       end
+    end
 
     ENV.prepend "LDFLAGS", "-L#{Formula["tidy-html5"].opt_lib}"
 
