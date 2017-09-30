@@ -77,7 +77,7 @@ class Php < Formula
       --enable-wddx
       --enable-zip
       --libexecdir=#{libexec}
-      --with-apxs2=#{Formula["httpd24"].opt_bin}/apxs
+      --with-apxs2=#{Formula["httpd"].opt_bin}/apxs
       --with-bz2=/usr
       --with-enchant=#{Formula["enchant"].opt_prefix}
       --with-freetype-dir=#{Formula["freetype"].opt_prefix}
