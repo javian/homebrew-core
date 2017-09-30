@@ -96,7 +96,6 @@ class Php < Formula
       --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
       --with-imap-ssl=#{Formula["openssl"].opt_prefix}
       --with-mhash
-      --with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}
       --with-mysql-sock=/tmp/mysql.sock
       --with-mysqli=mysqlnd
       --with-pdo-mysql=mysqlnd
@@ -132,6 +131,8 @@ class Php < Formula
         --with-password-argon2=#{Formula["argon2"].opt_prefix}
         --with-sodium=#{Formula["libsodium"].opt_prefix}
       ]
+    else
+      args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
 
     system "./buildconf", "--force"
