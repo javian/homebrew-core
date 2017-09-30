@@ -25,7 +25,7 @@ class Php < Formula
   depends_on "freetype"
   depends_on "gettext"
   depends_on "gmp"
-  depends_on "homebrew/apache/httpd24"
+  depends_on "httpd"
   depends_on "imap-uw"
   depends_on "icu4c"
   depends_on "jpeg"
