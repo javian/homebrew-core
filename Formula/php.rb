@@ -267,6 +267,6 @@ class Php < Formula
     system "#{sbin}/php-fpm", "-t"
     system "#{bin}/phpdbg", "-V"
     system "#{bin}/php-cgi", "-m"
-    system "#{Formula['httpd24'].bin}/httpd", "-M", "-C", "LoadModule php7_module #{opt_libexec}/httpd/libphp7.so"
+    system "#{Formula['httpd'].bin}/httpd", "-M", "-C", "'LoadModule php7_module #{opt_libexec}/apache2/libphp7.so'"
   end
 end
