@@ -1,8 +1,8 @@
 class Php < Formula
   desc "General-purpose scripting language"
   homepage "https://php.net/"
-  url "https://github.com/php/php-src/archive/php-7.1.9.tar.gz"
-  sha256 "4bb7acacee5034705673004010789d6313e7d7f490a270308ec75d3391c4afea"
+  url "https://github.com/php/php-src/archive/php-7.1.10.tar.gz"
+  sha256 "a29005b60b128120ccbc4d989be434046b67a85e10f76d89575f884f7ca91f7b"
 
   devel do
     url "https://github.com/php/php-src/archive/php-7.2.0RC2.tar.gz"
