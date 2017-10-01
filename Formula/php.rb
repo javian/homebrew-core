@@ -1,22 +1,23 @@
 class Php < Formula
   desc "General-purpose scripting language"
   homepage "https://php.net/"
-  url "https://github.com/php/php-src/archive/php-7.1.10.tar.gz"
-  sha256 "a29005b60b128120ccbc4d989be434046b67a85e10f76d89575f884f7ca91f7b"
+
+  stable do
+    version "7.1.10"
+    url "https://php.net/get/php-#{version}.tar.bz2/from/this/mirror"
+    sha256 "0ee51b9b1ae7eca3e9558f772ce20cbacd1f76420009b3af630c87027f9a41af"
+    depends_on "mcrypt"
+  end
 
   devel do
-    url "https://github.com/php/php-src/archive/php-7.2.0RC2.tar.gz"
-    sha256 "a40e0aceb0f389b88883297a5b180a84f345756431057496c7d697f7a0c08013"
-
-    depends_on "libsodium"
+    url "https://downloads.php.net/~remi/php-7.2.0RC3.tar.bz2"
+    sha256 "8f49066a9180546d60e31fbb5c3c4b8271e1773ca3db3ea5fd8b0abac5f0fb6e"
     depends_on "argon2"
+    depends_on "libsodium"
   end
 
   option "with-thread-safety", "Build with thread safety"
 
-  depends_on "autoconf" => :build
-  depends_on "bison" => :build
-  depends_on "re2c" => :build
   depends_on "libtool" => :run
   depends_on "aspell"
   depends_on "curl" if MacOS.version < :lion
@@ -26,12 +27,12 @@ class Php < Formula
   depends_on "gettext"
   depends_on "gmp"
   depends_on "httpd"
-  depends_on "imap-uw"
   depends_on "icu4c"
+  depends_on "imap-uw"
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libpq"
-  depends_on "mcrypt"
+  depends_on "libzip"
   depends_on "net-snmp"
   depends_on "openssl"
   depends_on "pcre"
@@ -114,6 +115,7 @@ class Php < Formula
       --with-pic
       --with-xmlrpc
       --with-zlib=/usr
+      --with-libzip=#{Formula["libzip"].opt_prefix}
       --with-libedit
       --with-xsl=/usr
     ]
@@ -135,13 +137,17 @@ class Php < Formula
       args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
 
-    system "./buildconf", "--force"
+    # Fix configure error can't libzip include
+    ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
+
     system "./configure", *args
 
     inreplace "Makefile" do |s|
+      # Custom location for php module and remove -a (don't touch httpd.conf)
       s.gsub! /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
-        "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4 \\5"
+        "INSTALL_IT = $(mkinstalldirs) '#{php_module_path}' \\2 LIBEXECDIR='#{php_module_path}' \\4 \\5"
 
+      # Reorder linker flags to put system paths at the end to avoid accidential system linkage
       %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
         system_libs = []
         other_flags = []
@@ -156,6 +162,7 @@ class Php < Formula
       end
     end
 
+    # Shared module linker flags come after the sytem flags, prepend to avoid accidential system linkage
     ENV.prepend "LDFLAGS", "-L#{Formula["tidy-html5"].opt_lib}"
 
     system "make"
@@ -164,10 +171,39 @@ class Php < Formula
 
     bin.install_symlink "phar.phar" => "phar"
 
-    config_path.install "./php.ini-development" => "php.ini"
+    config_path.install "php.ini-development" => "php.ini"
     (config_path/"php-fpm.d").install "sapi/fpm/www.conf"
     config_path.install "sapi/fpm/php-fpm.conf"
     inreplace config_path/"php-fpm.conf", /^;?daemonize\s*=.+$/, "daemonize = no"
+
+    # patch PEAR so it installs extensions outside of the Cellar
+    Dir.chdir prefix do
+      pear_patch = Patch.create :p1, <<-EOS.undent
+        --- a/lib/php/PEAR/Builder.php	2017-09-07 23:46:07.000000000 -0500
+        +++ b/lib/php/PEAR/Builder.php	2017-09-07 23:47:17.000000000 -0500
+        @@ -405,7 +405,7 @@
+                 $prefix = exec($this->config->get('php_prefix')
+                                 . "php-config" .
+                                $this->config->get('php_suffix') . " --prefix");
+        -        $this->_harvestInstDir($prefix, $inst_dir . DIRECTORY_SEPARATOR . $prefix, $built_files);
+        +        $this->_harvestInstDir($this->config->get('ext_dir'), $inst_dir . DIRECTORY_SEPARATOR . $prefix, $built_files);
+                 chdir($old_cwd);
+                 return $built_files;
+             }
+        --- a/lib/php/PEAR/Command/Install.php	2017-09-07 23:45:56.000000000 -0500
+        +++ b/lib/php/PEAR/Command/Install.php	2017-09-07 23:42:22.000000000 -0500
+        @@ -379,7 +379,7 @@
+                     $newini = array();
+                 }
+                 foreach ($binaries as $binary) {
+        -            if ($ini['extension_dir']) {
+        +            if ($ini['extension_dir'] && $ini['extension_dir'] === $this->config->get('ext_dir')) {
+                         $binary = basename($binary);
+                     }
+                     $newini[] = $enable . '="' . $binary . '"' . (OS_UNIX ? "\\n" : "\\r\\n");
+      EOS
+      pear_patch.apply
+    end
   end
 
   def caveats
@@ -175,7 +211,7 @@ class Php < Formula
 
     s << <<-EOS.undent
       To enable PHP in Apache add the following to httpd.conf and restart Apache:
-          LoadModule php7_module #{opt_libexec}/apache2/libphp7.so
+          LoadModule php7_module #{php_module_path}/libphp7.so
 
           <FilesMatch \.php$>
               SetHandler application/x-httpd-php
@@ -210,7 +246,27 @@ class Php < Formula
       chmod 0644, lib/f
     end
 
-    system bin/"pear", "config-set", "php_ini", "#{etc}/php/#{php_version}/php.ini", "system"
+    # custom location for extensions installed via pecl
+    pecl_path = HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl"
+    pecl_path.mkpath
+
+    # fix pear config to use opt paths
+    php_lib_path = opt_lib/"php"
+    {
+      "php_ini" => etc/"php/#{php_version}/php.ini",
+      "php_dir" => php_lib_path,
+      "ext_dir" => pecl_path,
+      "doc_dir" => php_lib_path/"doc",
+      "bin_dir" => opt_bin,
+      "data_dir" => php_lib_path/"data",
+      "cfg_dir" => php_lib_path/"cfg",
+      "www_dir" => php_lib_path/"htdocs",
+      "man_dir" => php_lib_path/"local/man",
+      "test_dir" => php_lib_path/"test",
+      "php_bin" => opt_bin/"php",
+    }.each do |key, value|
+      system bin/"pear", "config-set", key, value, "system"
+    end
 
     %w[
       ldap
@@ -237,6 +293,10 @@ class Php < Formula
     version.to_s.split(".")[0..1].join(".")
   end
 
+  def php_module_path
+    lib/"httpd/modules"
+  end
+
   plist_options :startup => true, :manual => "php-fpm"
 
   def plist; <<-EOPLIST.undent
@@ -258,7 +318,7 @@ class Php < Formula
         <key>WorkingDirectory</key>
         <string>#{var}</string>
         <key>StandardErrorPath</key>
-        <string>#{opt_prefix}/var/log/php-fpm.log</string>
+        <string>#{var}/log/php-fpm.log</string>
       </dict>
     </plist>
     EOPLIST
@@ -269,6 +329,6 @@ class Php < Formula
     system "#{sbin}/php-fpm", "-t"
     system "#{bin}/phpdbg", "-V"
     system "#{bin}/php-cgi", "-m"
-    system "#{Formula['httpd'].bin}/httpd", "-M", "-C", "LoadModule php7_module #{opt_libexec}/apache2/libphp7.so"
+    assert_match "php7_module", shell_output("#{Formula["httpd"].bin}/httpd -M -C 'LoadModule php7_module #{php_module_path}/libphp7.so'")
   end
 end
