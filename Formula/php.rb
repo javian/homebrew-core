@@ -219,6 +219,7 @@ class Php < Formula
       imap
       opcache
     ].each do |e|
+      next if build.devel? && (e == "mcrypt")
       config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
       if config_path.exist?
