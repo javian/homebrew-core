@@ -32,6 +32,7 @@ class Php < Formula
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libpq"
+  depends_on "libzip"
   depends_on "net-snmp"
   depends_on "openssl"
   depends_on "pcre"
@@ -114,6 +115,7 @@ class Php < Formula
       --with-pic
       --with-xmlrpc
       --with-zlib=/usr
+      --with-libzip=#{Formula["libzip"].opt_prefix}
       --with-libedit
       --with-xsl=/usr
     ]
@@ -134,6 +136,9 @@ class Php < Formula
     else
       args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
+
+    # Fix configure error can't libzip include
+    ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
 
     system "./configure", *args
 
