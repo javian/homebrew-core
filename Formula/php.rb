@@ -175,6 +175,35 @@ class Php < Formula
     (config_path/"php-fpm.d").install "sapi/fpm/www.conf"
     config_path.install "sapi/fpm/php-fpm.conf"
     inreplace config_path/"php-fpm.conf", /^;?daemonize\s*=.+$/, "daemonize = no"
+
+    # patch PEAR so it installs extensions outside of the Cellar
+    Dir.chdir prefix do
+      pear_patch = Patch.create :p1, <<-EOS.undent
+        --- a/lib/php/PEAR/Builder.php	2017-09-07 23:46:07.000000000 -0500
+        +++ b/lib/php/PEAR/Builder.php	2017-09-07 23:47:17.000000000 -0500
+        @@ -405,7 +405,7 @@
+                 $prefix = exec($this->config->get('php_prefix')
+                                 . "php-config" .
+                                $this->config->get('php_suffix') . " --prefix");
+        -        $this->_harvestInstDir($prefix, $inst_dir . DIRECTORY_SEPARATOR . $prefix, $built_files);
+        +        $this->_harvestInstDir($this->config->get('ext_dir'), $inst_dir . DIRECTORY_SEPARATOR . $prefix, $built_files);
+                 chdir($old_cwd);
+                 return $built_files;
+             }
+        --- a/lib/php/PEAR/Command/Install.php	2017-09-07 23:45:56.000000000 -0500
+        +++ b/lib/php/PEAR/Command/Install.php	2017-09-07 23:42:22.000000000 -0500
+        @@ -379,7 +379,7 @@
+                     $newini = array();
+                 }
+                 foreach ($binaries as $binary) {
+        -            if ($ini['extension_dir']) {
+        +            if ($ini['extension_dir'] && $ini['extension_dir'] === $this->config->get('ext_dir')) {
+                         $binary = basename($binary);
+                     }
+                     $newini[] = $enable . '="' . $binary . '"' . (OS_UNIX ? "\\n" : "\\r\\n");
+      EOS
+      pear_patch.apply
+    end
   end
 
   def caveats
@@ -217,7 +246,27 @@ class Php < Formula
       chmod 0644, lib/f
     end
 
-    system bin/"pear", "config-set", "php_ini", "#{etc}/php/#{php_version}/php.ini", "system"
+    # custom location for extensions installed via pecl
+    pecl_path = HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl"
+    pecl_path.mkpath
+
+    # fix pear config to use opt paths
+    php_lib_path = opt_lib/"php"
+    {
+      "php_ini" => etc/"php/#{php_version}/php.ini",
+      "php_dir" => php_lib_path,
+      "ext_dir" => pecl_path,
+      "doc_dir" => php_lib_path/"doc",
+      "bin_dir" => opt_bin,
+      "data_dir" => php_lib_path/"data",
+      "cfg_dir" => php_lib_path/"cfg",
+      "www_dir" => php_lib_path/"htdocs",
+      "man_dir" => php_lib_path/"local/man",
+      "test_dir" => php_lib_path/"test",
+      "php_bin" => opt_bin/"php",
+    }.each do |key, value|
+      system bin/"pear", "config-set", key, value, "system"
+    end
 
     %w[
       ldap
