@@ -168,7 +168,7 @@ class Php < Formula
 
     bin.install_symlink "phar.phar" => "phar"
 
-    config_path.install "./php.ini-development" => "php.ini"
+    config_path.install "php.ini-development" => "php.ini"
     (config_path/"php-fpm.d").install "sapi/fpm/www.conf"
     config_path.install "sapi/fpm/php-fpm.conf"
     inreplace config_path/"php-fpm.conf", /^;?daemonize\s*=.+$/, "daemonize = no"
