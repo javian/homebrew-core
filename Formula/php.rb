@@ -1,15 +1,20 @@
 class Php < Formula
   desc "General-purpose scripting language"
   homepage "https://php.net/"
-  url "https://github.com/php/php-src/archive/php-7.1.10.tar.gz"
-  sha256 "a29005b60b128120ccbc4d989be434046b67a85e10f76d89575f884f7ca91f7b"
+
+  stable do
+    url "https://github.com/php/php-src/archive/php-7.1.10.tar.gz"
+    sha256 "a29005b60b128120ccbc4d989be434046b67a85e10f76d89575f884f7ca91f7b"
+
+    depends_on "mcrypt"
+  end
 
   devel do
     url "https://github.com/php/php-src/archive/php-7.2.0RC2.tar.gz"
     sha256 "a40e0aceb0f389b88883297a5b180a84f345756431057496c7d697f7a0c08013"
 
-    depends_on "libsodium"
     depends_on "argon2"
+    depends_on "libsodium"
   end
 
   option "with-thread-safety", "Build with thread safety"
@@ -31,7 +36,6 @@ class Php < Formula
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libpq"
-  depends_on "mcrypt"
   depends_on "net-snmp"
   depends_on "openssl"
   depends_on "pcre"
