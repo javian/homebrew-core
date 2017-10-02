@@ -146,6 +146,7 @@ class Php < Formula
       s.gsub! /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
         "INSTALL_IT = $(mkinstalldirs) '#{lib}/httpd/modules' \\2 LIBEXECDIR='#{lib}/httpd/modules' \\4 \\5"
 
+      # Reorder linker flags to put system paths at the end to avoid accidential system linkage
       %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
         system_libs = []
         other_flags = []
@@ -160,6 +161,7 @@ class Php < Formula
       end
     end
 
+    # Shared module linker flags come after the sytem flags, prepend to avoid accidential system linkage
     ENV.prepend "LDFLAGS", "-L#{Formula["tidy-html5"].opt_lib}"
 
     system "make"
