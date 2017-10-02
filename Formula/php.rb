@@ -36,6 +36,7 @@ class Php < Formula
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libpq"
+  depends_on "libzip"
   depends_on "net-snmp"
   depends_on "openssl"
   depends_on "pcre"
@@ -99,6 +100,7 @@ class Php < Formula
       --with-libxml-dir=/usr
       --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
       --with-imap-ssl=#{Formula["openssl"].opt_prefix}
+      --with-libzip=#{Formula["libzip"].opt_prefix}
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
       --with-mysqli=mysqlnd
@@ -182,7 +184,7 @@ class Php < Formula
 
     s << <<-EOS.undent
       To enable PHP in Apache add the following to httpd.conf and restart Apache:
-          LoadModule php7_module #{lib}/httpd/modules/libphp7.so
+          LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so
 
           <FilesMatch \.php$>
               SetHandler application/x-httpd-php
@@ -265,7 +267,7 @@ class Php < Formula
         <key>WorkingDirectory</key>
         <string>#{var}</string>
         <key>StandardErrorPath</key>
-        <string>#{opt_prefix}/var/log/php-fpm.log</string>
+        <string>#{var}/log/php-fpm.log</string>
       </dict>
     </plist>
     EOPLIST
@@ -276,6 +278,6 @@ class Php < Formula
     system "#{sbin}/php-fpm", "-t"
     system "#{bin}/phpdbg", "-V"
     system "#{bin}/php-cgi", "-m"
-    assert_match "php7_module", shell_output("#{Formula["httpd"].bin}/httpd -M -C 'LoadModule php7_module #{lib}/httpd/modules/libphp7.so'")
+    assert_match "php7_module", shell_output("#{Formula["httpd"].bin}/httpd -M -C 'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'")
   end
 end
