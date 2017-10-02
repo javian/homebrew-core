@@ -144,7 +144,7 @@ class Php < Formula
 
     inreplace "Makefile" do |s|
       s.gsub! /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
-        "INSTALL_IT = $(mkinstalldirs) '#{libexec}/apache2' \\2 LIBEXECDIR='#{libexec}/apache2' \\4 \\5"
+        "INSTALL_IT = $(mkinstalldirs) '#{lib}/httpd/modules' \\2 LIBEXECDIR='#{lib}/httpd/modules' \\4 \\5"
 
       %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
         system_libs = []
@@ -179,7 +179,7 @@ class Php < Formula
 
     s << <<-EOS.undent
       To enable PHP in Apache add the following to httpd.conf and restart Apache:
-          LoadModule php7_module #{opt_libexec}/apache2/libphp7.so
+          LoadModule php7_module #{lib}/httpd/modules/libphp7.so
 
           <FilesMatch \.php$>
               SetHandler application/x-httpd-php
