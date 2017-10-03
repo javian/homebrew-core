@@ -6,6 +6,7 @@ class Php < Formula
     url "https://github.com/php/php-src/archive/php-7.1.10.tar.gz"
     sha256 "a29005b60b128120ccbc4d989be434046b67a85e10f76d89575f884f7ca91f7b"
 
+    depends_on "libtool" => :run
     depends_on "mcrypt"
   end
 
@@ -22,7 +23,7 @@ class Php < Formula
   depends_on "autoconf" => :build
   depends_on "bison" => :build
   depends_on "re2c" => :build
-  depends_on "libtool" => :run
+
   depends_on "aspell"
   depends_on "curl" if MacOS.version < :lion
   depends_on "enchant"
