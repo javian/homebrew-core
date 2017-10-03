@@ -46,6 +46,10 @@ class Php < Formula
 
   def install
     ENV.cxx11
+
+    # Fix missing header file during configure for libzip include
+    ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
+
     config_path = etc/"php/#{php_version}"
     ENV["lt_cv_path_SED"] = "sed"
 
@@ -138,9 +142,6 @@ class Php < Formula
     else
       args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
-
-    # Fix configure error can't libzip include (possible libzip bug)
-    ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
 
     system "./configure", *args
 
