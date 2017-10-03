@@ -4,7 +4,7 @@ class Php < Formula
 
   stable do
     version "7.1.10"
-    url "http://fi2.php.net/get/php-7.1.10.tar.gz/from/a/mirror"
+    url "http://php.net/get/php-7.1.10.tar.gz/from/this/mirror"
     sha256 "edc6a7c3fe89419525ce51969c5f48610e53613235bbef255c3a4db33b458083"
 
     depends_on "libtool" => :run
