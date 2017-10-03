@@ -3,26 +3,23 @@ class Php < Formula
   homepage "https://php.net/"
 
   stable do
-    url "https://github.com/php/php-src/archive/php-7.1.10.tar.gz"
-    sha256 "a29005b60b128120ccbc4d989be434046b67a85e10f76d89575f884f7ca91f7b"
+    version "7.1.10"
+    url "http://fi2.php.net/get/php-7.1.10.tar.gz/from/a/mirror"
+    sha256 "edc6a7c3fe89419525ce51969c5f48610e53613235bbef255c3a4db33b458083"
 
     depends_on "libtool" => :run
     depends_on "mcrypt"
   end
 
   devel do
-    url "https://github.com/php/php-src/archive/php-7.2.0RC2.tar.gz"
-    sha256 "a40e0aceb0f389b88883297a5b180a84f345756431057496c7d697f7a0c08013"
+    url "https://downloads.php.net/~remi/php-7.2.0RC3.tar.gz"
+    sha256 "076491818dd80d723c9232bd4553a95eb30374f3c602d5ca67b95f2ac5e1655a"
 
     depends_on "argon2"
     depends_on "libsodium"
   end
 
   option "with-thread-safety", "Build with thread safety"
-
-  depends_on "autoconf" => :build
-  depends_on "bison" => :build
-  depends_on "re2c" => :build
 
   depends_on "aspell"
   depends_on "curl" if MacOS.version < :lion
@@ -145,7 +142,6 @@ class Php < Formula
     # Fix configure error can't libzip include (possible libzip bug)
     ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
 
-    system "./buildconf", "--force"
     system "./configure", *args
 
     inreplace "Makefile" do |s|
