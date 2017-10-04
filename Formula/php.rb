@@ -4,21 +4,23 @@ class Php < Formula
 
   stable do
     version "7.1.10"
-    url "https://php.net/get/php-#{version}.tar.bz2/from/this/mirror"
-    sha256 "0ee51b9b1ae7eca3e9558f772ce20cbacd1f76420009b3af630c87027f9a41af"
+    url "http://php.net/get/php-7.1.10.tar.gz/from/this/mirror"
+    sha256 "edc6a7c3fe89419525ce51969c5f48610e53613235bbef255c3a4db33b458083"
+
+    depends_on "libtool" => :run
     depends_on "mcrypt"
   end
 
   devel do
-    url "https://downloads.php.net/~remi/php-7.2.0RC3.tar.bz2"
-    sha256 "8f49066a9180546d60e31fbb5c3c4b8271e1773ca3db3ea5fd8b0abac5f0fb6e"
+    url "https://downloads.php.net/~remi/php-7.2.0RC3.tar.gz"
+    sha256 "076491818dd80d723c9232bd4553a95eb30374f3c602d5ca67b95f2ac5e1655a"
+
     depends_on "argon2"
     depends_on "libsodium"
   end
 
   option "with-thread-safety", "Build with thread safety"
 
-  depends_on "libtool" => :run
   depends_on "aspell"
   depends_on "curl" if MacOS.version < :lion
   depends_on "enchant"
@@ -44,6 +46,10 @@ class Php < Formula
 
   def install
     ENV.cxx11
+
+    # Fix missing header file during configure for libzip include
+    ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
+
     config_path = etc/"php/#{php_version}"
     ENV["lt_cv_path_SED"] = "sed"
 
@@ -96,6 +102,7 @@ class Php < Formula
       --with-libxml-dir=/usr
       --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
       --with-imap-ssl=#{Formula["openssl"].opt_prefix}
+      --with-libzip=#{Formula["libzip"].opt_prefix}
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
       --with-mysqli=mysqlnd
@@ -137,15 +144,12 @@ class Php < Formula
       args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
 
-    # Fix configure error can't libzip include
-    ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
-
     system "./configure", *args
 
     inreplace "Makefile" do |s|
       # Custom location for php module and remove -a (don't touch httpd.conf)
       s.gsub! /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
-        "INSTALL_IT = $(mkinstalldirs) '#{php_module_path}' \\2 LIBEXECDIR='#{php_module_path}' \\4 \\5"
+        "INSTALL_IT = $(mkinstalldirs) '#{lib}/httpd/modules' \\2 LIBEXECDIR='#{lib}/httpd/modules' \\4 \\5"
 
       # Reorder linker flags to put system paths at the end to avoid accidential system linkage
       %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
@@ -211,7 +215,7 @@ class Php < Formula
 
     s << <<-EOS.undent
       To enable PHP in Apache add the following to httpd.conf and restart Apache:
-          LoadModule php7_module #{php_module_path}/libphp7.so
+          LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so
 
           <FilesMatch \.php$>
               SetHandler application/x-httpd-php
@@ -293,10 +297,6 @@ class Php < Formula
     version.to_s.split(".")[0..1].join(".")
   end
 
-  def php_module_path
-    lib/"httpd/modules"
-  end
-
   plist_options :startup => true, :manual => "php-fpm"
 
   def plist; <<-EOPLIST.undent
@@ -329,6 +329,6 @@ class Php < Formula
     system "#{sbin}/php-fpm", "-t"
     system "#{bin}/phpdbg", "-V"
     system "#{bin}/php-cgi", "-m"
-    assert_match "php7_module", shell_output("#{Formula["httpd"].bin}/httpd -M -C 'LoadModule php7_module #{php_module_path}/libphp7.so'")
+    assert_match "php7_module", shell_output("#{Formula["httpd"].bin}/httpd -M -C 'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'")
   end
 end
