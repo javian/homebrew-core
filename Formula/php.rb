@@ -106,7 +106,7 @@ class Php < Formula
       --with-mysqli=mysqlnd
       --with-pdo-mysql=mysqlnd
       --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
-      --with-ndbm=/usr
+      --with-ndbm
       --with-openssl=#{Formula["openssl"].opt_prefix}
       --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
       --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
@@ -119,9 +119,9 @@ class Php < Formula
       --with-webp-dir=#{Formula["webp"].opt_prefix}
       --with-pic
       --with-xmlrpc
-      --with-zlib=/usr
+      --with-zlib
       --with-libedit
-      --with-xsl=/usr
+      --with-xsl
     ]
 
     if MacOS.version < :lion
