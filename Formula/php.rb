@@ -19,8 +19,6 @@ class Php < Formula
     depends_on "libsodium"
   end
 
-  option "with-thread-safety", "Build with thread safety"
-
   depends_on "aspell"
   depends_on "curl" if MacOS.version < :lion
   depends_on "enchant"
@@ -131,8 +129,6 @@ class Php < Formula
     else
       args << "--with-curl"
     end
-
-    args << "--enable-maintainer-zts" if build.with? "thread-safety"
 
     if build.devel?
       args += %W[
