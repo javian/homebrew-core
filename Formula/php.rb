@@ -4,7 +4,7 @@ class Php < Formula
 
   stable do
     version "7.1.10"
-    url "http://php.net/get/php-7.1.10.tar.gz/from/this/mirror"
+    url "https://php.net/get/php-7.1.10.tar.gz/from/this/mirror"
     sha256 "edc6a7c3fe89419525ce51969c5f48610e53613235bbef255c3a4db33b458083"
 
     depends_on "libtool" => :run
@@ -18,8 +18,6 @@ class Php < Formula
     depends_on "argon2"
     depends_on "libsodium"
   end
-
-  option "with-thread-safety", "Build with thread safety"
 
   depends_on "aspell"
   depends_on "curl" if MacOS.version < :lion
@@ -85,7 +83,7 @@ class Php < Formula
       --enable-zip
       --libexecdir=#{libexec}
       --with-apxs2=#{Formula["httpd"].opt_bin}/apxs
-      --with-bz2=/usr
+      --with-bz2
       --with-enchant=#{Formula["enchant"].opt_prefix}
       --with-freetype-dir=#{Formula["freetype"].opt_prefix}
       --with-gmp=#{Formula["gmp"].opt_prefix}
@@ -93,13 +91,13 @@ class Php < Formula
       --with-gettext=#{Formula["gettext"].opt_prefix}
       --with-fpm-user=_www
       --with-fpm-group=_www
-      --with-iconv-dir=/usr
+      --with-iconv-dir
       --with-icu-dir=#{Formula["icu4c"].opt_prefix}
       --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
-      --with-kerberos=/usr
+      --with-kerberos
       --with-ldap=shared
-      --with-ldap-sasl=/usr
-      --with-libxml-dir=/usr
+      --with-ldap-sasl
+      --with-libxml-dir
       --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
       --with-imap-ssl=#{Formula["openssl"].opt_prefix}
       --with-libzip=#{Formula["libzip"].opt_prefix}
@@ -108,7 +106,7 @@ class Php < Formula
       --with-mysqli=mysqlnd
       --with-pdo-mysql=mysqlnd
       --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
-      --with-ndbm=/usr
+      --with-ndbm
       --with-openssl=#{Formula["openssl"].opt_prefix}
       --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
       --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
@@ -121,10 +119,9 @@ class Php < Formula
       --with-webp-dir=#{Formula["webp"].opt_prefix}
       --with-pic
       --with-xmlrpc
-      --with-zlib=/usr
-      --with-libzip=#{Formula["libzip"].opt_prefix}
+      --with-zlib
       --with-libedit
-      --with-xsl=/usr
+      --with-xsl
     ]
 
     if MacOS.version < :lion
@@ -132,8 +129,6 @@ class Php < Formula
     else
       args << "--with-curl"
     end
-
-    args << "--enable-maintainer-zts" if build.with? "thread-safety"
 
     if build.devel?
       args += %W[
@@ -240,15 +235,7 @@ class Php < Formula
     chmod 0755, lib/"php/.channels"
     chmod 0755, lib/"php/.channels/.alias"
     chmod 0644, (Dir.glob(lib/"php/.channels/**/*", File::FNM_DOTMATCH).reject { |a| a =~ %r{\/\.{1,2}$} || File.directory?(a) })
-
-    %w[
-      php/.depdblock
-      php/.filemap
-      php/.depdb
-      php/.lock
-    ].each do |f|
-      chmod 0644, lib/f
-    end
+    chmod 0644, %w[php/.depdblock php/.filemap php/.depdb php/.lock]
 
     # custom location for extensions installed via pecl
     pecl_path = HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl"
