@@ -4,7 +4,7 @@ class Php < Formula
 
   stable do
     version "7.1.10"
-    url "http://php.net/get/php-7.1.10.tar.gz/from/this/mirror"
+    url "https://php.net/get/php-7.1.10.tar.gz/from/this/mirror"
     sha256 "edc6a7c3fe89419525ce51969c5f48610e53613235bbef255c3a4db33b458083"
 
     depends_on "libtool" => :run
@@ -235,15 +235,7 @@ class Php < Formula
     chmod 0755, lib/"php/.channels"
     chmod 0755, lib/"php/.channels/.alias"
     chmod 0644, (Dir.glob(lib/"php/.channels/**/*", File::FNM_DOTMATCH).reject { |a| a =~ %r{\/\.{1,2}$} || File.directory?(a) })
-
-    %w[
-      php/.depdblock
-      php/.filemap
-      php/.depdb
-      php/.lock
-    ].each do |f|
-      chmod 0644, lib/f
-    end
+    chmod 0644, %w[php/.depdblock php/.filemap php/.depdb php/.lock]
 
     # custom location for extensions installed via pecl
     pecl_path = HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl"
