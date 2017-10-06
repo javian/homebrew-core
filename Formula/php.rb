@@ -19,6 +19,8 @@ class Php < Formula
     depends_on "libsodium"
   end
 
+  depends_on "autoconf" => :build
+  depends_on "pkg-config" => :build
   depends_on "aspell"
   depends_on "curl" if MacOS.version < :lion
   depends_on "enchant"
@@ -44,9 +46,6 @@ class Php < Formula
 
   def install
     ENV.cxx11
-
-    # Fix missing header file during configure for libzip include
-    ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
 
     config_path = etc/"php/#{php_version}"
     ENV["lt_cv_path_SED"] = "sed"
@@ -80,8 +79,7 @@ class Php < Formula
       --enable-sysvsem
       --enable-sysvshm
       --enable-wddx
-      --enable-zip
-      --libexecdir=#{libexec}
+      --enable-zip=shared
       --with-apxs2=#{Formula["httpd"].opt_bin}/apxs
       --with-bz2
       --with-enchant=#{Formula["enchant"].opt_prefix}
@@ -91,37 +89,34 @@ class Php < Formula
       --with-gettext=#{Formula["gettext"].opt_prefix}
       --with-fpm-user=_www
       --with-fpm-group=_www
-      --with-iconv-dir
       --with-icu-dir=#{Formula["icu4c"].opt_prefix}
       --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
       --with-kerberos
       --with-ldap=shared
       --with-ldap-sasl
-      --with-libxml-dir
+      --with-libzip
+      --with-libedit
       --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
       --with-imap-ssl=#{Formula["openssl"].opt_prefix}
-      --with-libzip=#{Formula["libzip"].opt_prefix}
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
       --with-mysqli=mysqlnd
-      --with-pdo-mysql=mysqlnd
-      --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
       --with-ndbm
       --with-openssl=#{Formula["openssl"].opt_prefix}
+      --with-pdo-mysql=mysqlnd
+      --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
       --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
       --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
       --with-pgsql=#{Formula["libpq"].opt_prefix}
+      --with-pic
       --with-png-dir=#{Formula["libpng"].opt_prefix}
       --with-pspell=#{Formula["aspell"].opt_prefix}
       --with-snmp
-      --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
       --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
-      --with-pic
       --with-xmlrpc
-      --with-zlib
-      --with-libedit
       --with-xsl
+      --with-zlib
     ]
 
     if MacOS.version < :lion
@@ -161,48 +156,51 @@ class Php < Formula
       end
     end
 
-    # Shared module linker flags come after the sytem flags, prepend to avoid accidential system linkage
-    ENV.prepend "LDFLAGS", "-L#{Formula["tidy-html5"].opt_lib}"
-
     system "make"
-    ENV.deparallelize
     system "make", "install"
 
-    bin.install_symlink "phar.phar" => "phar"
+    Dir.chdir "ext/tidy" do
+      system bin/"phpize"
+      system "./configure", "--with-tidy=#{Formula["tidy-html5"].opt_prefix}",
+                            "--with-php-config=#{bin}/php-config"
+      system "make", "install"
+    end
 
+    orig_ext_dir = `#{bin}/php-config --extension-dir`.chomp
+    orig_ext_dir.gsub! prefix, opt_prefix
+    inreplace bin/"php-config", lib/"php/extensions", prefix/"pecl-extensions"
+
+    %w[
+      ldap
+      mcrypt
+      tidy
+      imap
+      opcache
+      zip
+    ].each do |e|
+      next if build.devel? && (e == "mcrypt")
+      ini_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
+      extension_type = (e == "opcache") ? "zend_extension" : "extension"
+      if ini_path.exist?
+        inreplace ini_path,
+          /#{extension_type}=.*$/, "#{extension_type}=#{orig_ext_dir}/#{e}.so"
+      else
+        ini_path.write <<-EOS.undent
+          [#{e}]
+          #{extension_type}="#{orig_ext_dir}/#{e}.so"
+        EOS
+      end
+    end
+
+    inreplace "php.ini-development", %r{^; extension_dir = "\./"},
+      "extension_dir = \"#{HOMEBREW_PREFIX}/lib/php/#{php_version}/#{File.basename orig_ext_dir}\""
     config_path.install "php.ini-development" => "php.ini"
     (config_path/"php-fpm.d").install "sapi/fpm/www.conf"
     config_path.install "sapi/fpm/php-fpm.conf"
     inreplace config_path/"php-fpm.conf", /^;?daemonize\s*=.+$/, "daemonize = no"
 
-    # patch PEAR so it installs extensions outside of the Cellar
-    Dir.chdir prefix do
-      pear_patch = Patch.create :p1, <<-EOS.undent
-        --- a/lib/php/PEAR/Builder.php	2017-09-07 23:46:07.000000000 -0500
-        +++ b/lib/php/PEAR/Builder.php	2017-09-07 23:47:17.000000000 -0500
-        @@ -405,7 +405,7 @@
-                 $prefix = exec($this->config->get('php_prefix')
-                                 . "php-config" .
-                                $this->config->get('php_suffix') . " --prefix");
-        -        $this->_harvestInstDir($prefix, $inst_dir . DIRECTORY_SEPARATOR . $prefix, $built_files);
-        +        $this->_harvestInstDir($this->config->get('ext_dir'), $inst_dir . DIRECTORY_SEPARATOR . $prefix, $built_files);
-                 chdir($old_cwd);
-                 return $built_files;
-             }
-        --- a/lib/php/PEAR/Command/Install.php	2017-09-07 23:45:56.000000000 -0500
-        +++ b/lib/php/PEAR/Command/Install.php	2017-09-07 23:42:22.000000000 -0500
-        @@ -379,7 +379,7 @@
-                     $newini = array();
-                 }
-                 foreach ($binaries as $binary) {
-        -            if ($ini['extension_dir']) {
-        +            if ($ini['extension_dir'] && $ini['extension_dir'] === $this->config->get('ext_dir')) {
-                         $binary = basename($binary);
-                     }
-                     $newini[] = $enable . '="' . $binary . '"' . (OS_UNIX ? "\\n" : "\\r\\n");
-      EOS
-      pear_patch.apply
-    end
+    (var/"log").mkpath
+    touch var/"log/php-fpm.log" unless File.exist? var/"log/php-fpm.log"
   end
 
   def caveats
@@ -229,24 +227,35 @@ class Php < Formula
   end
 
   def post_install
-    (var/"log").mkpath
-    touch var/"log/php-fpm.log"
+    pecl_path = HOMEBREW_PREFIX/"lib/php"/php_version
+    pecl_path.mkpath
+    ln_s pecl_path, prefix/"pecl-extensions"
 
-    chmod 0755, lib/"php/.channels"
-    chmod 0755, lib/"php/.channels/.alias"
-    chmod 0644, (Dir.glob(lib/"php/.channels/**/*", File::FNM_DOTMATCH).reject { |a| a =~ %r{\/\.{1,2}$} || File.directory?(a) })
-    chmod 0644, %w[php/.depdblock php/.filemap php/.depdb php/.lock]
+    pear_files = %W[
+      #{lib}/php/.depdblock
+      #{lib}/php/.filemap
+      #{lib}/php/.depdb
+      #{lib}/php/.lock
+    ]
+
+    %W[
+      #{lib}/php/.channels
+      #{lib}/php/.channels/.alias
+    ].each do |f|
+      chmod 0755, f
+      pear_files.concat(Dir["#{f}/*"])
+    end
+
+    chmod 0644, pear_files
 
     # custom location for extensions installed via pecl
-    pecl_path = HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl"
-    pecl_path.mkpath
+    (HOMEBREW_PREFIX/"lib/php/#{php_version}").mkpath
 
     # fix pear config to use opt paths
     php_lib_path = opt_lib/"php"
     {
       "php_ini" => etc/"php/#{php_version}/php.ini",
       "php_dir" => php_lib_path,
-      "ext_dir" => pecl_path,
       "doc_dir" => php_lib_path/"doc",
       "bin_dir" => opt_bin,
       "data_dir" => php_lib_path/"data",
@@ -257,26 +266,6 @@ class Php < Formula
       "php_bin" => opt_bin/"php",
     }.each do |key, value|
       system bin/"pear", "config-set", key, value, "system"
-    end
-
-    %w[
-      ldap
-      mcrypt
-      tidy
-      imap
-      opcache
-    ].each do |e|
-      next if build.devel? && (e == "mcrypt")
-      config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
-      extension_type = (e == "opcache") ? "zend_extension" : "extension"
-      if config_path.exist?
-        inreplace config_path, /#{extension_type}=.*$/, "#{extension_type}=#{e}.so"
-      else
-        config_path.write <<-EOS.undent
-          [#{e}]
-          #{extension_type}="#{e}.so"
-        EOS
-      end
     end
   end
 
@@ -316,6 +305,11 @@ class Php < Formula
     system "#{sbin}/php-fpm", "-t"
     system "#{bin}/phpdbg", "-V"
     system "#{bin}/php-cgi", "-m"
-    assert_match "php7_module", shell_output("#{Formula["httpd"].bin}/httpd -M -C 'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'")
+    assert_match "php7_module", shell_output(
+      %W[
+        #{Formula["httpd"].bin}/httpd -M -C
+        'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'
+      ].join(" "),
+    )
   end
 end
