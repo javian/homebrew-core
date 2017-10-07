@@ -134,7 +134,13 @@ class Php < Formula
       args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
 
+    (buildpath/"httpd-prefork.conf").write "LoadModule mpm_prefork_module lib/httpd/modules/mod_mpm_prefork.so"
+    cp etc/"httpd/httpd.conf", buildpath/"httpd.conf.bak"
+    mv buildpath/"httpd-prefork.conf", etc/"httpd/httpd.conf"
+
     system "./configure", *args
+
+    mv buildpath/"httpd.conf.bak", etc/"httpd/httpd.conf"
 
     inreplace "Makefile" do |s|
       # Custom location for php module and remove -a (don't touch httpd.conf)
@@ -166,34 +172,11 @@ class Php < Formula
       system "make", "install"
     end
 
-    orig_ext_dir = `#{bin}/php-config --extension-dir`.chomp
-    orig_ext_dir.gsub! prefix, opt_prefix
+    orig_ext_dir = File.basename `#{bin}/php-config --extension-dir`.chomp
     inreplace bin/"php-config", lib/"php/extensions", prefix/"pecl-extensions"
 
-    %w[
-      ldap
-      mcrypt
-      tidy
-      imap
-      opcache
-      zip
-    ].each do |e|
-      next if build.devel? && (e == "mcrypt")
-      ini_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
-      extension_type = (e == "opcache") ? "zend_extension" : "extension"
-      if ini_path.exist?
-        inreplace ini_path,
-          /#{extension_type}=.*$/, "#{extension_type}=#{orig_ext_dir}/#{e}.so"
-      else
-        ini_path.write <<-EOS.undent
-          [#{e}]
-          #{extension_type}="#{orig_ext_dir}/#{e}.so"
-        EOS
-      end
-    end
-
     inreplace "php.ini-development", %r{^; extension_dir = "\./"},
-      "extension_dir = \"#{HOMEBREW_PREFIX}/lib/php/#{php_version}/#{File.basename orig_ext_dir}\""
+      "extension_dir = \"#{HOMEBREW_PREFIX}/lib/php/#{php_version}/#{orig_ext_dir}\""
     config_path.install "php.ini-development" => "php.ini"
     (config_path/"php-fpm.d").install "sapi/fpm/www.conf"
     config_path.install "sapi/fpm/php-fpm.conf"
@@ -230,6 +213,30 @@ class Php < Formula
     pecl_path = HOMEBREW_PREFIX/"lib/php"/php_version
     pecl_path.mkpath
     ln_s pecl_path, prefix/"pecl-extensions"
+
+    orig_ext_dir = File.basename `#{bin}/php-config --extension-dir`.chomp
+    orig_ext_dir = opt_prefix/"lib/php/extensions/#{orig_ext_dir}"
+    %w[
+      ldap
+      mcrypt
+      tidy
+      imap
+      opcache
+      zip
+    ].each do |e|
+      next if build.devel? && (e == "mcrypt")
+      ini_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
+      extension_type = (e == "opcache") ? "zend_extension" : "extension"
+      if ini_path.exist?
+        inreplace ini_path,
+          /#{extension_type}=.*$/, "#{extension_type}=#{orig_ext_dir}/#{e}.so"
+      else
+        ini_path.write <<-EOS.undent
+          [#{e}]
+          #{extension_type}="#{orig_ext_dir}/#{e}.so"
+        EOS
+      end
+    end
 
     pear_files = %W[
       #{lib}/php/.depdblock
