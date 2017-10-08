@@ -84,42 +84,42 @@ class Php < Formula
       --with-apxs2=#{Formula["httpd"].opt_bin}/apxs
       --with-bz2
       --with-enchant=#{Formula["enchant"].opt_prefix}
-      --with-freetype-dir=#{Formula["freetype"].opt_prefix}
-      --with-gmp=#{Formula["gmp"].opt_prefix}
-      --with-gd
-      --with-gettext=#{Formula["gettext"].opt_prefix}
       --with-fpm-user=_www
       --with-fpm-group=_www
+      --with-freetype-dir=#{Formula["freetype"].opt_prefix}
+      --with-gd
+      --with-gettext=#{Formula["gettext"].opt_prefix}
+      --with-gmp=#{Formula["gmp"].opt_prefix}
       --with-iconv-dir
       --with-icu-dir=#{Formula["icu4c"].opt_prefix}
+      --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
+      --with-imap-ssl=#{Formula["openssl"].opt_prefix}
       --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
       --with-kerberos
       --with-ldap=shared
       --with-ldap-sasl
+      --with-libedit
       --with-libxml-dir
-      --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
-      --with-imap-ssl=#{Formula["openssl"].opt_prefix}
       --with-libzip=#{Formula["libzip"].opt_prefix}
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
       --with-mysqli=mysqlnd
-      --with-pdo-mysql=mysqlnd
-      --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
       --with-ndbm
       --with-openssl=#{Formula["openssl"].opt_prefix}
       --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
+      --with-pdo-mysql=mysqlnd
+      --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
       --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
       --with-pgsql=#{Formula["libpq"].opt_prefix}
+      --with-pic
       --with-png-dir=#{Formula["libpng"].opt_prefix}
       --with-pspell=#{Formula["aspell"].opt_prefix}
       --with-snmp
       --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
       --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
-      --with-pic
       --with-xmlrpc
       --with-zlib
-      --with-libedit
       --with-xsl
     ]
 
