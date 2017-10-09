@@ -202,6 +202,11 @@ class Php < Formula
       EOS
       pear_patch.apply
     end
+
+    unless File.exist? "#{var}/log/php-fpm.log"
+      (var/"log").mkpath
+      touch var/"log/php-fpm.log"
+    end
   end
 
   def caveats
@@ -228,8 +233,7 @@ class Php < Formula
   end
 
   def post_install
-    (var/"log").mkpath
-    touch var/"log/php-fpm.log"
+
 
     chmod 0755, lib/"php/.channels"
     chmod 0755, lib/"php/.channels/.alias"
