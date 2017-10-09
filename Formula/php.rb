@@ -315,6 +315,10 @@ class Php < Formula
     system "#{sbin}/php-fpm", "-t"
     system "#{bin}/phpdbg", "-V"
     system "#{bin}/php-cgi", "-m"
-    assert_match "php7_module", shell_output("#{Formula["httpd"].bin}/httpd -M -C 'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'")
+    assert_match "php7_module", shell_output(
+      %W[
+        #{Formula["httpd"].bin}/httpd -M -C
+        'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'
+      ].join(" "))
   end
 end
