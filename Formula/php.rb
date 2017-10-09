@@ -141,10 +141,6 @@ class Php < Formula
     system "./configure", *args
 
     inreplace "Makefile" do |s|
-      # Custom location for php module and remove -a (don't touch httpd.conf)
-      s.gsub! /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
-        "INSTALL_IT = $(mkinstalldirs) '#{lib}/httpd/modules' \\2 LIBEXECDIR='#{lib}/httpd/modules' \\4 \\5"
-
       # Reorder linker flags to put system paths at the end to avoid accidential system linkage
       %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
         system_libs = []
