@@ -233,8 +233,6 @@ class Php < Formula
   end
 
   def post_install
-
-
     chmod 0755, lib/"php/.channels"
     chmod 0755, lib/"php/.channels/.alias"
     chmod 0644, (Dir.glob(lib/"php/.channels/**/*", File::FNM_DOTMATCH).reject { |a| a =~ %r{\/\.{1,2}$} || File.directory?(a) })
@@ -322,6 +320,7 @@ class Php < Formula
       %W[
         #{Formula["httpd"].bin}/httpd -M -C
         'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'
-      ].join(" "))
+      ].join(" "),
+    )
   end
 end
