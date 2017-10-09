@@ -237,8 +237,7 @@ class Php < Formula
     chmod 0644, %w[php/.depdblock php/.filemap php/.depdb php/.lock]
 
     # custom location for extensions installed via pecl
-    pecl_path = HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl"
-    pecl_path.mkpath
+    (HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl").mkpath
 
     # fix pear config to use opt paths
     php_lib_path = opt_lib/"php"
