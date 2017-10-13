@@ -136,13 +136,11 @@ class Php < Formula
       args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
 
-    (buildpath/"httpd-prefork.conf").write "LoadModule mpm_prefork_module lib/httpd/modules/mod_mpm_prefork.so"
-    cp etc/"httpd/httpd.conf", buildpath/"httpd.conf.bak"
-    mv buildpath/"httpd-prefork.conf", etc/"httpd/httpd.conf"
+    inreplace "configure",
+              "APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`",
+              "APACHE_THREADED_MPM="
 
     system "./configure", *args
-
-    mv buildpath/"httpd.conf.bak", etc/"httpd/httpd.conf"
 
     inreplace "Makefile" do |s|
       # Custom location for php module and remove -a (don't touch httpd.conf)
@@ -176,9 +174,9 @@ class Php < Formula
 
     orig_ext_dir = File.basename `#{bin}/php-config --extension-dir`.chomp
     inreplace bin/"php-config", lib/"php/extensions", prefix/"pecl-extensions"
-
     inreplace "php.ini-development", %r{^; extension_dir = "\./"},
       "extension_dir = \"#{HOMEBREW_PREFIX}/lib/php/#{php_version}/#{orig_ext_dir}\""
+
     config_path.install "php.ini-development" => "php.ini"
     (config_path/"php-fpm.d").install "sapi/fpm/www.conf"
     config_path.install "sapi/fpm/php-fpm.conf"
