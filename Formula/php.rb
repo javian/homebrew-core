@@ -82,21 +82,21 @@ class Php < Formula
       --with-apxs2=#{Formula["httpd"].opt_bin}/apxs
       --with-bz2
       --with-enchant=#{Formula["enchant"].opt_prefix}
-      --with-freetype-dir=#{Formula["freetype"].opt_prefix}
-      --with-gmp=#{Formula["gmp"].opt_prefix}
-      --with-gd
-      --with-gettext=#{Formula["gettext"].opt_prefix}
       --with-fpm-user=_www
       --with-fpm-group=_www
+      --with-freetype-dir=#{Formula["freetype"].opt_prefix}
+      --with-gd
+      --with-gettext=#{Formula["gettext"].opt_prefix}
+      --with-gmp=#{Formula["gmp"].opt_prefix}
       --with-icu-dir=#{Formula["icu4c"].opt_prefix}
+      --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
+      --with-imap-ssl=#{Formula["openssl"].opt_prefix}
       --with-jpeg-dir=#{Formula["jpeg"].opt_prefix}
       --with-kerberos
       --with-ldap=shared
       --with-ldap-sasl
-      --with-libzip
       --with-libedit
-      --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
-      --with-imap-ssl=#{Formula["openssl"].opt_prefix}
+      --with-libzip
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
       --with-mysqli=mysqlnd
@@ -105,6 +105,8 @@ class Php < Formula
       --with-pdo-mysql=mysqlnd
       --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
       --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
+      --with-pdo-mysql=mysqlnd
+      --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
       --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
       --with-pgsql=#{Formula["libpq"].opt_prefix}
       --with-pic
@@ -114,6 +116,7 @@ class Php < Formula
       --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
       --with-xmlrpc
+      --with-zlib
       --with-xsl
       --with-zlib
     ]
