@@ -102,8 +102,6 @@ class Php < Formula
       --with-mysqli=mysqlnd
       --with-ndbm
       --with-openssl=#{Formula["openssl"].opt_prefix}
-      --with-pdo-mysql=mysqlnd
-      --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
       --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
       --with-pdo-mysql=mysqlnd
       --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
@@ -116,7 +114,6 @@ class Php < Formula
       --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
       --with-xmlrpc
-      --with-zlib
       --with-xsl
       --with-zlib
     ]
