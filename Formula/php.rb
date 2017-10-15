@@ -46,6 +46,12 @@ class Php < Formula
               "APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`",
               "APACHE_THREADED_MPM="
 
+    inreplace "sapi/apache2handler/sapi_apache2.c",
+              "You need to recompile PHP.",
+              "Homebrew PHP does not support a thread-safe php binary. "\
+              "To use the PHP apache sapi please change "\
+              "your httpd config to use the prefork MPM"
+
     ENV.cxx11
 
     # Fix missing header file during configure for libzip include
