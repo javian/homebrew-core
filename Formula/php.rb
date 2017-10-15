@@ -11,8 +11,8 @@ class Php < Formula
   end
 
   devel do
-    url "https://downloads.php.net/~remi/php-7.2.0RC3.tar.gz"
-    sha256 "076491818dd80d723c9232bd4553a95eb30374f3c602d5ca67b95f2ac5e1655a"
+    url "https://downloads.php.net/~remi/php-7.2.0RC4.tar.gz"
+    sha256 "f89422d9bcd443e0f3d00d4be19f767dcbe4829efd561b5b9800fe0c57e16156"
 
     depends_on "argon2"
     depends_on "libsodium"
