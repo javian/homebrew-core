@@ -3,13 +3,13 @@ class Osquery < Formula
   homepage "https://osquery.io"
   # pull from git tag to get submodules
   url "https://github.com/facebook/osquery.git",
-      :tag => "2.8.0",
-      :revision => "168cb327f245bd520d326fcbf612678059547a0d"
+      :tag => "2.9.0",
+      :revision => "fc4ee471ff660632671ce537bd9a3336578afa24"
 
   bottle do
     cellar :any
-    sha256 "259e62e01ef994e3e9bb48fd4ea01ff28d4a3e04137af1044415462329649fc2" => :high_sierra
-    sha256 "1e668477bf5dcc83903ca91724f5e6d7dd3174f8901f9de8b0e2eab56a8a11e3" => :sierra
+    sha256 "e22d2766a80bec328332f8cb5692ea574e4b5dec9bad363b22a0a81e30a97b17" => :high_sierra
+    sha256 "a271b533137cd9f0b033b97ecc3b9b9fb55e2c30f6545c0ff010a964b24e8d85" => :sierra
   end
 
   fails_with :gcc => "6"
@@ -52,8 +52,8 @@ class Osquery < Formula
   end
 
   resource "aws-sdk-cpp" do
-    url "https://github.com/aws/aws-sdk-cpp/archive/1.1.20.tar.gz"
-    sha256 "d88e152ab5d9ad838166cb32a6152549ec16a51fb2fcc0802c704ea79c12edcb"
+    url "https://github.com/aws/aws-sdk-cpp/archive/1.2.7.tar.gz"
+    sha256 "1f65e63dbbceb1e8ffb19851a8e0ee153e05bf63bfa12b0e259d50021ac3ab6e"
   end
 
   resource "cpp-netlib" do

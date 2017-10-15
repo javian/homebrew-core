@@ -5,20 +5,20 @@ class GitAnnex < Formula
 
   desc "Manage files with git without checking in file contents"
   homepage "https://git-annex.branchable.com/"
-  url "https://hackage.haskell.org/package/git-annex-6.20170925/git-annex-6.20170925.tar.gz"
-  sha256 "c0b14db55a215fdc19f129646ad6a014da99cda5a77af5ce3915e2af6cb3f84f"
+  url "https://hackage.haskell.org/package/git-annex-6.20171003/git-annex-6.20171003.tar.gz"
+  sha256 "51edd74b98cbf5baa38e2197fb60b8b04d8cc375a686859ee74cb5e54a53de3b"
   head "git://git-annex.branchable.com/"
 
   bottle do
-    sha256 "2c08f39c961a98fd3a98401bdf892018d70b2aba481e3a81affbe1233050fe75" => :high_sierra
-    sha256 "601eb19f3c75f3ff66c45a45cb27cbf923569762b4f625692d013ae1a3b15bd1" => :sierra
-    sha256 "a1d5dee4627e5f865544038058d14d0a7bf1b36a378dca521d9b27f2ed489435" => :el_capitan
+    sha256 "14506f7f7538daa7395484890b860441ce3a390c81e6c7ed58fd6669fd215a7f" => :high_sierra
+    sha256 "0d04414621e85f62e2826b4abc00322b4ab638d6fbce1e08d8e445d34dfeb701" => :sierra
+    sha256 "f7587ce10d93624d4c7ab3983c93309aae2cb799fb96b7ef881aba3a040aa134" => :el_capitan
   end
 
   option "with-git-union-merge", "Build the git-union-merge tool"
 
-  depends_on "ghc@8.0" => :build
   depends_on "cabal-install" => :build
+  depends_on "ghc" => :build
   depends_on "pkg-config" => :build
   depends_on "gsasl"
   depends_on "libmagic"
@@ -26,7 +26,13 @@ class GitAnnex < Formula
   depends_on "xdot" => :recommended
 
   def install
-    install_cabal_package :using => ["alex", "happy", "c2hs"], :flags => ["s3", "webapp"] do
+    # The fingertree constraint can be removed after the next release of reducers (>v3.12.1)
+    # https://git-annex.branchable.com/bugs/fingertree___62____61___0.1.2_causes_build_to_fail_on_reducers/
+    # git-annex is broken with aws 0.17, error: "Couldn't match expected type 'AWS.Configuration'"
+    # https://git-annex.branchable.com/bugs/Cannot_build_with_aws_0.17.1/
+    install_cabal_package "--constraint", "fingertree<0.1.2.0", "--constraint", "aws<0.17",
+                          "--allow-newer=aws:time", :using => ["alex", "happy", "c2hs"],
+                                                    :flags => ["s3", "webapp"] do
       # this can be made the default behavior again once git-union-merge builds properly when bottling
       if build.with? "git-union-merge"
         system "make", "git-union-merge", "PREFIX=#{prefix}"

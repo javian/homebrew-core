@@ -1,16 +1,15 @@
 class Gopass < Formula
   desc "The slightly more awesome Standard Unix Password Manager for Teams"
   homepage "https://www.justwatch.com/gopass"
-  url "https://www.justwatch.com/gopass/releases/1.3.2/gopass-1.3.2.tar.gz"
-  sha256 "83eb409ed683b6e574680e70272977299e5741b1a7e82c835f0dea9485063aba"
+  url "https://www.justwatch.com/gopass/releases/1.4.1/gopass-1.4.1.tar.gz"
+  sha256 "b7f15f6504f14301842423b4ab424f7050fb880ef52a720f16c7ba65611f05ad"
   head "https://github.com/justwatchcom/gopass.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "59a5cd330e6df3bdfc5da666c2c5d6edd8612137fc196a605879c7d1707e723b" => :high_sierra
-    sha256 "05223f9c31e3aed7bf3f483eaa41159d8f1e2755fe1dd0fb24837e0ef4a13e29" => :sierra
-    sha256 "afea43d98e86969f9c7424099e63ff67cfcf5a834ef09b4db28285e43ce222e5" => :el_capitan
-    sha256 "8b2c1ce0392083f76a98cf0a7a13f1209c6476b4eb7ecff07fb075f9e9fb0f35" => :yosemite
+    sha256 "e67fe2d6b31ba0c10b41ba0066c235e7e36f96b688e12e6c72ff03bf2824ccf3" => :high_sierra
+    sha256 "568125508b41b9004363df86df46cc784aa372fa3f29938e597aebe7fa561017" => :sierra
+    sha256 "5c505090966f1542e9782d597d02b696c5fed1b05f3cc6f57349c185b04380b5" => :el_capitan
   end
 
   depends_on "go" => :build
@@ -49,7 +48,7 @@ class Gopass < Formula
 
       system bin/"gopass", "init", "--nogit", "testing@foo.bar"
       system bin/"gopass", "generate", "Email/other@foo.bar", "15"
-      assert File.exist?(".password-store/Email/other@foo.bar.gpg")
+      assert_predicate testpath/".password-store/Email/other@foo.bar.gpg", :exist?
     ensure
       system Formula["gnupg"].opt_bin/"gpgconf", "--kill", "gpg-agent"
       system Formula["gnupg"].opt_bin/"gpgconf", "--homedir", "keyrings/live",

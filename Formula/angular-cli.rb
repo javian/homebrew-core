@@ -3,13 +3,13 @@ require "language/node"
 class AngularCli < Formula
   desc "CLI tool for Angular"
   homepage "https://cli.angular.io/"
-  url "https://registry.npmjs.org/@angular/cli/-/cli-1.4.4.tgz"
-  sha256 "a20e59a356940fbf9b8a529f3feb0af7d71bc7c24e07f9f886ba314ecec75ff6"
+  url "https://registry.npmjs.org/@angular/cli/-/cli-1.4.7.tgz"
+  sha256 "3727fbd7893f20bf076dd7dc7aad685369f40c7e67568ec88614d5eb3c7f3c49"
 
   bottle do
-    sha256 "e5e2c94f6d892055fdb4f397fdc32f10bba9005f45845cbd34562fa5de67cd76" => :high_sierra
-    sha256 "b1431ffed9802fb336bdd472d2aabec63f682d67f536e9d007f9bb1848861eef" => :sierra
-    sha256 "eced7745eb837ed551534f290016d04a5fc44390724b5781256199e59a1eca48" => :el_capitan
+    sha256 "b3e451bc5c862cc671ccbd1e0cbb9f3e4b8ebd8a7a1195a7c20111ae09585e96" => :high_sierra
+    sha256 "b780b065cf87d7b6d3244923e8d951896e0f41372dc5aaf94a4180e428c886b6" => :sierra
+    sha256 "6fc69aea3367fb56888d4377d79c01f380bd08fd3b44ea70f6e98a8c809bef20" => :el_capitan
   end
 
   depends_on "node"
@@ -21,6 +21,6 @@ class AngularCli < Formula
 
   test do
     system bin/"ng", "new", "--skip-install", "angular-homebrew-test"
-    assert File.exist?("angular-homebrew-test/package.json"), "Project was not created"
+    assert_predicate testpath/"angular-homebrew-test/package.json", :exist?, "Project was not created"
   end
 end

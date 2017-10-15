@@ -13,9 +13,10 @@ class Ffmpeg < Formula
 
     # Upstream commit from 23 Jun 2017 "Add support for LibOpenJPEG v2.2/git"
     # See https://github.com/FFmpeg/FFmpeg/commit/078322f33ced4b2db6ac3e5002f98233d6fbf643
+    # Also, add openjpeg 2.3 compatibility
     patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/dfe0fd6/ffmpeg/openjpeg-2.2.patch"
-      sha256 "77fbc0f61f2e5742f33116e0da3d246882717affeee2f25112a8a8a69dc17815"
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/ad15f83/ffmpeg/openjpeg-2.3.patch"
+      sha256 "af5bbbc2c05ec5bb7e639f316531b6a2c08370a9ab7ecab465ffa3e7b1467427"
     end
   end
 
@@ -57,6 +58,7 @@ class Ffmpeg < Formula
   option "without-securetransport", "Disable use of SecureTransport"
   option "without-x264", "Disable H.264 encoder"
   option "without-xvid", "Disable Xvid MPEG-4 video encoder"
+  option "without-gpl", "Disable building GPL licensed parts of FFmpeg"
 
   deprecated_option "with-ffplay" => "with-sdl2"
   deprecated_option "with-sdl" => "with-sdl2"
@@ -111,7 +113,6 @@ class Ffmpeg < Formula
       --prefix=#{prefix}
       --enable-shared
       --enable-pthreads
-      --enable-gpl
       --enable-version3
       --enable-hardcoded-tables
       --enable-avresample
@@ -120,6 +121,7 @@ class Ffmpeg < Formula
       --host-ldflags=#{ENV.ldflags}
     ]
 
+    args << "--enable-gpl" if build.with? "gpl"
     args << "--disable-indev=qtkit" if build.without? "qtkit"
     args << "--disable-securetransport" if build.without? "securetransport"
     args << "--enable-chromaprint" if build.with? "chromaprint"
