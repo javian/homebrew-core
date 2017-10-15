@@ -44,6 +44,16 @@ class Php < Formula
   needs :cxx11
 
   def install
+    inreplace "configure",
+              "APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`",
+              "APACHE_THREADED_MPM="
+
+    inreplace "sapi/apache2handler/sapi_apache2.c",
+              "You need to recompile PHP.",
+              "Homebrew PHP does not support a thread-safe php binary. "\
+              "To use the PHP apache sapi please change "\
+              "your httpd config to use the prefork MPM"
+
     ENV.cxx11
 
     config_path = etc/"php/#{php_version}"
@@ -133,10 +143,6 @@ class Php < Formula
       args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
 
-    inreplace "configure",
-              "APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`",
-              "APACHE_THREADED_MPM="
-
     system "./configure", *args
 
     inreplace "Makefile" do |s|
@@ -207,9 +213,37 @@ class Php < Formula
   end
 
   def post_install
+    chmod 0755, lib/"php/.channels"
+    chmod 0755, lib/"php/.channels/.alias"
+    chmod 0644, (Dir.glob(lib/"php/.channels/**/*", File::FNM_DOTMATCH).reject { |a| a =~ %r{\/\.{1,2}$} || File.directory?(a) })
+    chmod 0644, %W[
+      #{lib}/php/.depdblock
+      #{lib}/php/.filemap
+      #{lib}/php/.depdb
+      #{lib}/php/.lock
+    ]
+
+    # custom location for extensions installed via pecl
     pecl_path = HOMEBREW_PREFIX/"lib/php"/php_version
     pecl_path.mkpath
     ln_s pecl_path, prefix/"pecl-extensions"
+
+    # fix pear config to use opt paths
+    php_lib_path = opt_lib/"php"
+    {
+      "php_ini" => etc/"php/#{php_version}/php.ini",
+      "php_dir" => php_lib_path,
+      "doc_dir" => php_lib_path/"doc",
+      "bin_dir" => opt_bin,
+      "data_dir" => php_lib_path/"data",
+      "cfg_dir" => php_lib_path/"cfg",
+      "www_dir" => php_lib_path/"htdocs",
+      "man_dir" => php_lib_path/"local/man",
+      "test_dir" => php_lib_path/"test",
+      "php_bin" => opt_bin/"php",
+    }.each do |key, value|
+      system bin/"pear", "config-set", key, value, "system"
+    end
 
     orig_ext_dir = File.basename `#{bin}/php-config --extension-dir`.chomp
     orig_ext_dir = opt_prefix/"lib/php/extensions/#{orig_ext_dir}"
@@ -233,43 +267,6 @@ class Php < Formula
           #{extension_type}="#{orig_ext_dir}/#{e}.so"
         EOS
       end
-    end
-
-    pear_files = %W[
-      #{lib}/php/.depdblock
-      #{lib}/php/.filemap
-      #{lib}/php/.depdb
-      #{lib}/php/.lock
-    ]
-
-    %W[
-      #{lib}/php/.channels
-      #{lib}/php/.channels/.alias
-    ].each do |f|
-      chmod 0755, f
-      pear_files.concat(Dir["#{f}/*"])
-    end
-
-    chmod 0644, pear_files
-
-    # custom location for extensions installed via pecl
-    (HOMEBREW_PREFIX/"lib/php/#{php_version}").mkpath
-
-    # fix pear config to use opt paths
-    php_lib_path = opt_lib/"php"
-    {
-      "php_ini" => etc/"php/#{php_version}/php.ini",
-      "php_dir" => php_lib_path,
-      "doc_dir" => php_lib_path/"doc",
-      "bin_dir" => opt_bin,
-      "data_dir" => php_lib_path/"data",
-      "cfg_dir" => php_lib_path/"cfg",
-      "www_dir" => php_lib_path/"htdocs",
-      "man_dir" => php_lib_path/"local/man",
-      "test_dir" => php_lib_path/"test",
-      "php_bin" => opt_bin/"php",
-    }.each do |key, value|
-      system bin/"pear", "config-set", key, value, "system"
     end
   end
 
