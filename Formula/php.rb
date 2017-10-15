@@ -240,7 +240,12 @@ class Php < Formula
     chmod 0755, lib/"php/.channels"
     chmod 0755, lib/"php/.channels/.alias"
     chmod 0644, (Dir.glob(lib/"php/.channels/**/*", File::FNM_DOTMATCH).reject { |a| a =~ %r{\/\.{1,2}$} || File.directory?(a) })
-    chmod 0644, %w[php/.depdblock php/.filemap php/.depdb php/.lock]
+    chmod 0644, %W[
+      #{lib}/php/.depdblock
+      #{lib}/php/.filemap
+      #{lib}/php/.depdb
+      #{lib}/php/.lock
+    ]
 
     # custom location for extensions installed via pecl
     (HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl").mkpath
@@ -250,7 +255,7 @@ class Php < Formula
     {
       "php_ini" => etc/"php/#{php_version}/php.ini",
       "php_dir" => php_lib_path,
-      "ext_dir" => pecl_path,
+      "ext_dir" => HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl",
       "doc_dir" => php_lib_path/"doc",
       "bin_dir" => opt_bin,
       "data_dir" => php_lib_path/"data",
