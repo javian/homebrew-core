@@ -42,6 +42,10 @@ class Php < Formula
   needs :cxx11
 
   def install
+    inreplace "configure",
+              "APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`",
+              "APACHE_THREADED_MPM="
+
     ENV.cxx11
 
     # Fix missing header file during configure for libzip include
