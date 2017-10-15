@@ -110,7 +110,7 @@ class Php < Formula
       --with-ldap-sasl
       --with-libedit
       --with-libxml-dir
-      --with-libzip=#{Formula["libzip"].opt_prefix}
+      --with-libzip
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
       --with-mysqli=mysqlnd
