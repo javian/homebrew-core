@@ -100,7 +100,6 @@ class Php < Formula
       --with-gd
       --with-gettext=#{Formula["gettext"].opt_prefix}
       --with-gmp=#{Formula["gmp"].opt_prefix}
-      --with-iconv-dir
       --with-icu-dir=#{Formula["icu4c"].opt_prefix}
       --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
       --with-imap-ssl=#{Formula["openssl"].opt_prefix}
@@ -109,7 +108,6 @@ class Php < Formula
       --with-ldap=shared
       --with-ldap-sasl
       --with-libedit
-      --with-libxml-dir
       --with-libzip
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
@@ -129,8 +127,8 @@ class Php < Formula
       --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
       --with-xmlrpc
-      --with-zlib
       --with-xsl
+      --with-zlib
     ]
 
     if MacOS.version < :lion
