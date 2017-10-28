@@ -3,16 +3,16 @@ class Php < Formula
   homepage "https://php.net/"
 
   stable do
-    url "https://php.net/get/php-7.1.10.tar.gz/from/this/mirror"
-    sha256 "edc6a7c3fe89419525ce51969c5f48610e53613235bbef255c3a4db33b458083"
+    url "https://php.net/get/php-7.1.11.tar.gz/from/this/mirror"
+    sha256 "de41b2c166bc5ec8ea96a337d4dd675c794f7b115a8a47bb04595c03dbbdf425"
 
     depends_on "libtool" => :run
     depends_on "mcrypt"
   end
 
   devel do
-    url "https://downloads.php.net/~remi/php-7.2.0RC4.tar.gz"
-    sha256 "f89422d9bcd443e0f3d00d4be19f767dcbe4829efd561b5b9800fe0c57e16156"
+    url "https://downloads.php.net/~pollita/php-7.2.0RC5.tar.gz"
+    sha256 "eef6cda27b9f9a16ed0f622a3ac43011fd341053b33f16c6620941ab833d4890"
 
     depends_on "argon2"
     depends_on "libsodium"
