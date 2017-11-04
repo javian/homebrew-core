@@ -10,35 +10,26 @@ class PhpTiny < Formula
     depends_on "mcrypt"
   end
 
-  devel do
-    url "https://downloads.php.net/~pollita/php-7.2.0RC5.tar.gz"
-    sha256 "eef6cda27b9f9a16ed0f622a3ac43011fd341053b33f16c6620941ab833d4890"
-
-    depends_on "argon2"
-    depends_on "libsodium"
-  end
-
   depends_on "openssl"
-  depends_on "mcrypt"
   depends_on "tidy-html5"
 
   needs :cxx11
 
   def install
-    inreplace "configure",
-              "APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`",
-              "APACHE_THREADED_MPM="
+    # inreplace "configure",
+    #           "APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`",
+    #           "APACHE_THREADED_MPM="
 
-    inreplace "sapi/apache2handler/sapi_apache2.c",
-              "You need to recompile PHP.",
-              "Homebrew PHP does not support a thread-safe php binary. "\
-              "To use the PHP apache sapi please change "\
-              "your httpd config to use the prefork MPM"
+    # inreplace "sapi/apache2handler/sapi_apache2.c",
+    #           "You need to recompile PHP.",
+    #           "Homebrew PHP does not support a thread-safe php binary. "\
+    #           "To use the PHP apache sapi please change "\
+    #           "your httpd config to use the prefork MPM"
 
     ENV.cxx11
 
     # Fix missing header file during configure for libzip include
-    ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
+    #ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
 
     config_path = etc/"php/#{php_version}"
     ENV["lt_cv_path_SED"] = "sed"
@@ -51,23 +42,10 @@ class PhpTiny < Formula
       --with-config-file-scan-dir=#{config_path}/conf.d
       --mandir=#{man}
       --libexecdir=#{libexec}
-      --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
+      --with-curl
+      --with-mcrypt=#{Formula["mcrypt"].opt_prefix}
+      --with-tidy=#{Formula["tidy-html5"].opt_prefix}
     ]
-
-    if MacOS.version < :lion
-      args << "--with-curl=#{Formula["curl"].opt_prefix}"
-    else
-      args << "--with-curl"
-    end
-
-    if build.devel?
-      args += %W[
-        --with-password-argon2=#{Formula["argon2"].opt_prefix}
-        --with-sodium=#{Formula["libsodium"].opt_prefix}
-      ]
-    else
-      args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
-    end
 
     system "./configure", *args
 
@@ -193,29 +171,27 @@ class PhpTiny < Formula
     #   system bin/"pear", "config-set", key, value, "system"
     # end
 
-    %w[
-      tidy
-      mcrypt
-    ].each do |e|
-      next if build.devel? && (e == "mcrypt")
-      config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
-      extension_type = (e == "opcache") ? "zend_extension" : "extension"
-      if config_path.exist?
-        inreplace config_path, /#{extension_type}=.*$/, "#{extension_type}=#{e}.so"
-      else
-        config_path.write <<-EOS.undent
-          [#{e}]
-          #{extension_type}="#{e}.so"
-        EOS
-      end
+    # %w[
+    #   tidy
+    #   mcrypt
+    # ].each do |e|
+    #   next if build.devel? && (e == "mcrypt")
+    #   config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
+    #   extension_type = (e == "opcache") ? "zend_extension" : "extension"
+    #   if config_path.exist?
+    #     inreplace config_path, /#{extension_type}=.*$/, "#{extension_type}=#{e}.so"
+    #   else
+    #     config_path.write <<-EOS.undent
+    #       [#{e}]
+    #       #{extension_type}="#{e}.so"
+    #     EOS
+    #   end
     end
   end
 
   def php_version
     version.to_s.split(".")[0..1].join(".")
   end
-
-  plist_options :startup => true, :manual => "php-fpm"
 
   def plist; <<-EOPLIST.undent
     <?xml version="1.0" encoding="UTF-8"?>
@@ -244,14 +220,5 @@ class PhpTiny < Formula
 
   test do
     system "#{bin}/php", "-i"
-    system "#{sbin}/php-fpm", "-t"
-    system "#{bin}/phpdbg", "-V"
-    system "#{bin}/php-cgi", "-m"
-    assert_match "php7_module", shell_output(
-      %W[
-        #{Formula["httpd"].bin}/httpd -M -C
-        'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'
-      ].join(" "),
-    )
   end
 end
