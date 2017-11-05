@@ -1,15 +1,15 @@
 class NodeAT4 < Formula
   desc "Platform built on V8 to build network applications"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v4.8.4/node-v4.8.4.tar.xz"
-  sha256 "35fe633a48cbe93c79327161d9dc964ac9810f4ceb2ed8628487e6e14a15905b"
-  revision 2
+  url "https://nodejs.org/dist/v4.8.5/node-v4.8.5.tar.xz"
+  sha256 "a48aeefc2b4fae0ea6410a8045ca106af244223012eab003bd5cb00aa3b50d53"
   head "https://github.com/nodejs/node.git", :branch => "v4.x-staging"
 
   bottle do
-    sha256 "46bf3610595d07f31463f7c367e88400bd7b2ab76115c2b08b221074f5f77e70" => :high_sierra
-    sha256 "ad1e4cf4b28a5219c13f1504ff8e5eff50e10aa76e155b0629117e90c8561f8b" => :sierra
-    sha256 "70426b6a457d8b591a1444cda2d3b9a0bfd14583cd503f17c599394a51802079" => :el_capitan
+    rebuild 1
+    sha256 "1a1a395afc2d909a7d689b958c37023f5c2970713bc6371b468a83f3b5d432e8" => :high_sierra
+    sha256 "685127a91db8250b88e682c2a0fa9690ce4492b5a9dd1522c2ef269d00b085ae" => :sierra
+    sha256 "c55d9c5723928f544f79b5017a485aaba2a1be7b7ab74af33fbc025decf0bdf3" => :el_capitan
   end
 
   keg_only :versioned_formula
@@ -25,8 +25,8 @@ class NodeAT4 < Formula
 
   # Keep in sync with main node formula
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-5.4.2.tgz"
-    sha256 "04dc5f87b1079d59d51404d4b4c4aacbe385807a33bd15a8f2da2fabe27bf443"
+    url "https://registry.npmjs.org/npm/-/npm-5.5.1.tgz"
+    sha256 "b8b9afb0bb6211a289f969f66ba184ca5bc83abf6a570e0853ea5185073dca6f"
   end
 
   resource "icu4c" do
@@ -115,7 +115,7 @@ class NodeAT4 < Formula
     s = ""
 
     if build.without? "npm"
-      s += <<-EOS.undent
+      s += <<~EOS
         Homebrew has NOT installed npm. If you later install it, you should supplement
         your NODE_PATH with the npm module folder:
           #{HOMEBREW_PREFIX}/lib/node_modules
@@ -146,7 +146,7 @@ class NodeAT4 < Formula
       system "#{HOMEBREW_PREFIX}/bin/npm", *npm_args, "install", "bignum" unless head?
       assert_predicate HOMEBREW_PREFIX/"bin/npx", :exist?, "npx must exist"
       assert_predicate HOMEBREW_PREFIX/"bin/npx", :executable?, "npx must be executable"
-      assert_match "< hello >", shell_output("#{HOMEBREW_PREFIX}/bin/npx --cache=#{HOMEBREW_CACHE}/npm_cache cowsay hello")
+      assert_match "< hello >", shell_output("#{HOMEBREW_PREFIX}/bin/npx cowsay hello")
     end
   end
 end

@@ -1,13 +1,13 @@
 class Httpd < Formula
   desc "Apache HTTP server"
   homepage "https://httpd.apache.org/"
-  url "https://www.apache.org/dyn/closer.cgi?path=httpd/httpd-2.4.28.tar.bz2"
-  sha256 "c1197a3a62a4ab5c584ab89b249af38cf28b4adee9c0106b62999fd29f920666"
+  url "https://www.apache.org/dyn/closer.cgi?path=httpd/httpd-2.4.29.tar.bz2"
+  sha256 "777753a5a25568a2a27428b2214980564bc1c38c1abf9ccc7630b639991f7f00"
 
   bottle do
-    sha256 "9052787a9e83dcd5a00e60a752d55f3b8f794738291d306f760eb5d3fbc2b527" => :high_sierra
-    sha256 "24a11f73011740d5d95d6382eba225b4b1a54722af9090d17b62a96aaba9754f" => :sierra
-    sha256 "a762f7c1b9dd5e2fa69555d79056b5a19bd92ed4a2ad354ce89d267de4d8f11f" => :el_capitan
+    sha256 "9607b2648d706175f8c8a7ee529bb6e57abdb7a60d47bcb4012e403721707d6d" => :high_sierra
+    sha256 "ca0fc3385ab31d3f44413e4b847785093b10e862b90dd3b61b9973f1cc6f3639" => :sierra
+    sha256 "5fa46264c518ec0c03b8f2b83f801220f704f5580a29002123554c9872fb9439" => :el_capitan
   end
 
   depends_on "apr"
@@ -54,6 +54,7 @@ class Httpd < Formula
                           "--with-sslport=8443",
                           "--with-apr=#{Formula["apr"].opt_prefix}",
                           "--with-apr-util=#{Formula["apr-util"].opt_prefix}",
+                          "--with-mpm=prefork",
                           "--with-nghttp2=#{Formula["nghttp2"].opt_prefix}",
                           "--with-ssl=#{Formula["openssl"].opt_prefix}",
                           "--with-pcre=#{Formula["pcre"].opt_prefix}"
@@ -94,7 +95,7 @@ class Httpd < Formula
   end
 
   def caveats
-    <<-EOS.undent
+    <<~EOS
       DocumentRoot is #{var}/www.
 
       The default ports have been set in #{etc}/httpd/httpd.conf to 8080 and in
@@ -109,7 +110,7 @@ class Httpd < Formula
 
   plist_options :manual => "apachectl start"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
@@ -133,18 +134,18 @@ class Httpd < Formula
     begin
       expected_output = "Hello world!"
       (testpath/"index.html").write expected_output
-      (testpath/"httpd.conf").write <<-EOS.undent
+      (testpath/"httpd.conf").write <<~EOS
         Listen 8080
         DocumentRoot "#{testpath}"
         ErrorLog "#{testpath}/httpd-error.log"
         LoadModule authz_core_module #{lib}/httpd/modules/mod_authz_core.so
         LoadModule unixd_module #{lib}/httpd/modules/mod_unixd.so
         LoadModule dir_module #{lib}/httpd/modules/mod_dir.so
-        LoadModule mpm_event_module #{lib}/httpd/modules/mod_mpm_event.so
+        LoadModule mpm_prefork_module #{lib}/httpd/modules/mod_mpm_prefork.so
       EOS
 
       pid = fork do
-        exec bin/"httpd", "-DFOREGROUND", "-f", "#{testpath}/httpd.conf"
+        exec bin/"httpd", "-X", "-f", "#{testpath}/httpd.conf"
       end
       sleep 3
 

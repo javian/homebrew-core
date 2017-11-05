@@ -1,20 +1,23 @@
 class ProtobufSwift < Formula
   desc "Implementation of Protocol Buffers in Swift"
   homepage "https://github.com/alexeyxo/protobuf-swift"
-  url "https://github.com/alexeyxo/protobuf-swift/archive/3.0.24.tar.gz"
-  sha256 "b259dbf0306c3cb37fa15958cc1b3135ca2fd4febee2362f2917f19acdc093e8"
+  url "https://github.com/alexeyxo/protobuf-swift/archive/3.0.28.tar.gz"
+  sha256 "dfa07e41ddc790d3373e16195c9bee8512ebba34979aeb70357a922d6ac7bf7f"
 
   bottle do
     cellar :any
-    sha256 "1be5203b5773b972387e6ad5f363957ff79cf7524c57e2f5154b5984403680f4" => :high_sierra
-    sha256 "5eabe4656fd3bf3b9b8e45bc16ae77ddcc6499124aecba187592fd4777632e50" => :sierra
-    sha256 "9475a40826aafbc4d647532aa6f9e670f19cb54da00f5ad439111f1719ae594e" => :el_capitan
+    sha256 "7ec6a24157ce085ad99ff05eeb42bbce0ebb642e4a2a887e08910a8717215e37" => :high_sierra
+    sha256 "170011008df1434a264a56a8caf06179a7a12a72fa76f157ab430b708f8ca044" => :sierra
+    sha256 "bf8767bc7336ddb47db5d2dcf8708062090e7e9a7153872a0406ce586b71c632" => :el_capitan
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "protobuf"
+
+  conflicts_with "swift-protobuf",
+    :because => "both install `protoc-gen-swift` binaries"
 
   def install
     system "protoc", "-Iplugin/compiler",
@@ -28,7 +31,7 @@ class ProtobufSwift < Formula
   end
 
   test do
-    testdata = <<-EOS.undent
+    testdata = <<~EOS
       syntax = "proto3";
       enum Flavor {
         CHOCOLATE = 0;

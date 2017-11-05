@@ -3,7 +3,7 @@ class Camlp5TransitionalModeRequirement < Requirement
 
   satisfy(:build_env => false) { !Tab.for_name("camlp5").with?("strict") }
 
-  def message; <<-EOS.undent
+  def message; <<~EOS
     camlp5 must be compiled in transitional mode (instead of --strict mode):
       brew install camlp5
     EOS
@@ -41,6 +41,8 @@ class Ssreflect < Formula
   patch :DATA
 
   def install
+    ENV["OCAMLPARAM"] = "safe-string=0,_" # OCaml 4.06.0 compat
+
     resource("coq84").stage do
       system "./configure", "-prefix", libexec/"coq",
                             "-camlp5dir", Formula["camlp5"].opt_lib/"ocaml/camlp5",
@@ -87,7 +89,7 @@ class Ssreflect < Formula
   end
 
   test do
-    (testpath/"helloworld.v").write <<-EOS.undent
+    (testpath/"helloworld.v").write <<~EOS
       Add LoadPath "#{lib}/coq/user-contrib/Ssreflect" as Ssreflect.
       Require Import Ssreflect.ssreflect.
       Variable P:Prop.
@@ -99,7 +101,7 @@ class Ssreflect < Formula
 
       Check helloworld.
     EOS
-    (testpath/"expected").write <<-EOS.undent
+    (testpath/"expected").write <<~EOS
       helloworld
            : P -> P
     EOS

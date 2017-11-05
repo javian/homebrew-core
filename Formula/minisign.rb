@@ -1,5 +1,5 @@
 class Minisign < Formula
-  desc "Sign files & verify signatures. Works with signify in OpenBSD."
+  desc "Sign files & verify signatures. Works with signify in OpenBSD"
   homepage "https://jedisct1.github.io/minisign/"
   url "https://github.com/jedisct1/minisign/archive/0.7.tar.gz"
   sha256 "0c9f25ae647b6ba38cf7e6aea1da4e8fb20e1bc64ef0c679da737a38c8ad43ef"
@@ -23,7 +23,7 @@ class Minisign < Formula
 
   test do
     (testpath/"homebrew.txt").write "Hello World!"
-    (testpath/"keygen.sh").write <<-EOS.undent
+    (testpath/"keygen.sh").write <<~EOS
       #!/usr/bin/expect -f
       set timeout -1
       spawn #{bin}/minisign -G
@@ -42,7 +42,7 @@ class Minisign < Formula
     assert_predicate testpath/"minisign.pub", :exist?
     assert_predicate testpath/".minisign/minisign.key", :exist?
 
-    (testpath/"signing.sh").write <<-EOS.undent
+    (testpath/"signing.sh").write <<~EOS
       #!/usr/bin/expect -f
       set timeout -1
       spawn #{bin}/minisign -Sm homebrew.txt

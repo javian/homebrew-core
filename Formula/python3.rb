@@ -12,8 +12,8 @@ class Python3 < Formula
   end
 
   devel do
-    url "https://www.python.org/ftp/python/3.7.0/Python-3.7.0a1.tar.xz"
-    sha256 "aab053dc3c23b829c60e973ce5972c4e58ffb5e26210acc26611e0d766a06eea"
+    url "https://www.python.org/ftp/python/3.7.0/Python-3.7.0a2.tar.xz"
+    sha256 "3e5adaa8a264b0c8eeab7b8a0185acec053b0d1547d2712ebc915153c4a52f28"
   end
 
   option "with-tcl-tk", "Use Homebrew's Tk instead of macOS Tk (has optional Cocoa and threads support)"
@@ -63,10 +63,10 @@ class Python3 < Formula
   # setuptools remembers the build flags python is built with and uses them to
   # build packages later. Xcode-only systems need different flags.
   pour_bottle? do
-    reason <<-EOS.undent
-    The bottle needs the Apple Command Line Tools to be installed.
-      You can install them, if desired, with:
-        xcode-select --install
+    reason <<~EOS
+      The bottle needs the Apple Command Line Tools to be installed.
+        You can install them, if desired, with:
+          xcode-select --install
     EOS
     satisfy { MacOS::CLT.installed? }
   end
@@ -264,20 +264,20 @@ class Python3 < Formula
 
     cfg = prefix/"Frameworks/Python.framework/Versions/#{xy}/lib/python#{xy}/distutils/distutils.cfg"
 
-    cfg.atomic_write <<-EOF.undent
+    cfg.atomic_write <<~EOS
       [install]
       prefix=#{HOMEBREW_PREFIX}
 
       [build_ext]
       include_dirs=#{include_dirs.join ":"}
       library_dirs=#{library_dirs.join ":"}
-    EOF
+    EOS
   end
 
   def sitecustomize
     xy = (prefix/"Frameworks/Python.framework/Versions").children.first.basename.to_s
 
-    <<-EOF.undent
+    <<~EOS
       # This file is created by Homebrew and is executed on each python startup.
       # Don't print from here, or else python command line scripts may fail!
       # <https://docs.brew.sh/Homebrew-and-Python.html>
@@ -311,7 +311,7 @@ class Python3 < Formula
 
           # Set the sys.executable to use the opt_prefix
           sys.executable = '#{opt_bin}/python#{xy}'
-    EOF
+    EOS
   end
 
   def caveats
@@ -320,7 +320,7 @@ class Python3 < Formula
     else
       xy = version.to_s.slice(/(3\.\d)/) || "3.6"
     end
-    text = <<-EOS.undent
+    text = <<~EOS
       Pip, setuptools, and wheel have been installed. To update them
         pip3 install --upgrade pip setuptools wheel
 
@@ -334,7 +334,7 @@ class Python3 < Formula
     EOS
 
     # Tk warning only for 10.6
-    tk_caveats = <<-EOS.undent
+    tk_caveats = <<~EOS
 
       Apple's Tcl/Tk is not recommended for use with Python on Mac OS X 10.6.
       For more information see: https://www.python.org/download/mac/tcltk/

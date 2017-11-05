@@ -1,8 +1,8 @@
 class ApibuilderCli < Formula
   desc "Command-line interface to generate clients for api builder"
   homepage "https://www.apibuilder.io"
-  url "https://github.com/apicollective/apibuilder-cli/archive/0.1.12.tar.gz"
-  sha256 "3d4e66b6730e8b51127c5142969729860e1837a30b0c15da578c96bd26cdccd0"
+  url "https://github.com/apicollective/apibuilder-cli/archive/0.1.15.tar.gz"
+  sha256 "a15528479403c234dc9c999fe7b34ee033fa9faa24c51c7abeaa06c3ffe7e703"
 
   bottle :unneeded
 
@@ -11,7 +11,7 @@ class ApibuilderCli < Formula
   end
 
   test do
-    (testpath/"config").write <<-EOS.undent
+    (testpath/"config").write <<~EOS
       [default]
       token = abcd1234
     EOS

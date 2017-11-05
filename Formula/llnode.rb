@@ -20,11 +20,11 @@ class Llnode < Formula
   end
 
   resource "lldb" do
-    if MacOS::Xcode.version >= "8.3"
+    if DevelopmentTools.clang_build_version >= 802
       # lldb 390
       url "https://github.com/llvm-mirror/lldb.git",
           :revision => "d556e60f02a7404b291d07cac2f27512c73bc743"
-    elsif MacOS::Xcode.version >= "8.0"
+    elsif DevelopmentTools.clang_build_version >= 800
       # lldb 360.1
       url "https://github.com/llvm-mirror/lldb.git",
           :revision => "839b868e2993dcffc7fea898a1167f1cec097a82"
@@ -46,7 +46,7 @@ class Llnode < Formula
     prefix.install "out/Release/llnode.dylib"
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     `brew install llnode` does not link the plugin to LLDB PlugIns dir.
 
     To load this plugin in LLDB, one will need to either
@@ -61,11 +61,11 @@ class Llnode < Formula
   end
 
   test do
-    lldb_out = pipe_output "lldb", <<-EOS.undent
+    lldb_out = pipe_output "lldb", <<~EOS
       plugin load #{opt_prefix}/llnode.dylib
       help v8
       quit
     EOS
-    assert_match /v8 bt/, lldb_out
+    assert_match "v8 bt", lldb_out
   end
 end

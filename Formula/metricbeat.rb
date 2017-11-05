@@ -1,5 +1,5 @@
 class Metricbeat < Formula
-  desc "Collect metrics from your systems and services."
+  desc "Collect metrics from your systems and services"
   homepage "https://www.elastic.co/products/beats/metricbeat"
   url "https://github.com/elastic/beats/archive/v5.6.3.tar.gz"
   sha256 "52a4c9094287f725a089e161dc71d9cdf0caf73595e8835a5d0636d3ad333bbe"
@@ -32,7 +32,7 @@ class Metricbeat < Formula
       (etc/"metricbeat").install "metricbeat.template-es6x.json"
     end
 
-    (bin/"metricbeat").write <<-EOS.undent
+    (bin/"metricbeat").write <<~EOS
       #!/bin/sh
       exec "#{libexec}/metricbeat" --path.config "#{etc}/metricbeat" --path.home="#{prefix}" --path.logs="#{var}/log/metricbeat" --path.data="#{opt_prefix}" "$@"
     EOS
@@ -40,7 +40,7 @@ class Metricbeat < Formula
 
   plist_options :manual => "metricbeat"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
     "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -58,7 +58,7 @@ class Metricbeat < Formula
   end
 
   test do
-    (testpath/"metricbeat.yml").write <<-EOS.undent
+    (testpath/"metricbeat.yml").write <<~EOS
       metricbeat.modules:
       - module: system
         metricsets: ["load"]

@@ -1,16 +1,15 @@
 class Sip < Formula
   desc "Tool to create Python bindings for C and C++ libraries"
   homepage "https://www.riverbankcomputing.com/software/sip/intro"
-  url "https://downloads.sourceforge.net/project/pyqt/sip/sip-4.19.3/sip-4.19.3.tar.gz"
-  sha256 "740df844f80cc45dcc9b23294a92492923bc403ce88e68c35783f27c177c4b74"
-  revision 4
+  url "https://downloads.sourceforge.net/project/pyqt/sip/sip-4.19.4/sip-4.19.4.tar.gz"
+  sha256 "59d3872b9f7d87f33dee1f87e4fa1de9bd025531d9adbb9b3581725af3121646"
   head "https://www.riverbankcomputing.com/hg/sip", :using => :hg
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "5fc393ef529959a75c5e549338eacd51e60453848b9aebb7c9c8dfede518f87c" => :high_sierra
-    sha256 "99ab357056cfe7e53b0452bda1be46aec55f44dc6fca338c2302a174d3e406df" => :sierra
-    sha256 "7ca21d5d033bcc25eda9be7d1f321129b278535cf7bd5e9705ad722c013747e2" => :el_capitan
+    sha256 "344502c68000596c8e53218a1513e1f30cf5160c7d59e4dfaf4f9f743bfacb06" => :high_sierra
+    sha256 "22528769b0f54c362e060428cfcdaba028465932f3d9894ca7a70b63205757f3" => :sierra
+    sha256 "fec79fcdf740062b6e4452c416c09e9432e9bdaf6ac21d4b209ecb51d01c6b36" => :el_capitan
   end
 
   depends_on :python => :recommended
@@ -47,13 +46,13 @@ class Sip < Formula
     (HOMEBREW_PREFIX/"share/sip").mkpath
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     The sip-dir for Python is #{HOMEBREW_PREFIX}/share/sip.
   EOS
   end
 
   test do
-    (testpath/"test.h").write <<-EOS.undent
+    (testpath/"test.h").write <<~EOS
       #pragma once
       class Test {
       public:
@@ -61,7 +60,7 @@ class Sip < Formula
         void test();
       };
     EOS
-    (testpath/"test.cpp").write <<-EOS.undent
+    (testpath/"test.cpp").write <<~EOS
       #include "test.h"
       #include <iostream>
       Test::Test() {}
@@ -70,7 +69,7 @@ class Sip < Formula
         std::cout << "Hello World!" << std::endl;
       }
     EOS
-    (testpath/"test.sip").write <<-EOS.undent
+    (testpath/"test.sip").write <<~EOS
       %Module test
       class Test {
       %TypeHeaderCode
@@ -81,14 +80,14 @@ class Sip < Formula
         void test();
       };
     EOS
-    (testpath/"generate.py").write <<-EOS.undent
+    (testpath/"generate.py").write <<~EOS
       from sipconfig import SIPModuleMakefile, Configuration
       m = SIPModuleMakefile(Configuration(), "test.build")
       m.extra_libs = ["test"]
       m.extra_lib_dirs = ["."]
       m.generate()
     EOS
-    (testpath/"run.py").write <<-EOS.undent
+    (testpath/"run.py").write <<~EOS
       from test import Test
       t = Test()
       t.test()

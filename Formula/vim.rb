@@ -1,14 +1,15 @@
 class Vim < Formula
   desc "Vi 'workalike' with many additional features"
   homepage "https://vim.sourceforge.io/"
-  url "https://github.com/vim/vim/archive/v8.0.1175.zip"
-  sha256 "2ebbfc7a0d9f4a75b6571dfb8eb1fd92feb2cdf33f083a3f196018ac8f697f7c"
+  # vim should only be updated every 50 releases on multiples of 50
+  url "https://github.com/vim/vim/archive/v8.0.1250.tar.gz"
+  sha256 "daa0c19dbf2c4dda8b08af2a5ebc7d0dfb5cac335cb55c09a198f6de17e6219c"
   head "https://github.com/vim/vim.git"
 
   bottle do
-    sha256 "ba94e7034107117dd77d287d32d1257292a4b411e4ac54bfce3bda7a6fb25566" => :high_sierra
-    sha256 "a02ed0b3de1ebc95d3e85cb4e7c465eb2b0239b46cec686ad0bc74948c16166c" => :sierra
-    sha256 "742aaefd7d0244e81bf70e6d3be9e12f39e6791f28a847863ec8bfacb56e19fa" => :el_capitan
+    sha256 "382ea892d4ef50d9dbc9467cb9c863546c36986faa7a07db7e055cc6f3a56a88" => :high_sierra
+    sha256 "2f677a17e017f21fac9df6bcbc84ce28bbb18239f68a2c58ef044c908e8eb19e" => :sierra
+    sha256 "80da2406139729ca9d123b1f9bf571b3818fcf0f9e11e544c57ab9e5a7f317ed" => :el_capitan
   end
 
   deprecated_option "override-system-vi" => "with-override-system-vi"
@@ -87,7 +88,7 @@ class Vim < Formula
       opts << "--with-luajit" if build.with? "luajit"
 
       if build.with?("lua") && build.with?("luajit")
-        onoe <<-EOS.undent
+        onoe <<~EOS
           Vim will not link against both Luajit & Lua simultaneously.
           Proceeding with Lua.
         EOS
@@ -122,14 +123,14 @@ class Vim < Formula
 
   test do
     if build.with? "python3"
-      (testpath/"commands.vim").write <<-EOS.undent
+      (testpath/"commands.vim").write <<~EOS
         :python3 import vim; vim.current.buffer[0] = 'hello python3'
         :wq
       EOS
       system bin/"vim", "-T", "dumb", "-s", "commands.vim", "test.txt"
       assert_equal "hello python3", File.read("test.txt").chomp
     elsif build.with? "python"
-      (testpath/"commands.vim").write <<-EOS.undent
+      (testpath/"commands.vim").write <<~EOS
         :python import vim; vim.current.buffer[0] = 'hello world'
         :wq
       EOS

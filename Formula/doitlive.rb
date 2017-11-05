@@ -1,14 +1,14 @@
 class Doitlive < Formula
   desc "Replay stored shell commands for live presentations"
   homepage "https://doitlive.readthedocs.io/en/latest/"
-  url "https://files.pythonhosted.org/packages/75/68/44b16599a252364964bebf1f1f59f03e9d3a1fcd9049dc877b3b9682bafa/doitlive-3.0.0.tar.gz"
-  sha256 "0e7ae2f1bb1ccb630ff7e0c12cf74d92e126dfe3e63dfecb3ac9992d85084127"
+  url "https://files.pythonhosted.org/packages/65/2a/b12740bbd4ff45647b50e202236388c8bca5448ecd177ead1f244d07a617/doitlive-3.0.2.tar.gz"
+  sha256 "df5f595a7809f11dd3676c3e271e3cf1ff904b8f7e4191fb81b229b6d08f8bf5"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "92d2920c2872b7074284619a7e0effce74375f50ca27b8fa83031d61406509d9" => :high_sierra
-    sha256 "92d2920c2872b7074284619a7e0effce74375f50ca27b8fa83031d61406509d9" => :sierra
-    sha256 "e073d738773021f242e10ccf85c08b511160c7329368f70cbdd074a5591db033" => :el_capitan
+    sha256 "64f444a22662a3155ba8f5a57dfc904459021fcbeab0d4aaa75a0403ad98d619" => :high_sierra
+    sha256 "64f444a22662a3155ba8f5a57dfc904459021fcbeab0d4aaa75a0403ad98d619" => :sierra
+    sha256 "d27c4d742b6a7b0556743eaa388446d660436bccc21bd143c3c1e6ef632338c3" => :el_capitan
   end
 
   depends_on :python if MacOS.version <= :snow_leopard

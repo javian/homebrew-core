@@ -1,15 +1,14 @@
 class Opencv < Formula
   desc "Open source computer vision library"
-  homepage "http://opencv.org/"
-  url "https://github.com/opencv/opencv/archive/3.3.0.tar.gz"
-  sha256 "8bb312b9d9fd17336dc1f8b3ac82f021ca50e2034afc866098866176d985adc6"
-  revision 3
+  homepage "https://opencv.org/"
+  url "https://github.com/opencv/opencv/archive/3.3.1.tar.gz"
+  sha256 "5dca3bb0d661af311e25a72b04a7e4c22c47c1aa86eb73e70063cd378a2aa6ee"
+  revision 1
 
   bottle do
-    sha256 "386ac2caf18b558237cf8a8a510fce0c56213259ce18e8bcf418513829e790fe" => :high_sierra
-    sha256 "cf9f5f528cb2217a4fde2c635ce90d07b51e01564d7c66fc4413c41e22b17572" => :sierra
-    sha256 "bd88772952a81606b7ff43e7d3874213680d4d190c319360f3da603b76f1cfb3" => :el_capitan
-    sha256 "6073b44f5b601de364147a9b6b3ee784c6070303582cf3db9a513ce8a1796a0c" => :yosemite
+    sha256 "c857504e05f1150938a618c101a38f52761d874ef477d71f319dd22b530467a1" => :high_sierra
+    sha256 "5a09d9bc84475db0026df47363f983c9104610ceece82270bdf60730b546e12b" => :sierra
+    sha256 "745cdcae976045ee39b0f6912446a879ecc63b2d3d50898df2457745ebef2dc0" => :el_capitan
   end
 
   depends_on "cmake" => :build
@@ -23,12 +22,13 @@ class Opencv < Formula
   depends_on :python
   depends_on :python3
   depends_on "numpy"
+  depends_on "tbb"
 
   needs :cxx11
 
   resource "contrib" do
-    url "https://github.com/opencv/opencv_contrib/archive/3.3.0.tar.gz"
-    sha256 "e94acf39cd4854c3ef905e06516e5f74f26dddfa6477af89558fb40a57aeb444"
+    url "https://github.com/opencv/opencv_contrib/archive/3.3.1.tar.gz"
+    sha256 "6f3ce148dc6e147496f0dbec1c99e917e13bf138f5a8ccfc3765f5c2372bd331"
   end
 
   def install
@@ -69,7 +69,7 @@ class Opencv < Formula
       -DWITH_OPENEXR=ON
       -DWITH_OPENGL=OFF
       -DWITH_QT=OFF
-      -DWITH_TBB=OFF
+      -DWITH_TBB=ON
       -DWITH_VTK=OFF
       -DBUILD_opencv_python2=ON
       -DBUILD_opencv_python3=ON
@@ -94,7 +94,7 @@ class Opencv < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<-EOS.undent
+    (testpath/"test.cpp").write <<~EOS
       #include <opencv/cv.h>
       #include <iostream>
       int main() {

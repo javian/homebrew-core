@@ -24,6 +24,8 @@ class Haxe < Formula
   depends_on "pcre"
 
   def install
+    ENV["OCAMLPARAM"] = "safe-string=0,_" # OCaml 4.06.0 compat
+
     # Build requires targets to be built in specific order
     ENV.deparallelize
 
@@ -56,7 +58,7 @@ class Haxe < Formula
     bin.install_symlink lib/"haxe/haxe"
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     Add the following line to your .bashrc or equivalent:
       export HAXE_STD_PATH="#{HOMEBREW_PREFIX}/lib/haxe/std"
     EOS

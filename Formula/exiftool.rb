@@ -6,19 +6,19 @@ class Exiftool < Formula
   url "https://www.sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-10.55.tar.gz"
   mirror "https://downloads.sourceforge.net/project/exiftool/Image-ExifTool-10.55.tar.gz"
   sha256 "029b81a43f423332c00b76b5402fd8f85dee975fad41a734b494faeda4e41f7d"
+  revision 1
 
   bottle do
     cellar :any_skip_relocation
-    rebuild 1
-    sha256 "89bf92b3ae7c5f60a085e87f0eef9604a8537d4c392d2c04a1743dd6c581414d" => :high_sierra
-    sha256 "89bf92b3ae7c5f60a085e87f0eef9604a8537d4c392d2c04a1743dd6c581414d" => :sierra
-    sha256 "89bf92b3ae7c5f60a085e87f0eef9604a8537d4c392d2c04a1743dd6c581414d" => :el_capitan
+    sha256 "5039ab4f2bc31d2afc9b4cd1fab9ab5d6deec2bf2d1bba0a95f4d54e747dd117" => :high_sierra
+    sha256 "5039ab4f2bc31d2afc9b4cd1fab9ab5d6deec2bf2d1bba0a95f4d54e747dd117" => :sierra
+    sha256 "5039ab4f2bc31d2afc9b4cd1fab9ab5d6deec2bf2d1bba0a95f4d54e747dd117" => :el_capitan
   end
 
   devel do
-    url "https://www.sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-10.63.tar.gz"
-    mirror "https://downloads.sourceforge.net/project/exiftool/Image-ExifTool-10.63.tar.gz"
-    sha256 "84d63972e9172cd18fce54fef862f0d818c91c29a79c95689557be31747b9fde"
+    url "https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-10.65.tar.gz"
+    mirror "https://downloads.sourceforge.net/project/exiftool/Image-ExifTool-10.65.tar.gz"
+    sha256 "206a03c3ca8f25ad3b8f25290d934c19da350c8cbafae9de2a6db074bc5c42ad"
   end
 
   def install
@@ -26,9 +26,12 @@ class Exiftool < Formula
     inreplace "exiftool", "$exeDir/lib", libexec/"lib"
 
     system "perl", "Makefile.PL"
+    system "make", "all"
     libexec.install "lib"
     bin.install "exiftool"
     doc.install Dir["html/*"]
+    man1.install "blib/man1/exiftool.1"
+    man3.install Dir["blib/man3/*"]
   end
 
   test do

@@ -1,5 +1,5 @@
 class S6 < Formula
-  desc "Small & secure supervision software suite."
+  desc "Small & secure supervision software suite"
   homepage "https://skarnet.org/software/s6/"
 
   stable do
@@ -76,10 +76,10 @@ class S6 < Formula
   test do
     # Test execline
     test_script = testpath/"test.eb"
-    test_script.write <<-EOS.undent
-     import PATH
-     if { [ ! -z ${PATH} ] }
-       true
+    test_script.write <<~EOS
+      import PATH
+      if { [ ! -z ${PATH} ] }
+        true
     EOS
     system "#{bin}/execlineb", test_script
 

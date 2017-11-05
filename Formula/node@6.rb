@@ -1,15 +1,15 @@
 class NodeAT6 < Formula
   desc "Platform built on V8 to build network applications"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v6.11.4/node-v6.11.4.tar.xz"
-  sha256 "4c2f0435e3088136ac4bc75236a7717f189d590a13f490065e7b3b8e5aacd450"
-  revision 1
+  url "https://nodejs.org/dist/v6.11.5/node-v6.11.5.tar.xz"
+  sha256 "1c6de415216799fbaeca82304b3fef87accc7101ebf2ead7d5c545e0779e8aaf"
   head "https://github.com/nodejs/node.git", :branch => "v6.x-staging"
 
   bottle do
-    sha256 "74a7028d76df0c5d8a4337693183e5558edf2e46cda1534a6e0633052ae43a53" => :high_sierra
-    sha256 "68135b66205498f0d294b8c9bb5d70799cd8e3d772d309150549d33d822aadf5" => :sierra
-    sha256 "5d3f79943fae2332090e942fe95f0c0fae0f4c53ef8b45a38a3ee894c299e741" => :el_capitan
+    rebuild 1
+    sha256 "943b2cd1ee4e7b95f6c72720f4e2a985993500542db3976e527ba2f61ec8612b" => :high_sierra
+    sha256 "6e0c415287170f09e1685896dc2229bd695055aa481b96eaa6bd5967f43cf45c" => :sierra
+    sha256 "397c62372f2963a7063aabdc09ad236604706101f0d1ff58aec0ffa28a903ea0" => :el_capitan
   end
 
   keg_only :versioned_formula
@@ -34,8 +34,8 @@ class NodeAT6 < Formula
 
   # Keep in sync with main node formula
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-5.4.2.tgz"
-    sha256 "04dc5f87b1079d59d51404d4b4c4aacbe385807a33bd15a8f2da2fabe27bf443"
+    url "https://registry.npmjs.org/npm/-/npm-5.5.1.tgz"
+    sha256 "b8b9afb0bb6211a289f969f66ba184ca5bc83abf6a570e0853ea5185073dca6f"
   end
 
   resource "icu4c" do
@@ -122,7 +122,7 @@ class NodeAT6 < Formula
     s = ""
 
     if build.without? "npm"
-      s += <<-EOS.undent
+      s += <<~EOS
         Homebrew has NOT installed npm. If you later install it, you should supplement
         your NODE_PATH with the npm module folder:
           #{HOMEBREW_PREFIX}/lib/node_modules
@@ -130,7 +130,7 @@ class NodeAT6 < Formula
     end
 
     if build.without? "full-icu"
-      s += <<-EOS.undent
+      s += <<~EOS
         Please note by default only English locale support is provided. If you need
         full locale support you should either rebuild with full icu:
           `brew reinstall node --with-full-icu`
@@ -167,7 +167,7 @@ class NodeAT6 < Formula
       system "#{HOMEBREW_PREFIX}/bin/npm", *npm_args, "install", "bignum" unless head?
       assert_predicate HOMEBREW_PREFIX/"bin/npx", :exist?, "npx must exist"
       assert_predicate HOMEBREW_PREFIX/"bin/npx", :executable?, "npx must be executable"
-      assert_match "< hello >", shell_output("#{HOMEBREW_PREFIX}/bin/npx --cache=#{HOMEBREW_CACHE}/npm_cache cowsay hello")
+      assert_match "< hello >", shell_output("#{HOMEBREW_PREFIX}/bin/npx cowsay hello")
     end
   end
 end

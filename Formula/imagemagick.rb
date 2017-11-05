@@ -4,15 +4,15 @@ class Imagemagick < Formula
   # Please always keep the Homebrew mirror as the primary URL as the
   # ImageMagick site removes tarballs regularly which means we get issues
   # unnecessarily and older versions of the formula are broken.
-  url "https://dl.bintray.com/homebrew/mirror/imagemagick-7.0.7-7.tar.xz"
-  mirror "https://www.imagemagick.org/download/ImageMagick-7.0.7-7.tar.xz"
-  sha256 "01b7171b784fdc689697fa35fbfa70e716a9e1608d45f81015ba78f6583f1dcf"
+  url "https://dl.bintray.com/homebrew/mirror/imagemagick-7.0.7-9.tar.xz"
+  mirror "https://www.imagemagick.org/download/ImageMagick-7.0.7-9.tar.xz"
+  sha256 "dc0c7418e20d9f113b3c3ae6903ed89d00a95465bd3f5e15832f3b06593a085c"
   head "https://github.com/ImageMagick/ImageMagick.git"
 
   bottle do
-    sha256 "7ba7870bae8a8b3236240cbbb6f9fde5598d78dd567c936857dd1470f7e3c7af" => :high_sierra
-    sha256 "7fe3ef5dc80215fb9050f441d1d00191233b90da646b3eb60f0295f00cf38169" => :sierra
-    sha256 "3da2ca31353e9139acd51037696a4b0bd5e2ebecdcd9f06cef1d889836e99277" => :el_capitan
+    sha256 "3f6e843ff91043c131bd57ae5ad485a13e6b05ea289d122f4ba03c8af0069447" => :high_sierra
+    sha256 "440a472e77a533e513601b23da7e5874447692997bc6b2f23005e7514f5bd9ad" => :sierra
+    sha256 "9421504b8d53908d4f4d152b280514b669740f9ecdd25a85a1e296bb91682850" => :el_capitan
   end
 
   option "with-fftw", "Compile with FFTW support"
@@ -118,7 +118,7 @@ class Imagemagick < Formula
   end
 
   def caveats
-    s = <<-EOS.undent
+    s = <<~EOS
       For full Perl support you may need to adjust your PERL5LIB variable:
         export PERL5LIB="#{HOMEBREW_PREFIX}/lib/perl5/site_perl":$PERL5LIB
     EOS

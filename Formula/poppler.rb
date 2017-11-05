@@ -5,9 +5,10 @@ class Poppler < Formula
   sha256 "19f185e05c3b59b4a1de2cec8ef39f5446035493d17bbed41d02fb9a77c8a93c"
 
   bottle do
-    sha256 "97807b812c0c2ae740a7012bd093d90ee29da202fd382bea31901dddff13832a" => :high_sierra
-    sha256 "42a67016b0a9d0885c830836cdb7005017e618ca17e0ef64a1e4d88f8a034747" => :sierra
-    sha256 "021774b70aa76351a86a26cbb2a326b282777a1bd0268c9ffcd92e1d16dfb8f6" => :el_capitan
+    rebuild 2
+    sha256 "13f8ff3f6eb14776b732a7cfa5e25195695fd966956afa9df9c4bbe92a83bf78" => :high_sierra
+    sha256 "95b3beb2df01043bc3db58179016ca6f8f3b553a9ae9ac663ab4bdcb2c6656d2" => :sierra
+    sha256 "4efb01d72131c21530168b4a545a1ebb5eb21cb4cedf9d2a80ac12a49b32421e" => :el_capitan
   end
 
   option "with-qt", "Build Qt5 backend"
@@ -69,6 +70,14 @@ class Poppler < Formula
     system "make", "install"
     resource("font-data").stage do
       system "make", "install", "prefix=#{prefix}"
+    end
+
+    libpoppler = (lib/"libpoppler.dylib").readlink
+    ["#{lib}/libpoppler-cpp.dylib", "#{lib}/libpoppler-glib.dylib",
+     *Dir["#{bin}/*"]].each do |f|
+      macho = MachO.open(f)
+      macho.change_dylib("@rpath/#{libpoppler}", "#{lib}/#{libpoppler}")
+      macho.write!
     end
   end
 
