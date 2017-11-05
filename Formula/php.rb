@@ -37,7 +37,6 @@ class Php < Formula
   depends_on "net-snmp"
   depends_on "openssl"
   depends_on "pcre"
-  depends_on "tidy-html5"
   depends_on "unixodbc"
   depends_on "webp"
 
@@ -121,6 +120,7 @@ class Php < Formula
       --with-png-dir=#{Formula["libpng"].opt_prefix}
       --with-pspell=#{Formula["aspell"].opt_prefix}
       --with-snmp
+      --with-tidy
       --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
       --with-xmlrpc
@@ -168,13 +168,6 @@ class Php < Formula
     system "make"
     system "make", "install"
 
-    Dir.chdir "ext/tidy" do
-      system bin/"phpize"
-      system "./configure", "--with-tidy=#{Formula["tidy-html5"].opt_prefix}",
-                            "--with-php-config=#{bin}/php-config"
-      system "make", "install"
-    end
-
     orig_ext_dir = File.basename `#{bin}/php-config --extension-dir`.chomp
     inreplace bin/"php-config", lib/"php/extensions", prefix/"pecl-extensions"
     inreplace "php.ini-development", %r{^; extension_dir = "\./"},
@@ -185,8 +178,10 @@ class Php < Formula
     config_path.install "sapi/fpm/php-fpm.conf"
     inreplace config_path/"php-fpm.conf", /^;?daemonize\s*=.+$/, "daemonize = no"
 
-    (var/"log").mkpath
-    (var/"log/php-fpm.log").tap { |log| touch log unless log.exist? }
+    unless File.exist? "#{var}/log/php-fpm.log"
+      (var/"log").mkpath
+      touch var/"log/php-fpm.log"
+    end
   end
 
   def caveats
@@ -250,7 +245,6 @@ class Php < Formula
     %w[
       ldap
       mcrypt
-      tidy
       imap
       opcache
       zip
