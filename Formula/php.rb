@@ -245,15 +245,15 @@ class Php < Formula
       #{lib}/php/.lock
     ]
 
-    # custom location for extensions installed via pecl
-    (HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl").mkpath
+    php_ext_dir = opt_prefix/"lib/php/extensions/" + \
+      File.basename `#{bin}/php-config --extension-dir`.chomp
 
     # fix pear config to use opt paths
     php_lib_path = opt_lib/"php"
     {
       "php_ini" => etc/"php/#{php_version}/php.ini",
       "php_dir" => php_lib_path,
-      "ext_dir" => HOMEBREW_PREFIX/"lib/php/#{php_version}/pecl",
+      "ext_dir" => php_ext_dir,
       "doc_dir" => php_lib_path/"doc",
       "bin_dir" => opt_bin,
       "data_dir" => php_lib_path/"data",
@@ -276,11 +276,11 @@ class Php < Formula
       config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
       if config_path.exist?
-        inreplace config_path, /#{extension_type}=.*$/, "#{extension_type}=#{e}.so"
+        inreplace config_path, /#{extension_type}=.*$/, "#{extension_type}=#{php_ext_dir}.so"
       else
         config_path.write <<-EOS.undent
           [#{e}]
-          #{extension_type}="#{e}.so"
+          #{extension_type}="#{php_ext_dir}.so"
         EOS
       end
     end
