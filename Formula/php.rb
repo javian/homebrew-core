@@ -35,7 +35,6 @@ class Php < Formula
   depends_on "net-snmp"
   depends_on "openssl"
   depends_on "pcre"
-  depends_on "tidy-html5"
   depends_on "unixodbc"
   depends_on "webp"
 
@@ -123,7 +122,7 @@ class Php < Formula
       --with-png-dir=#{Formula["libpng"].opt_prefix}
       --with-pspell=#{Formula["aspell"].opt_prefix}
       --with-snmp
-      --with-tidy=shared,#{Formula["tidy-html5"].opt_prefix}
+      --with-tidy
       --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
       --with-xmlrpc
@@ -167,9 +166,6 @@ class Php < Formula
         s.change_make_var! mk_var, other_flags.concat(system_libs).join(" ")
       end
     end
-
-    # Shared module linker flags come after the sytem flags, prepend to avoid accidential system linkage
-    ENV.prepend "LDFLAGS", "-L#{Formula["tidy-html5"].opt_lib}"
 
     system "make"
     ENV.deparallelize
@@ -273,7 +269,6 @@ class Php < Formula
     %w[
       ldap
       mcrypt
-      tidy
       imap
       opcache
     ].each do |e|
