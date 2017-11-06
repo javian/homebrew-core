@@ -245,8 +245,8 @@ class Php < Formula
       #{lib}/php/.lock
     ]
 
-    php_ext_dir = opt_prefix/"lib/php/extensions/" + \
-      File.basename `#{bin}/php-config --extension-dir`.chomp
+    php_basename = File.basename `#{bin}/php-config --extension-dir`.chomp
+    php_ext_dir = opt_prefix/"lib/php/extensions/" + php_basename
 
     # fix pear config to use opt paths
     php_lib_path = opt_lib/"php"
