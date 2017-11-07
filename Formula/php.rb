@@ -18,9 +18,9 @@ class Php < Formula
     depends_on "libsodium"
   end
 
-  depends_on "autoconf" => :build
   depends_on "pkg-config" => :build
   depends_on "aspell"
+  depends_on "berkeley-db@4"
   depends_on "curl" if MacOS.version < :lion
   depends_on "enchant"
   depends_on "freetds"
@@ -33,6 +33,8 @@ class Php < Formula
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libpq"
+  depends_on "libxml2"
+  depends_on "libxslt"
   depends_on "libzip"
   depends_on "net-snmp"
   depends_on "openssl"
@@ -65,38 +67,49 @@ class Php < Formula
       --with-config-file-path=#{config_path}
       --with-config-file-scan-dir=#{config_path}/conf.d
       --mandir=#{man}
-      --enable-bcmath
-      --enable-calendar
-      --enable-dba
+      --enable-bcmath=shared
+      --enable-calendar=shared
+      --enable-ctype=shared
+      --enable-dba=shared
+      --enable-dom=shared
       --enable-dtrace
-      --enable-exif
-      --enable-ftp
+      --enable-exif=shared
+      --enable-fileinfo=shared
+      --enable-ftp=shared
       --enable-fpm
       --enable-gd-native-ttf
-      --enable-intl
+      --enable-intl=shared
+      --enable-json=shared
       --enable-mbregex
-      --enable-mbstring
-      --enable-mysqlnd
+      --enable-mbstring=shared
+      --enable-mysqlnd=shared
       --enable-pcntl
       --enable-phpdbg
       --enable-phpdbg-webhelper
-      --enable-shmop
-      --enable-soap
-      --enable-sockets
-      --enable-sysvmsg
-      --enable-sysvsem
-      --enable-sysvshm
-      --enable-wddx
+      --enable-posix=shared
+      --enable-shmop=shared
+      --enable-simplexml=shared
+      --enable-soap=shared
+      --enable-sockets=shared
+      --enable-sysvmsg=shared
+      --enable-sysvsem=shared
+      --enable-sysvshm=shared
+      --enable-tokenizer=shared
+      --enable-wddx=shared
+      --enable-xmlreader=shared
+      --enable-xmlwriter=shared
       --enable-zip=shared
       --with-apxs2=#{Formula["httpd"].opt_bin}/apxs
-      --with-bz2
-      --with-enchant=#{Formula["enchant"].opt_prefix}
+      --with-bz2=shared
+      --with-db4=#{Formula["berkeley-db@4"].opt_prefix}
+      --with-enchant=shared,#{Formula["enchant"].opt_prefix}
       --with-fpm-user=_www
       --with-fpm-group=_www
       --with-freetype-dir=#{Formula["freetype"].opt_prefix}
-      --with-gd
-      --with-gettext=#{Formula["gettext"].opt_prefix}
-      --with-gmp=#{Formula["gmp"].opt_prefix}
+      --with-gd=shared
+      --with-gettext=shared,#{Formula["gettext"].opt_prefix}
+      --with-gmp=shared,#{Formula["gmp"].opt_prefix}
+      --with-iconv=shared
       --with-icu-dir=#{Formula["icu4c"].opt_prefix}
       --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
       --with-imap-ssl=#{Formula["openssl"].opt_prefix}
@@ -105,39 +118,43 @@ class Php < Formula
       --with-ldap=shared
       --with-ldap-sasl
       --with-libedit
+      --with-libxml-dir=#{Formula["libxml2"].opt_prefix}
       --with-libzip
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
-      --with-mysqli=mysqlnd
+      --with-mysqli=shared,mysqlnd
       --with-ndbm
       --with-openssl=#{Formula["openssl"].opt_prefix}
-      --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
-      --with-pdo-mysql=mysqlnd
-      --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
-      --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
-      --with-pgsql=#{Formula["libpq"].opt_prefix}
+      --with-openssl-dir=#{Formula["openssl"].opt_prefix}
+      --with-pdo-dblib=shared,#{Formula["freetds"].opt_prefix}
+      --with-pdo-mysql=shared,mysqlnd
+      --with-pdo-odbc=shared,unixODBC,#{Formula["unixodbc"].opt_prefix}
+      --with-pdo-pgsql=shared,#{Formula["libpq"].opt_prefix}
+      --with-pdo-sqlite=shared
+      --with-pgsql=shared,#{Formula["libpq"].opt_prefix}
       --with-pic
       --with-png-dir=#{Formula["libpng"].opt_prefix}
-      --with-pspell=#{Formula["aspell"].opt_prefix}
-      --with-snmp
-      --with-tidy
-      --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
+      --with-pspell=shared,#{Formula["aspell"].opt_prefix}
+      --with-snmp=shared
+      --with-sqlite3=shared
+      --with-tidy=shared
+      --with-unixODBC=shared,#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
-      --with-xmlrpc
-      --with-xsl
+      --with-xmlrpc=shared
+      --with-xsl=shared,#{Formula["libxslt"].opt_prefix}
       --with-zlib
     ]
 
     if MacOS.version < :lion
-      args << "--with-curl=#{Formula["curl"].opt_prefix}"
+      args << "--with-curl=shared,#{Formula["curl"].opt_prefix}"
     else
-      args << "--with-curl"
+      args << "--with-curl=shared"
     end
 
     if build.devel?
       args += %W[
         --with-password-argon2=#{Formula["argon2"].opt_prefix}
-        --with-sodium=#{Formula["libsodium"].opt_prefix}
+        --with-sodium=shared,#{Formula["libsodium"].opt_prefix}
       ]
     else
       args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
@@ -145,25 +162,10 @@ class Php < Formula
 
     system "./configure", *args
 
-    inreplace "Makefile" do |s|
-      # Custom location for php module and remove -a (don't touch httpd.conf)
-      s.gsub! /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
-        "INSTALL_IT = $(mkinstalldirs) '#{lib}/httpd/modules' \\2 LIBEXECDIR='#{lib}/httpd/modules' \\4 \\5"
-
-      # Reorder linker flags to put system paths at the end to avoid accidential system linkage
-      %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
-        system_libs = []
-        other_flags = []
-        s.get_make_var(mk_var).split.each do |f|
-          if f[%r{^-L\/(?:Applications|usr\/lib)\/}]
-            system_libs << f
-            next
-          end
-          other_flags << f
-        end
-        s.change_make_var! mk_var, other_flags.concat(system_libs).join(" ")
-      end
-    end
+    # Custom location for php module and remove -a (don't touch httpd.conf)
+    inreplace "Makefile",
+      /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
+      "INSTALL_IT = $(mkinstalldirs) '#{lib}/httpd/modules' \\2 LIBEXECDIR='#{lib}/httpd/modules' \\4 \\5"
 
     system "make"
     system "make", "install"
@@ -243,15 +245,67 @@ class Php < Formula
     orig_ext_dir = File.basename `#{bin}/php-config --extension-dir`.chomp
     orig_ext_dir = opt_prefix/"lib/php/extensions/#{orig_ext_dir}"
     %w[
-      ldap
-      mcrypt
+      bcmath
+      bz2
+      calendar
+      ctype
+      curl
+      dba
+      dom
+      enchant
+      exif
+      fileinfo
+      ftp
+      gd
+      gettext
+      gmp
+      iconv
       imap
+      intl
+      json
+      ldap
+      mbstring
+      mcrypt
+      mysqli
+      mysqlnd
       opcache
+      pdo_dblib
+      pdo_mysql
+      pdo_odbc
+      pdo_pgsql
+      pdo_sqlite
+      pgsql
+      posix
+      pspell
+      shmop
+      simplexml
+      snmp
+      soap
+      sockets
+      sodium
+      sqlite3
+      sysvmsg
+      sysvsem
+      sysvshm
+      tidy
+      tokenizer
+      wddx
+      xmlreader
+      xmlrpc
+      xmlwriter
+      xsl
       zip
     ].each do |e|
-      next if build.devel? && (e == "mcrypt")
-      ini_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
+      next if build.devel? && e == "mcrypt"
+      next if !build.devel? && e == "sodium"
+      ini_priority = case e
+      when "opcache" then "10"
+      when /pdo_|mysqli|wddx|xmlreader|xmlrpc/ then "30"
+      else "20"
+      end
+      ini_path = etc/"php/#{php_version}/conf.d/#{ini_priority}-ext-#{e}.ini"
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
+      extension_type.prepend("#") if e == "snmp"
       if ini_path.exist?
         inreplace ini_path,
           /#{extension_type}=.*$/, "#{extension_type}=#{orig_ext_dir}/#{e}.so"
@@ -300,11 +354,70 @@ class Php < Formula
     system "#{sbin}/php-fpm", "-t"
     system "#{bin}/phpdbg", "-V"
     system "#{bin}/php-cgi", "-m"
-    assert_match "php7_module", shell_output(
-      %W[
-        #{Formula["httpd"].bin}/httpd -M -C
-        'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'
-      ].join(" "),
-    )
+    begin
+      expected_output = /^Hello world!$/
+      (testpath/"index.php").write <<~EOS
+        <?php
+        echo 'Hello world!';
+      EOS
+      main_config = <<~EOS
+        Listen 8080
+        ServerName localhost:8080
+        DocumentRoot "#{testpath}"
+        ErrorLog "#{testpath}/httpd-error.log"
+        ServerRoot "#{Formula["httpd"].opt_prefix}"
+        LoadModule authz_core_module lib/httpd/modules/mod_authz_core.so
+        LoadModule unixd_module lib/httpd/modules/mod_unixd.so
+        LoadModule dir_module lib/httpd/modules/mod_dir.so
+        DirectoryIndex index.php
+      EOS
+
+      (testpath/"httpd.conf").write <<~EOS
+        #{main_config}
+        LoadModule mpm_prefork_module lib/httpd/modules/mod_mpm_prefork.so
+        LoadModule php7_module #{lib}/httpd/modules/libphp7.so
+        <FilesMatch \.(php|phar)$>
+          SetHandler application/x-httpd-php
+        </FilesMatch>
+      EOS
+
+      (testpath/"httpd-fpm.conf").write <<~EOS
+        #{main_config}
+        LoadModule mpm_event_module lib/httpd/modules/mod_mpm_event.so
+        LoadModule proxy_module lib/httpd/modules/mod_proxy.so
+        LoadModule proxy_fcgi_module lib/httpd/modules/mod_proxy_fcgi.so
+        <FilesMatch \.(php|phar)$>
+          SetHandler "proxy:fcgi://127.0.0.1:9000"
+        </FilesMatch>
+      EOS
+
+      pid = fork do
+        exec Formula["httpd"].opt_bin/"httpd", "-X", "-f", "#{testpath}/httpd.conf"
+      end
+      sleep 3
+
+      assert_match expected_output, shell_output("curl -s 127.0.0.1:8080")
+
+      Process.kill("TERM", pid)
+      Process.wait(pid)
+      pid = nil
+
+      fpm_pid = fork do
+        exec sbin/"php-fpm"
+      end
+      pid = fork do
+        exec Formula["httpd"].opt_bin/"httpd", "-X", "-f", "#{testpath}/httpd-fpm.conf"
+      end
+      sleep 3
+
+      assert_match expected_output, shell_output("curl -s 127.0.0.1:8080")
+    ensure
+      Process.kill("TERM", pid)
+      Process.wait(pid)
+      if fpm_pid
+        Process.kill("TERM", fpm_pid)
+        Process.wait(fpm_pid)
+      end
+    end
   end
 end
