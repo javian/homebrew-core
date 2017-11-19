@@ -276,7 +276,7 @@ class Php < Formula
       config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
       if config_path.exist?
-        inreplace config_path, /#{extension_type}=.*$/, "#{extension_type}=#{php_ext_dir}.so"
+        inreplace config_path, /#{extension_type}=.*$/, "#{extension_type}=#{php_ext_dir}/#{e}.so"
       else
         config_path.write <<-EOS.undent
           [#{e}]
@@ -322,11 +322,70 @@ class Php < Formula
     system "#{sbin}/php-fpm", "-t"
     system "#{bin}/phpdbg", "-V"
     system "#{bin}/php-cgi", "-m"
-    assert_match "php7_module", shell_output(
-      %W[
-        #{Formula["httpd"].bin}/httpd -M -C
-        'LoadModule php7_module #{HOMEBREW_PREFIX}/lib/httpd/modules/libphp7.so'
-      ].join(" "),
-    )
+    begin
+      expected_output = /^Hello world!$/
+      (testpath/"index.php").write <<~EOS
+        <?php
+        echo 'Hello world!';
+      EOS
+      main_config = <<~EOS
+        Listen 8080
+        ServerName localhost:8080
+        DocumentRoot "#{testpath}"
+        ErrorLog "#{testpath}/httpd-error.log"
+        ServerRoot "#{Formula["httpd"].opt_prefix}"
+        LoadModule authz_core_module lib/httpd/modules/mod_authz_core.so
+        LoadModule unixd_module lib/httpd/modules/mod_unixd.so
+        LoadModule dir_module lib/httpd/modules/mod_dir.so
+        DirectoryIndex index.php
+      EOS
+
+      (testpath/"httpd.conf").write <<~EOS
+        #{main_config}
+        LoadModule mpm_prefork_module lib/httpd/modules/mod_mpm_prefork.so
+        LoadModule php7_module #{lib}/httpd/modules/libphp7.so
+        <FilesMatch \.(php|phar)$>
+          SetHandler application/x-httpd-php
+        </FilesMatch>
+      EOS
+
+      (testpath/"httpd-fpm.conf").write <<~EOS
+        #{main_config}
+        LoadModule mpm_event_module lib/httpd/modules/mod_mpm_event.so
+        LoadModule proxy_module lib/httpd/modules/mod_proxy.so
+        LoadModule proxy_fcgi_module lib/httpd/modules/mod_proxy_fcgi.so
+        <FilesMatch \.(php|phar)$>
+          SetHandler "proxy:fcgi://127.0.0.1:9000"
+        </FilesMatch>
+      EOS
+
+      pid = fork do
+        exec Formula["httpd"].opt_bin/"httpd", "-X", "-f", "#{testpath}/httpd.conf"
+      end
+      sleep 3
+
+      assert_match expected_output, shell_output("curl -s 127.0.0.1:8080")
+
+      Process.kill("TERM", pid)
+      Process.wait(pid)
+      pid = nil
+
+      fpm_pid = fork do
+        exec sbin/"php-fpm"
+      end
+      pid = fork do
+        exec Formula["httpd"].opt_bin/"httpd", "-X", "-f", "#{testpath}/httpd-fpm.conf"
+      end
+      sleep 3
+
+      assert_match expected_output, shell_output("curl -s 127.0.0.1:8080")
+    ensure
+      Process.kill("TERM", pid)
+      Process.wait(pid)
+      if fpm_pid
+        Process.kill("TERM", fpm_pid)
+        Process.wait(fpm_pid)
+      end
+    end
   end
 end
