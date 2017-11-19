@@ -280,7 +280,7 @@ class Php < Formula
       else
         config_path.write <<-EOS.undent
           [#{e}]
-          #{extension_type}="#{php_ext_dir}.so"
+          #{extension_type}="#{php_ext_dir}/#{e}.so"
         EOS
       end
     end
