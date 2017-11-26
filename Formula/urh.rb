@@ -1,14 +1,14 @@
 class Urh < Formula
   desc "Universal Radio Hacker"
   homepage "https://github.com/jopohl/urh"
-  url "https://files.pythonhosted.org/packages/03/c5/56296de882bb3b270843a069521eff61a50247796717c11b4410da36d88f/urh-1.8.10.tar.gz"
-  sha256 "b826900304e8af3d8c76bba4311789fe946f0c698b0a25e74dcd20d90f104ec9"
+  url "https://files.pythonhosted.org/packages/71/c7/403b133afe1b5716ff13c92394ea9eeaeba6cc0898c6783825cbf8677bb5/urh-1.8.14.tar.gz"
+  sha256 "956e8d62b90d14310c788ede25492dc9d8fb87bc147e079dc64b023cbcef8a73"
   head "https://github.com/jopohl/urh.git"
 
   bottle do
-    sha256 "2a545b2a1d92bab5dd92d55595399cbcac06280c7ce01cd11b5ca778fe1cd0c4" => :high_sierra
-    sha256 "f552666acbdee50a2ad6b46ac9107bd64b1f2dfab191e491426cc5186ebea6dd" => :sierra
-    sha256 "2d4b0e08b219c11506f09335ae7d0827924165623a41efca09aa0f6b8321f998" => :el_capitan
+    sha256 "98e85d6723fd6cbe64925e6cd663b641e60aba206be53eb403f709aa51f25a7d" => :high_sierra
+    sha256 "9f0a65f95840aef108e0dcecad970f0ff777842190e7afb520a40b3a9ece564e" => :sierra
+    sha256 "b43a8b7e6ff6a122d471ac1fb7aeeefb684c6e1f0eabf15ea1558aa223521a0e" => :el_capitan
   end
 
   option "with-hackrf", "Build with libhackrf support"
@@ -26,13 +26,13 @@ class Urh < Formula
   end
 
   resource "psutil" do
-    url "https://files.pythonhosted.org/packages/8d/96/1fc6468be91521192861966c40bd73fdf8b065eae6d82dd0f870b9825a65/psutil-5.4.0.tar.gz"
-    sha256 "8e6397ec24a2ec09751447d9f169486b68b37ac7a8d794dca003ace4efaafc6a"
+    url "https://files.pythonhosted.org/packages/fe/17/0f0bf5792b2dfe6003efc5175c76225f7d3426f88e2bf8d360cfab870cd8/psutil-5.4.1.tar.gz"
+    sha256 "42e2de159e3c987435cb3b47d6f37035db190a1499f3af714ba7af5c379b6ba2"
   end
 
   resource "pyzmq" do
-    url "https://files.pythonhosted.org/packages/af/37/8e0bf3800823bc247c36715a52e924e8f8fd5d1432f04b44b8cd7a5d7e55/pyzmq-16.0.2.tar.gz"
-    sha256 "0322543fff5ab6f87d11a8a099c4c07dd8a1719040084b6ce9162bcdf5c45c9d"
+    url "https://files.pythonhosted.org/packages/1e/f9/d0675409c11d11e549e3da000901cfaabd848da117390ee00030e14bfdb6/pyzmq-16.0.3.tar.gz"
+    sha256 "8a883824147523c0fe76d247dd58994c1c28ef07f1cc5dde595a4fd1c28f2580"
   end
 
   def install

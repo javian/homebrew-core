@@ -41,9 +41,9 @@ class Wine < Formula
   end
 
   devel do
-    url "https://dl.winehq.org/wine/source/2.x/wine-2.20.tar.xz"
-    mirror "https://downloads.sourceforge.net/project/wine/Source/wine-2.20.tar.xz"
-    sha256 "b444826c69048932fd51ac00b791d18528a4d4abd4c397e5bd51ac60eda455a5"
+    url "https://dl.winehq.org/wine/source/2.x/wine-2.22.tar.xz"
+    mirror "https://downloads.sourceforge.net/project/wine/Source/wine-2.22.tar.xz"
+    sha256 "db5c7e7f652405d927b3ba43cc09e4e2f5726a2c7cbf9445a0d01d1b335e8b73"
 
     # Patch to fix screen-flickering issues. Still relevant on 2.14.
     # https://bugs.winehq.org/show_bug.cgi?id=34166
@@ -373,10 +373,6 @@ class Wine < Formula
       end
 
       resource("gd").stage do
-        # Poor man's patch as this is a resource
-        inreplace "src/gd_gd2.c",
-                  "#include <math.h>",
-                  "#include <math.h>\n#include <limits.h>"
         system "./configure", "--disable-dependency-tracking",
                               "--prefix=#{libexec}",
                               "--disable-static",

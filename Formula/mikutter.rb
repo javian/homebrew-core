@@ -1,14 +1,15 @@
 class Mikutter < Formula
   desc "Extensible Twitter client"
   homepage "https://mikutter.hachune.net/"
-  url "https://mikutter.hachune.net/bin/mikutter.3.5.13.tar.gz"
-  sha256 "2e01cd6cfe0caad663a381e5263f6d8030f0fb7cd8d4f858d320166516c7c320"
+  url "https://mikutter.hachune.net/bin/mikutter.3.5.15.tar.gz"
+  sha256 "1e970525b692be1a109d25e529969f64540eff31ace5149c4d2056f1c34e4150"
+  revision 1
   head "git://toshia.dip.jp/mikutter.git", :branch => "develop"
 
   bottle do
-    sha256 "957270122358385d87ad1c28380d6c1714ce54ccf9f7bd564e30bbdfb7323d0a" => :high_sierra
-    sha256 "431ae15af530c858f7ae2ec9bc0cb2042441d2b3cc6c86c375281952aad575d1" => :sierra
-    sha256 "d4855574064a98639e88323ec5f10856a17f56e533d433964859b8d3f605a2af" => :el_capitan
+    sha256 "e92b36405da63a293c7e0a5403f5a4ac169244c671b3754231b80be4790ae950" => :high_sierra
+    sha256 "5ebd403b2b44bf1f20987b5818c12521402bb5d7f5c11f3ea5d649f297bff02d" => :sierra
+    sha256 "585042a808c140a313dccd73d2b58245f925496104d7a61d576b8b4170c8eecb" => :el_capitan
   end
 
   depends_on "gtk+"
@@ -131,8 +132,8 @@ class Mikutter < Formula
   end
 
   resource "native-package-installer" do
-    url "https://rubygems.org/gems/native-package-installer-1.0.4.gem"
-    sha256 "4a20c4c74681d60075cad4b435f64278e6b09813edef8c41a23f1e7f9e16726b"
+    url "https://rubygems.org/gems/native-package-installer-1.0.5.gem"
+    sha256 "c299002a4a05652598c26614a0fc4b75bc2c619d253e0db775d419382e0b54b9"
   end
 
   resource "nokogiri" do
@@ -166,8 +167,8 @@ class Mikutter < Formula
   end
 
   resource "public_suffix" do
-    url "https://rubygems.org/gems/public_suffix-3.0.0.gem"
-    sha256 "ae48d8122866e342c09f1f643c2b88e3547562fd6df85d83926445d75f90ca6a"
+    url "https://rubygems.org/gems/public_suffix-3.0.1.gem"
+    sha256 "67182699cb644e66b4c68d30b5f1dd42e3dfe6c0aa0d8fd36a1e71c97c6a7f57"
   end
 
   resource "rake" do
@@ -249,29 +250,40 @@ class Mikutter < Formula
 
     (bin/"mikutter").write(exec_script)
     pkgshare.install_symlink libexec/"core/skin"
-    libexec.install_symlink lib/"mikutter/plugin"
+
+    # enable other formulae to install plugins
+    libexec.install_symlink HOMEBREW_PREFIX/"lib/mikutter/plugin"
   end
 
   def exec_script
     <<~EOS
       #!/bin/bash
-      export GEM_HOME="#{opt_lib}/mikutter/vendor"
+
       export DISABLE_BUNDLER_SETUP=1
-      export GTK_PATH="#{Formula["gtk+"].opt_lib}/gtk-2.0"
+
+      # also include gems/gtk modules from other formulae
+      export GEM_HOME="#{HOMEBREW_PREFIX}/lib/mikutter/vendor"
+      export GTK_PATH="#{HOMEBREW_PREFIX}/lib/gtk-2.0"
+
       exec ruby "#{libexec}/mikutter.rb" "$@"
     EOS
   end
 
   test do
-    (testpath/"test_plugin").write <<~EOS
+    (testpath/".mikutter/plugin/test_plugin/test_plugin.rb").write <<~EOS
       # -*- coding: utf-8 -*-
-      Plugin.create(:brew) do
-        Delayer.new { Thread.exit }
+      Plugin.create(:test_plugin) do
+        require 'logger'
+
+        Delayer.new do
+          log = Logger.new(STDOUT)
+          log.info("loaded test_plugin")
+          exit
+        end
       end
     EOS
-    system bin/"mikutter", "generate", "test_plugin"
-    assert File.file?(testpath/".mikutter/plugin/test_plugin/test_plugin.rb")
     system bin/"mikutter", "plugin_depends",
            testpath/".mikutter/plugin/test_plugin/test_plugin.rb"
+    system bin/"mikutter", "--plugin=test_plugin", "--debug"
   end
 end
