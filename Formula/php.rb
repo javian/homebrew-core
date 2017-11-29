@@ -223,7 +223,7 @@ class Php < Formula
     # custom location for extensions installed via pecl
     pecl_path = HOMEBREW_PREFIX/"lib/php"/php_version
     pecl_path.mkpath
-    ln_s pecl_path, prefix/"pecl-extensions"
+    ln_s pecl_path, prefix/"pecl-extensions" unless (prefix/"pecl-extensions").exist?
 
     # fix pear config to use opt paths
     php_lib_path = opt_lib/"php"
