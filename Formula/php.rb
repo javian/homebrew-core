@@ -2,22 +2,10 @@ class Php < Formula
   desc "General-purpose scripting language"
   homepage "https://php.net/"
 
-  stable do
-    url "https://php.net/get/php-7.1.11.tar.gz/from/this/mirror"
-    sha256 "de41b2c166bc5ec8ea96a337d4dd675c794f7b115a8a47bb04595c03dbbdf425"
+  url "https://php.net/get/php-7.2.0.tar.gz/from/this/mirror"
+  sha256 "801876abd52e0dc58a44701344252035fd50702d8f510cda7fdb317ab79897bc"
 
-    depends_on "libtool" => :run
-    depends_on "mcrypt"
-  end
-
-  devel do
-    url "https://downloads.php.net/~pollita/php-7.2.0RC5.tar.gz"
-    sha256 "eef6cda27b9f9a16ed0f622a3ac43011fd341053b33f16c6620941ab833d4890"
-
-    depends_on "argon2"
-    depends_on "libsodium"
-  end
-
+  depends_on "argon2"
   depends_on "aspell"
   depends_on "curl" if MacOS.version < :lion
   depends_on "enchant"
@@ -31,6 +19,7 @@ class Php < Formula
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libpq"
+  depends_on "libsodium"
   depends_on "libzip"
   depends_on "net-snmp"
   depends_on "openssl"
@@ -113,6 +102,7 @@ class Php < Formula
       --with-mysqli=mysqlnd
       --with-ndbm
       --with-openssl=#{Formula["openssl"].opt_prefix}
+      --with-password-argon2=#{Formula["argon2"].opt_prefix}
       --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
       --with-pdo-mysql=mysqlnd
       --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
@@ -122,6 +112,7 @@ class Php < Formula
       --with-png-dir=#{Formula["libpng"].opt_prefix}
       --with-pspell=#{Formula["aspell"].opt_prefix}
       --with-snmp
+      --with-sodium=#{Formula["libsodium"].opt_prefix}
       --with-tidy
       --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
@@ -134,15 +125,6 @@ class Php < Formula
       args << "--with-curl=#{Formula["curl"].opt_prefix}"
     else
       args << "--with-curl"
-    end
-
-    if build.devel?
-      args += %W[
-        --with-password-argon2=#{Formula["argon2"].opt_prefix}
-        --with-sodium=#{Formula["libsodium"].opt_prefix}
-      ]
-    else
-      args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
 
     system "./configure", *args
@@ -268,11 +250,9 @@ class Php < Formula
 
     %w[
       ldap
-      mcrypt
       imap
       opcache
     ].each do |e|
-      next if build.devel? && (e == "mcrypt")
       config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
       if config_path.exist?
