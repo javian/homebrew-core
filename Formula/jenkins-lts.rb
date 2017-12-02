@@ -1,8 +1,8 @@
 class JenkinsLts < Formula
   desc "Extendable open-source CI server"
   homepage "https://jenkins.io/index.html#stable"
-  url "http://mirrors.jenkins-ci.org/war-stable/2.73.1/jenkins.war"
-  sha256 "171c6b3d819fb0240ccd06831b4b493bc7d1eb37ca2632c94f907f15b3aedf7f"
+  url "http://mirrors.jenkins.io/war-stable/2.73.3/jenkins.war"
+  sha256 "fcfb932a84ce03795abbf51ae7799439278155b0d42242d1d79a187034649fc8"
 
   bottle :unneeded
 
@@ -10,19 +10,19 @@ class JenkinsLts < Formula
 
   def install
     system "jar", "xvf", "jenkins.war"
-    libexec.install Dir["jenkins.war", "WEB-INF/jenkins-cli.jar"]
+    libexec.install "jenkins.war", "WEB-INF/jenkins-cli.jar"
     bin.write_jar_script libexec/"jenkins.war", "jenkins-lts"
     bin.write_jar_script libexec/"jenkins-cli.jar", "jenkins-lts-cli"
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     Note: When using launchctl the port will be 8080.
     EOS
   end
 
   plist_options :manual => "jenkins-lts"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">

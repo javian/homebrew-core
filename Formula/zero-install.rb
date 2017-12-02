@@ -23,6 +23,7 @@ class ZeroInstall < Formula
   depends_on "gtk+" => :optional
 
   def install
+    ENV["OCAMLPARAM"] = "safe-string=0,_" # OCaml 4.06.0 compat
     ENV.append_path "PATH", Formula["gnupg"].opt_bin
 
     opamroot = buildpath/"opamroot"
@@ -40,10 +41,10 @@ class ZeroInstall < Formula
   end
 
   test do
-    (testpath/"hello.py").write <<-EOS.undent
+    (testpath/"hello.py").write <<~EOS
       print("hello world")
     EOS
-    (testpath/"hello.xml").write <<-EOS.undent
+    (testpath/"hello.xml").write <<~EOS
       <?xml version="1.0" ?>
       <interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
         <name>Hello</name>

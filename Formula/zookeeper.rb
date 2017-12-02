@@ -2,7 +2,7 @@ class Zookeeper < Formula
   desc "Centralized server for distributed coordination of services"
   homepage "https://zookeeper.apache.org/"
   url "https://www.apache.org/dyn/closer.cgi?path=zookeeper/zookeeper-3.4.10/zookeeper-3.4.10.tar.gz"
-  mirror "http://mirror.nbtelecom.com.br/apache/zookeeper/zookeeper-3.4.10/zookeeper-3.4.10.tar.gz"
+  mirror "https://archive.apache.org/dist/zookeeper/zookeeper-3.4.10/zookeeper-3.4.10.tar.gz"
   sha256 "7f7f5414e044ac11fee2a1e0bc225469f51fb0cdf821e67df762a43098223f27"
 
   bottle do
@@ -30,7 +30,7 @@ class Zookeeper < Formula
   depends_on :python => :optional
 
   def shim_script(target)
-    <<-EOS.undent
+    <<~EOS
       #!/usr/bin/env bash
       . "#{etc}/zookeeper/defaults"
       cd "#{libexec}/bin"
@@ -39,13 +39,13 @@ class Zookeeper < Formula
   end
 
   def default_zk_env
-    <<-EOS.undent
+    <<~EOS
       [ -z "$ZOOCFGDIR" ] && export ZOOCFGDIR="#{etc}/zookeeper"
     EOS
   end
 
   def default_log4j_properties
-    <<-EOS.undent
+    <<~EOS
       log4j.rootCategory=WARN, zklog
       log4j.appender.zklog = org.apache.log4j.RollingFileAppender
       log4j.appender.zklog.File = #{var}/log/zookeeper/zookeeper.log
@@ -95,9 +95,11 @@ class Zookeeper < Formula
 
     if build.head?
       system "ant"
-      libexec.install Dir["bin", "src/contrib", "src/java/lib", "build/*.jar"]
+      libexec.install "bin", "src/contrib", "src/java/lib"
+      libexec.install Dir["build/*.jar"]
     else
-      libexec.install Dir["bin", "contrib", "lib", "*.jar"]
+      libexec.install "bin", "contrib", "lib"
+      libexec.install Dir["*.jar"]
     end
 
     bin.mkpath
@@ -126,7 +128,7 @@ class Zookeeper < Formula
 
   plist_options :manual => "zkServer start"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">

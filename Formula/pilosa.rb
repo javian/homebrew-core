@@ -3,15 +3,14 @@ require "language/go"
 class Pilosa < Formula
   desc "Distributed bitmap index that queries across data sets"
   homepage "https://www.pilosa.com"
-  url "https://github.com/pilosa/pilosa/archive/v0.6.0.tar.gz"
-  sha256 "6121066051ab55f266f2c891edcc66d449aa5786c8622f7f765015806ee6f84f"
+  url "https://github.com/pilosa/pilosa/archive/v0.8.1.tar.gz"
+  sha256 "52ff3b46a4ba05a056afa96609d7f9c73b9b4650b5b4af54c1a0cea58907357b"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "9d4ef7612d783786867d939e60fca53f52aac6ccd5edc3fa894368d32d6e5952" => :high_sierra
-    sha256 "856bcbf157d4374c259e20fd5b0afa7cc0faa0d340b2a8fc77a61cf4a7d820ad" => :sierra
-    sha256 "ddca7e8a0ace058776208d9f52332f760521fb5426362f57382e24a2e07cc3ab" => :el_capitan
-    sha256 "66c4f85b6f05e5873787a48a3665c0dcfe361dd2ab60ce3fdec44d9634bcac6d" => :yosemite
+    sha256 "e20e744e82449c1ce0a60b6086df9d30c71ca8da06bd3850e87dd75bd4556e00" => :high_sierra
+    sha256 "aa75078a4834c9b8033e2f3a076072ac290ce9fe5d5cbc86799cfe94982cbe9b" => :sierra
+    sha256 "d7ad7bce575ee00a0580404799ecad8aaddba131c88f1075a4fe56e499f31f32" => :el_capitan
   end
 
   depends_on "go" => :build
@@ -19,7 +18,7 @@ class Pilosa < Formula
 
   go_resource "github.com/rakyll/statik" do
     url "https://github.com/rakyll/statik.git",
-        :revision => "25d6cab4d68d2a9b7c5965aa381726dd5dd6d7b8"
+        :tag => "v0.1.1"
   end
 
   def install
@@ -33,13 +32,13 @@ class Pilosa < Formula
       system "go", "install"
     end
     cd "src/github.com/pilosa/pilosa" do
-      system "make", "generate-statik", "pilosa", "FLAGS=-o #{bin}/pilosa", "VERSION=#{version}"
+      system "make", "generate-statik", "pilosa", "FLAGS=-o #{bin}/pilosa", "VERSION=v#{version}"
     end
   end
 
   plist_options :manual => "pilosa server"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">

@@ -31,7 +31,7 @@ class Gpsbabel < Formula
   end
 
   test do
-    (testpath/"test.loc").write <<-EOS.undent
+    (testpath/"test.loc").write <<~EOS
       <?xml version="1.0"?>
       <loc version="1.0">
         <waypoint>
@@ -41,6 +41,6 @@ class Gpsbabel < Formula
       </loc>
     EOS
     system bin/"gpsbabel", "-i", "geo", "-f", "test.loc", "-o", "gpx", "-F", "test.gpx"
-    assert File.exist? "test.gpx"
+    assert_predicate testpath/"test.gpx", :exist?
   end
 end

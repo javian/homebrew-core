@@ -1,13 +1,13 @@
 class Logstash < Formula
   desc "Tool for managing events and logs"
   homepage "https://www.elastic.co/products/logstash"
-  url "https://artifacts.elastic.co/downloads/logstash/logstash-5.6.2.tar.gz"
-  sha256 "7d302fe858fe5a4ff6e122f1dec7381aba0f1085da7ee05718eeeaa4a10eb8ad"
+  url "https://artifacts.elastic.co/downloads/logstash/logstash-6.0.0.tar.gz"
+  sha256 "3e36257cf076c2da348dcc72765ea2cd6509cf3c2d6300257f8085cd43c21661"
   head "https://github.com/elastic/logstash.git"
 
   bottle :unneeded
 
-  depends_on :java => "1.8+"
+  depends_on :java => "1.8"
 
   def install
     if build.head?
@@ -19,15 +19,15 @@ class Logstash < Formula
       cd "tar"
     end
 
-    inreplace %w[bin/logstash], %r{^\. "\$\(cd `dirname \$SOURCEPATH`\/\.\.; pwd\)\/bin\/logstash\.lib\.sh\"}, ". #{libexec}/bin/logstash.lib.sh"
+    inreplace %w[bin/logstash], %r{^\. "\$\(cd `dirname \${SOURCEPATH}`\/\.\.; pwd\)\/bin\/logstash\.lib\.sh\"}, ". #{libexec}/bin/logstash.lib.sh"
     inreplace %w[bin/logstash-plugin], %r{^\. "\$\(cd `dirname \$0`\/\.\.; pwd\)\/bin\/logstash\.lib\.sh\"}, ". #{libexec}/bin/logstash.lib.sh"
     inreplace %w[bin/logstash.lib.sh], /^LOGSTASH_HOME=.*$/, "LOGSTASH_HOME=#{libexec}"
     libexec.install Dir["*"]
-    bin.install_symlink libexec/"bin/logstash"
-    bin.install_symlink libexec/"bin/logstash-plugin"
+    bin.install libexec/"bin/logstash", libexec/"bin/logstash-plugin"
+    bin.env_script_all_files(libexec/"bin", Language::Java.java_home_env("1.8"))
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     Please read the getting started guide located at:
       https://www.elastic.co/guide/en/logstash/current/getting-started-with-logstash.html
     EOS
@@ -35,7 +35,8 @@ class Logstash < Formula
 
   plist_options :manual => "logstash"
 
-  def plist; <<-EOS.undent
+  def plist
+    <<~EOS
       <?xml version="1.0" encoding="UTF-8"?>
       <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
       <plist version="1.0">
@@ -68,7 +69,7 @@ class Logstash < Formula
     # workaround https://github.com/elastic/logstash/issues/6378
     mkdir testpath/"config"
     ["jvm.options", "log4j2.properties", "startup.options"].each { |f| cp prefix/"libexec/config/#{f}", testpath/"config" }
-    (testpath/"config/logstash.yml").write <<-EOS.undent
+    (testpath/"config/logstash.yml").write <<~EOS
       path.queue: #{testpath}/queue
     EOS
     mkdir testpath/"data"

@@ -1,16 +1,17 @@
 class ConjureUp < Formula
   include Language::Python::Virtualenv
 
-  desc "Big software deployments so easy it's almost magical."
+  desc "Big software deployments so easy it's almost magical"
   homepage "https://conjure-up.io/"
-  url "https://github.com/conjure-up/conjure-up/archive/2.3.1.tar.gz"
-  sha256 "da429aad45ef0c6a70565a3748da2cb668def684b65f04ee3c081ebce065fac7"
+  url "https://github.com/conjure-up/conjure-up/archive/2.4.1.tar.gz"
+  sha256 "f3f897522691d9ab2016db675b5e1a5cf209f071b1e1784d1e35619ea12a4965"
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "d557b765effbc4f473f3fadaeba0a81f0603e20e76630546d2fdadc4f88fcc5a" => :high_sierra
-    sha256 "792cd3cf9a6dd725b6448bcf2498b1bd6ad29b2b45afe1444084912b4e69af4f" => :sierra
-    sha256 "d0b050dfa5a30359b93b31ee79a016cab89a3f2bf244d4f2035a9680857a02e7" => :el_capitan
+    sha256 "8131ca55b4f2d5ac097f978e450e8f09866ab8aa0f215ad3c3c388274f62b06a" => :high_sierra
+    sha256 "fd2885a2417c7df76a9b4805cf81909ee1d7e1237d9c8401bf082826a398e70a" => :sierra
+    sha256 "9cbb6b8566161814ca60cdbd6a04e0d19e6e7cbe704413ef4920a6c2d0bdd83f" => :el_capitan
   end
 
   depends_on :python3
@@ -19,16 +20,13 @@ class ConjureUp < Formula
   depends_on "jq"
   depends_on "wget"
   depends_on "redis"
+  depends_on "awscli"
+  depends_on "pwgen"
 
   # list generated from the 'requirements.txt' file in the repository root
   resource "aiofiles" do
     url "https://files.pythonhosted.org/packages/28/51/913ed4312b63b0a1b6cad5a761b2c163eb20e353c7a3f19f08e04e8675e5/aiofiles-0.3.1.tar.gz"
     sha256 "6c4936cea65175277183553dbc27d08b286a24ae5bd86f44fbe485dfcf77a14a"
-  end
-
-  resource "awscli" do
-    url "https://files.pythonhosted.org/packages/91/31/9b420c49cbbc4316bdec5596b659adba934b9209a647bf0a780dc4b11a3b/awscli-1.11.123.tar.gz"
-    sha256 "74808159d67c31ce00f6ef1ea7a7f15794cc9cc16d23e25689bf18c30de24c48"
   end
 
   resource "botocore" do
@@ -39,11 +37,6 @@ class ConjureUp < Formula
   resource "bundle-placement" do
     url "https://files.pythonhosted.org/packages/7f/f3/635ef95ac9afb049e721774acbbda39a1a9d2963b10c08cded15bf09ae43/bundle-placement-0.0.2.tar.gz"
     sha256 "3ee288c0d5b889d1a9e04d1c09c9527b471b57a7df1f4898cebb990a6a967b05"
-  end
-
-  resource "charmhelpers" do
-    url "https://files.pythonhosted.org/packages/30/4d/b65532ca36a8a68271d4950c70fb43b90fbdab56be3f9b0e3497a6d481ec/charmhelpers-0.18.1.tar.gz"
-    sha256 "15dbae866550b724fb81ce501e118386b28a554110bd45f8ce3f62139411cf9f"
   end
 
   resource "colorama" do
@@ -91,19 +84,19 @@ class ConjureUp < Formula
     sha256 "125383aee2f60af66bb909682aa0757d8e0be083e3f8125473e18a9f3f2d4f3d"
   end
 
+  resource "kv" do
+    url "https://files.pythonhosted.org/packages/c7/02/69ad28c7669bb1cebc0ca1bb92eaf07f6b3b67c4f79cf1dcc5082f18d7a4/kv-0.3.tar.gz"
+    sha256 "d40755e7358e2b2a624feb9e442b06168b04cf14abf4d7aa749725dfbc5034e5"
+  end
+
   resource "MarkupSafe" do
     url "https://files.pythonhosted.org/packages/4d/de/32d741db316d8fdb7680822dd37001ef7a448255de9699ab4bfcbdf4172b/MarkupSafe-1.0.tar.gz"
     sha256 "a6be69091dac236ea9c6bc7d012beab42010fa914c459791d627dad4910eb665"
   end
 
-  resource "netaddr" do
-    url "https://files.pythonhosted.org/packages/0c/13/7cbb180b52201c07c796243eeff4c256b053656da5cfe3916c3f5b57b3a0/netaddr-0.7.19.tar.gz"
-    sha256 "38aeec7cdd035081d3a4c306394b19d677623bf76fa0913f6695127c7753aefd"
-  end
-
   resource "oauthlib" do
-    url "https://files.pythonhosted.org/packages/8d/f6/73febc3edf774239b18231d8b17cf2c3319dd128f7fe2f55f3fdf96477b4/oauthlib-2.0.3.tar.gz"
-    sha256 "f36c6631d072a2acb8b3b99f94e5e314f1fb4ed996696b18b2723769391c071b"
+    url "https://files.pythonhosted.org/packages/a5/8a/212e9b47fb54be109f3ff0684165bb38c51117f34e175c379fce5c7df754/oauthlib-2.0.6.tar.gz"
+    sha256 "ce57b501e906ff4f614e71c36a3ab9eacbb96d35c24d1970d2539bbc3ec70ce1"
   end
 
   resource "PrettyTable" do
@@ -122,8 +115,8 @@ class ConjureUp < Formula
   end
 
   resource "pyasn1" do
-    url "https://files.pythonhosted.org/packages/1a/37/7ac6910d872fdac778ad58c82018dce4af59279a79b17403bbabbe2a866e/pyasn1-0.3.4.tar.gz"
-    sha256 "3946ff0ab406652240697013a89d76e388344866033864ef2b097228d1f0101a"
+    url "https://files.pythonhosted.org/packages/3c/a6/4d6c88aa1694a06f6671362cb3d0350f0d856edea4685c300785200d1cd9/pyasn1-0.3.7.tar.gz"
+    sha256 "187f2a66d617683f8e82d5c00033b7c8a0287e1da88a9d577aebec321cad4965"
   end
 
   resource "python-dateutil" do
@@ -177,13 +170,8 @@ class ConjureUp < Formula
   end
 
   resource "six" do
-    url "https://files.pythonhosted.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz"
-    sha256 "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a"
-  end
-
-  resource "Tempita" do
-    url "https://files.pythonhosted.org/packages/56/c8/8ed6eee83dbddf7b0fc64dd5d4454bc05e6ccaafff47991f73f2894d9ff4/Tempita-0.5.2.tar.gz"
-    sha256 "cacecf0baa674d356641f1d406b8bff1d756d739c46b869a54de515d08e6fc9c"
+    url "https://files.pythonhosted.org/packages/16/d8/bc6316cf98419719bd59c91742194c111b6f2e85abac88e496adefaf7afe/six-1.11.0.tar.gz"
+    sha256 "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
   end
 
   resource "termcolor" do
@@ -207,8 +195,8 @@ class ConjureUp < Formula
   end
 
   resource "websockets" do
-    url "https://files.pythonhosted.org/packages/4a/e8/acf36f117deeb18c0b6679624fa11b57b0876044f0ce3f34024c3a7b2d95/websockets-3.4.tar.gz"
-    sha256 "43e5b9f51dd0000a4c6f646e2ade0c886bd14a784ffac08b9e079bd17a63bcc5"
+    url "https://files.pythonhosted.org/packages/b6/12/6194aac840c65253e45a38912e318f9ac548f9ba86d75bdb8fe66841b335/websockets-4.0.1.tar.gz"
+    sha256 "da4d4fbe059b0453e726d6d993760065d69b823a27efc3040402a6fcfe6a1ed9"
   end
 
   resource "ws4py" do
@@ -218,10 +206,12 @@ class ConjureUp < Formula
 
   def install
     virtualenv_install_with_resources
+    bin.install_symlink "#{libexec}/bin/kv-cli"
+    bin.install_symlink "#{libexec}/bin/juju-wait"
   end
 
   test do
     assert_match "No spells found, syncing from registry, please wait", shell_output("#{bin}/conjure-up openstack-base metal --show-env")
-    File.exist? "#{testpath}/.cache/conjure-up-spells/spells-index.yaml"
+    assert_predicate testpath/".cache/conjure-up-spells/spells-index.yaml", :exist?
   end
 end

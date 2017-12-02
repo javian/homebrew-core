@@ -3,13 +3,13 @@ class Osquery < Formula
   homepage "https://osquery.io"
   # pull from git tag to get submodules
   url "https://github.com/facebook/osquery.git",
-      :tag => "2.8.0",
-      :revision => "168cb327f245bd520d326fcbf612678059547a0d"
+      :tag => "2.10.2",
+      :revision => "c3a2171ebcc92fb3bbe3b94b8ab83916cd1ca275"
 
   bottle do
     cellar :any
-    sha256 "259e62e01ef994e3e9bb48fd4ea01ff28d4a3e04137af1044415462329649fc2" => :high_sierra
-    sha256 "1e668477bf5dcc83903ca91724f5e6d7dd3174f8901f9de8b0e2eab56a8a11e3" => :sierra
+    sha256 "3d4d8ba349015a2c72fc006ae3bf7f0346644c77dfa4607262b4db6362730750" => :high_sierra
+    sha256 "4ff05dbf11244285df707aecd2e91c88744caa09e28d3a44060fb373a860dbe1" => :sierra
   end
 
   fails_with :gcc => "6"
@@ -52,8 +52,8 @@ class Osquery < Formula
   end
 
   resource "aws-sdk-cpp" do
-    url "https://github.com/aws/aws-sdk-cpp/archive/1.1.20.tar.gz"
-    sha256 "d88e152ab5d9ad838166cb32a6152549ec16a51fb2fcc0802c704ea79c12edcb"
+    url "https://github.com/aws/aws-sdk-cpp/archive/1.2.7.tar.gz"
+    sha256 "1f65e63dbbceb1e8ffb19851a8e0ee153e05bf63bfa12b0e259d50021ac3ab6e"
   end
 
   resource "cpp-netlib" do
@@ -174,6 +174,16 @@ class Osquery < Formula
       end
     end
 
+    cxx_flags_release = %W[
+      -DNDEBUG
+      -I#{MacOS.sdk_path}/usr/include/libxml2
+      -I#{vendor}/aws-sdk-cpp/include
+      -I#{vendor}/cpp-netlib/include
+      -I#{vendor}/linenoise/include
+      -I#{vendor}/thrift/include
+      -Wl,-L#{vendor}/linenoise/lib
+    ]
+
     args = std_cmake_args + %W[
       -Daws-cpp-sdk-core_library:FILEPATH=#{vendor}/aws-sdk-cpp/lib/libaws-cpp-sdk-core.a
       -Daws-cpp-sdk-firehose_library:FILEPATH=#{vendor}/aws-sdk-cpp/lib/libaws-cpp-sdk-firehose.a
@@ -183,7 +193,7 @@ class Osquery < Formula
       -Dcppnetlib-uri_library:FILEPATH=#{vendor}/cpp-netlib/lib/libcppnetlib-uri.a
       -Dlinenoise_library:FILEPATH=#{vendor}/linenoise/lib/liblinenoise.a
       -Dthrift_library:FILEPATH=#{vendor}/thrift/lib/libthrift.a
-      -DCMAKE_CXX_FLAGS_RELEASE:STRING=-DNDEBUG\ -I#{MacOS.sdk_path}/usr/include/libxml2\ -I#{vendor}/aws-sdk-cpp/include\ -I#{vendor}/cpp-netlib/include\ -I#{vendor}/linenoise/include\ -I#{vendor}/thrift/include\ -Wl,-L#{vendor}/linenoise/lib
+      -DCMAKE_CXX_FLAGS_RELEASE:STRING=#{cxx_flags_release.join(" ")}
     ]
 
     # Link dynamically against brew-installed libraries.

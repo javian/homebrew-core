@@ -1,15 +1,14 @@
 class ShadowsocksLibev < Formula
   desc "Libev port of shadowsocks"
   homepage "https://github.com/shadowsocks/shadowsocks-libev"
-  url "https://github.com/shadowsocks/shadowsocks-libev/releases/download/v3.1.0/shadowsocks-libev-3.1.0.tar.gz"
-  sha256 "3b6493ebdcfff1eb31faf34d164d57049f7253ff5bffafa6ce2263c9ac123f31"
+  url "https://github.com/shadowsocks/shadowsocks-libev/releases/download/v3.1.1/shadowsocks-libev-3.1.1.tar.gz"
+  sha256 "24a002c100fbe9b4481e3134273cb1a2f25a4026eb030760e7e7eb57f8466ef6"
 
   bottle do
     cellar :any
-    rebuild 1
-    sha256 "9f75180b7aad1c01908928e06de781238382fade81c7104ae5eab399d26cdbc4" => :high_sierra
-    sha256 "bb95e6875fa4374272362634537df8b5d69a30a659aee5b45c56073c42dbe8d5" => :sierra
-    sha256 "61b0375223848f774a1fa2cdb28688b097538353c32d6d82e0cc3bc56ae67c87" => :el_capitan
+    sha256 "007dc1d9b047077e492df9faf26a73336c9fdd6e474a33315e0d496a514f6232" => :high_sierra
+    sha256 "949cf59dc8f490b8f0b586d983551cbfcf8668557edc018c6684e784499342ad" => :sierra
+    sha256 "7d35a829ee8b1dbdaa63da643cfb7a227f02c9a247fb93b02506955c4ee45572" => :el_capitan
   end
 
   depends_on "asciidoc" => :build
@@ -26,7 +25,7 @@ class ShadowsocksLibev < Formula
     system "./configure", "--prefix=#{prefix}"
     system "make"
 
-    (buildpath/"shadowsocks-libev.json").write <<-EOS.undent
+    (buildpath/"shadowsocks-libev.json").write <<~EOS
       {
           "server":"localhost",
           "server_port":8388,
@@ -43,9 +42,9 @@ class ShadowsocksLibev < Formula
     system "make", "install"
   end
 
-  plist_options :manual => "#{HOMEBREW_PREFIX}/opt/shadowsocks-libev/bin/ss-local -c #{HOMEBREW_PREFIX}/etc/shadowsocks-libev.json"
+  plist_options :manual => "#{HOMEBREW_PREFIX}/opt/shadowsocks-libev/bin/ss-local -c #{HOMEBREW_PREFIX}/etc/shadowsocks-libev.json -u"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
@@ -57,6 +56,7 @@ class ShadowsocksLibev < Formula
           <string>#{opt_bin}/ss-local</string>
           <string>-c</string>
           <string>#{etc}/shadowsocks-libev.json</string>
+          <string>-u</string>
         </array>
         <key>RunAtLoad</key>
         <true/>
@@ -68,7 +68,7 @@ class ShadowsocksLibev < Formula
   end
 
   test do
-    (testpath/"shadowsocks-libev.json").write <<-EOS.undent
+    (testpath/"shadowsocks-libev.json").write <<~EOS
       {
           "server":"127.0.0.1",
           "server_port":9998,

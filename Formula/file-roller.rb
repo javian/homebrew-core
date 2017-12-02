@@ -1,14 +1,13 @@
 class FileRoller < Formula
   desc "GNOME archive manager"
   homepage "https://wiki.gnome.org/Apps/FileRoller"
-  url "https://download.gnome.org/sources/file-roller/3.26/file-roller-3.26.0.tar.xz"
-  sha256 "75147fe2439178b01e70ca5d7abe10b05e7500249eeaa3caf5d86df94c2afd60"
+  url "https://download.gnome.org/sources/file-roller/3.26/file-roller-3.26.2.tar.xz"
+  sha256 "3e677b8e1c2f19aead69cf4fc419a19fc3373aaf5d7bf558b4f077f10bbba8a5"
 
   bottle do
-    rebuild 1
-    sha256 "051a7c8b8e5ce48383f08909e894a332191009ef43a882595d15ec54e421eb23" => :high_sierra
-    sha256 "05c4548d387d5f7059b630f049c7739e6b9fb0d53a985e057bb0f1eaa4454de2" => :sierra
-    sha256 "025c624d012e4238e131215bdfb299a2ac97d7f5b2ba6be5e2bd1ade4d430667" => :el_capitan
+    sha256 "0f6ed9638357c88ec9e063f050f9602987f408f858d11f96ede54a889e9fb6ec" => :high_sierra
+    sha256 "527d3641639115a94e2cda64a7804d603a5c72cffff43fd3c12c32ed4b78ccba" => :sierra
+    sha256 "846f18e2a5785cbdb3acb87f86dc375a3362c0acf403888d989417a841912c4c" => :el_capitan
   end
 
   depends_on "pkg-config" => :build

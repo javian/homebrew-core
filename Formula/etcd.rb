@@ -1,15 +1,15 @@
 class Etcd < Formula
   desc "Key value store for shared configuration and service discovery"
   homepage "https://github.com/coreos/etcd"
-  url "https://github.com/coreos/etcd/archive/v3.2.8.tar.gz"
-  sha256 "800dff80c28fdcf753d8819f0a531ad974742e204489ad0050e2601fd1379ee8"
+  url "https://github.com/coreos/etcd/archive/v3.2.10.tar.gz"
+  sha256 "86b7afd78b3a409b23ddf9d889b74c4edecf0fec1148f83bf025911705895f08"
   head "https://github.com/coreos/etcd.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "b4e6e542ca128b3e0ad8103dd279e60427b8269e7f9ac2e0275938d11469a6e8" => :high_sierra
-    sha256 "365df8c1ad176fa7e2850b3f513cdf277e6fad8d806f26f99c01f07d057e42b9" => :sierra
-    sha256 "7846055325e39bf34f8b08ea75b600d2879ebf3d3cf1c48ab2ae20c31e5db47d" => :el_capitan
+    sha256 "d8655b67d0b5d8b4efd5f7f71ffdc63e31d6639e5ca0cf32376177ef239debac" => :high_sierra
+    sha256 "2678b0f79e7d0ff0dfdbc3a7f222427374a633082a9c3efa893cf1c271d3b6b7" => :sierra
+    sha256 "fcd1225ae8b07e3fc3db3adc6c1c8ae534852c13ecb30bf71e40dd47e1c7697b" => :el_capitan
   end
 
   depends_on "go" => :build
@@ -25,7 +25,7 @@ class Etcd < Formula
 
   plist_options :manual => "etcd"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">

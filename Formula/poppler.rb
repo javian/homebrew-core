@@ -1,15 +1,13 @@
 class Poppler < Formula
   desc "PDF rendering library (based on the xpdf-3.0 code base)"
   homepage "https://poppler.freedesktop.org/"
-  url "https://poppler.freedesktop.org/poppler-0.59.0.tar.xz"
-  sha256 "a3d626b24cd14efa9864e12584b22c9c32f51c46417d7c10ca17651f297c9641"
-  revision 1
+  url "https://poppler.freedesktop.org/poppler-0.61.1.tar.xz"
+  sha256 "1266096343f5163c1a585124e9a6d44474e1345de5cdfe55dc7b47357bcfcda9"
 
   bottle do
-    sha256 "98f5c927af0ae3037bd1281e81e239e2d8551ec7ba407bc11eafe7b2a23c2763" => :high_sierra
-    sha256 "45c498c850b6e0dd469ad01a9934e8a04c382a0765c43ffd558f36ba914e53d3" => :sierra
-    sha256 "6414db0c4132faa741c0103f404c7e5620caf11484bbf4455c29f87e5184a21f" => :el_capitan
-    sha256 "dc7456a1f84d9125b08484bfdfa28950331656b8183368e245c66b30967f2cff" => :yosemite
+    sha256 "19c1f79d20eb82931cf288cd66da19972537f3bb6862d31f05ee13fba69ad295" => :high_sierra
+    sha256 "a81f8e5c998238f2c399c4917eff6b14ef1fa708841ff5b21e0a868391071e4b" => :sierra
+    sha256 "1621eced6c3d6d11a1e04df49e0d1619a465f8922a47f307e21855ceb1e77159" => :el_capitan
   end
 
   option "with-qt", "Build Qt5 backend"
@@ -19,6 +17,7 @@ class Poppler < Formula
   deprecated_option "with-qt5" => "with-qt"
   deprecated_option "with-lcms2" => "with-little-cms2"
 
+  depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "cairo"
   depends_on "fontconfig"
@@ -43,39 +42,41 @@ class Poppler < Formula
 
   needs :cxx11 if build.with?("qt") || MacOS.version < :mavericks
 
-  # Fix clang build failure due to missing user-provided default constructor
-  # Reported 4 Sep 2017 https://bugs.freedesktop.org/show_bug.cgi?id=102538
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/656cc7f/poppler/clang.diff"
-    sha256 "b95c454b78c83fc2a7cec276d4014c78aa4de48d247652eb3de3876f78875605"
-  end
-
   def install
     ENV.cxx11 if build.with?("qt") || MacOS.version < :mavericks
-    ENV["LIBOPENJPEG_CFLAGS"] = "-I#{Formula["openjpeg"].opt_include}/openjpeg-2.2"
 
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-      --enable-xpdf-headers
-      --enable-poppler-glib
-      --disable-gtk-test
-      --enable-introspection=yes
-      --disable-poppler-qt4
+    args = std_cmake_args + %w[
+      -DENABLE_XPDF_HEADERS=ON
+      -DENABLE_GLIB=ON
+      -DBUILD_GTK_TESTS=OFF
+      -DWITH_GObjectIntrospection=ON
+      -DENABLE_QT4=OFF
     ]
 
     if build.with? "qt"
-      args << "--enable-poppler-qt5"
+      args << "-DENABLE_QT5=ON"
     else
-      args << "--disable-poppler-qt5"
+      args << "-DENABLE_QT5=OFF"
     end
 
-    args << "--enable-cms=lcms2" if build.with? "little-cms2"
+    if build.with? "little-cms2"
+      args << "-DENABLE_CMS=lcms2"
+    else
+      args << "-DENABLE_CMS=OFF"
+    end
 
-    system "./configure", *args
+    system "cmake", ".", *args
     system "make", "install"
     resource("font-data").stage do
       system "make", "install", "prefix=#{prefix}"
+    end
+
+    libpoppler = (lib/"libpoppler.dylib").readlink
+    ["#{lib}/libpoppler-cpp.dylib", "#{lib}/libpoppler-glib.dylib",
+     *Dir["#{bin}/*"]].each do |f|
+      macho = MachO.open(f)
+      macho.change_dylib("@rpath/#{libpoppler}", "#{lib}/#{libpoppler}")
+      macho.write!
     end
   end
 

@@ -1,14 +1,13 @@
 class Httpd < Formula
   desc "Apache HTTP server"
   homepage "https://httpd.apache.org/"
-  url "https://www.apache.org/dyn/closer.cgi?path=httpd/httpd-2.4.27.tar.bz2"
-  sha256 "71fcc128238a690515bd8174d5330a5309161ef314a326ae45c7c15ed139c13a"
-  revision 2
+  url "https://www.apache.org/dyn/closer.cgi?path=httpd/httpd-2.4.29.tar.bz2"
+  sha256 "777753a5a25568a2a27428b2214980564bc1c38c1abf9ccc7630b639991f7f00"
 
   bottle do
-    sha256 "dbea8d85bc9b41d24eb9e88ee2ef2bdf3ebfb360a8ef62218c30bdbcf07b3748" => :high_sierra
-    sha256 "19bf2114d17e94601fa6eed220a0f82b6e028eb0a23d42bcbe30c1c6b61a80b6" => :sierra
-    sha256 "892b002db04a5ccea06840cf60403e08ef9a3f99f6fc65c98e8c1e8de95d7ef4" => :el_capitan
+    sha256 "9607b2648d706175f8c8a7ee529bb6e57abdb7a60d47bcb4012e403721707d6d" => :high_sierra
+    sha256 "ca0fc3385ab31d3f44413e4b847785093b10e862b90dd3b61b9973f1cc6f3639" => :sierra
+    sha256 "5fa46264c518ec0c03b8f2b83f801220f704f5580a29002123554c9872fb9439" => :el_capitan
   end
 
   depends_on "apr"
@@ -18,12 +17,23 @@ class Httpd < Formula
   depends_on "pcre"
 
   def install
+    # fixup prefix references in favour of opt_prefix references
+    inreplace "Makefile.in",
+      '#@@ServerRoot@@#$(prefix)#', '#@@ServerRoot@@'"##{opt_prefix}#"
+    inreplace "docs/conf/extra/httpd-autoindex.conf.in",
+      "@exp_iconsdir@", "#{opt_pkgshare}/icons"
+    inreplace "docs/conf/extra/httpd-multilang-errordoc.conf.in",
+      "@exp_errordir@", "#{opt_pkgshare}/error"
+
+    # fix default user/group when running as root
+    inreplace "docs/conf/httpd.conf.in", /(User|Group) daemon/, "\\1 _www"
+
     # use Slackware-FHS layout as it's closest to what we want.
     # these values cannot be passed directly to configure, unfortunately.
     inreplace "config.layout" do |s|
-      s.gsub! "${datadir}/cgi-bin", "#{pkgshare}/cgi-bin"
+      s.gsub! "${datadir}/htdocs", "${datadir}"
+      s.gsub! "${htdocsdir}/manual", "#{pkgshare}/manual"
       s.gsub! "${datadir}/error",   "#{pkgshare}/error"
-      s.gsub! "${datadir}/htdocs",  "#{pkgshare}/htdocs"
       s.gsub! "${datadir}/icons",   "#{pkgshare}/icons"
     end
 
@@ -37,14 +47,21 @@ class Httpd < Formula
                           "--enable-mpms-shared=all",
                           "--enable-mods-shared=all",
                           "--enable-pie",
+                          "--enable-suexec",
+                          "--with-suexec-bin=#{opt_bin}/suexec",
+                          "--with-suexec-caller=_www",
                           "--with-port=8080",
                           "--with-sslport=8443",
                           "--with-apr=#{Formula["apr"].opt_prefix}",
                           "--with-apr-util=#{Formula["apr-util"].opt_prefix}",
+                          "--with-mpm=prefork",
                           "--with-nghttp2=#{Formula["nghttp2"].opt_prefix}",
                           "--with-ssl=#{Formula["openssl"].opt_prefix}",
                           "--with-pcre=#{Formula["pcre"].opt_prefix}"
     system "make", "install"
+
+    # suexec does not install without root
+    bin.install "support/suexec"
 
     # remove non-executable files in bin dir (for brew audit)
     rm bin/"envvars"
@@ -52,18 +69,38 @@ class Httpd < Formula
 
     # avoid using Cellar paths
     inreplace %W[
-      #{lib}/httpd/build/config_vars.mk
       #{include}/httpd/ap_config_layout.h
+      #{lib}/httpd/build/config_vars.mk
     ] do |s|
       s.gsub! "#{lib}/httpd/modules", "#{HOMEBREW_PREFIX}/lib/httpd/modules"
+    end
+
+    inreplace %W[
+      #{bin}/apachectl
+      #{bin}/apxs
+      #{include}/httpd/ap_config_auto.h
+      #{include}/httpd/ap_config_layout.h
+      #{lib}/httpd/build/config_vars.mk
+      #{lib}/httpd/build/config.nice
+    ] do |s|
       s.gsub! prefix, opt_prefix
     end
+
     inreplace "#{lib}/httpd/build/config_vars.mk" do |s|
       pcre = Formula["pcre"]
       s.gsub! pcre.prefix.realpath, pcre.opt_prefix
       s.gsub! "${prefix}/lib/httpd/modules",
               "#{HOMEBREW_PREFIX}/lib/httpd/modules"
     end
+  end
+
+  def caveats
+    <<~EOS
+      DocumentRoot is #{var}/www.
+
+      The default ports have been set in #{etc}/httpd/httpd.conf to 8080 and in
+      #{etc}/httpd/extra/httpd-ssl.conf to 8443 so that httpd can run without sudo.
+    EOS
   end
 
   def post_install
@@ -73,7 +110,7 @@ class Httpd < Formula
 
   plist_options :manual => "apachectl start"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
@@ -97,22 +134,22 @@ class Httpd < Formula
     begin
       expected_output = "Hello world!"
       (testpath/"index.html").write expected_output
-      (testpath/"httpd.conf").write <<-EOS.undent
+      (testpath/"httpd.conf").write <<~EOS
         Listen 8080
         DocumentRoot "#{testpath}"
         ErrorLog "#{testpath}/httpd-error.log"
         LoadModule authz_core_module #{lib}/httpd/modules/mod_authz_core.so
         LoadModule unixd_module #{lib}/httpd/modules/mod_unixd.so
         LoadModule dir_module #{lib}/httpd/modules/mod_dir.so
-        LoadModule mpm_event_module #{lib}/httpd/modules/mod_mpm_event.so
+        LoadModule mpm_prefork_module #{lib}/httpd/modules/mod_mpm_prefork.so
       EOS
 
       pid = fork do
-        exec bin/"httpd", "-DFOREGROUND", "-f", "#{testpath}/httpd.conf"
+        exec bin/"httpd", "-X", "-f", "#{testpath}/httpd.conf"
       end
       sleep 3
 
-      assert_match expected_output, shell_output("curl 127.0.0.1:8080")
+      assert_match expected_output, shell_output("curl -s 127.0.0.1:8080")
     ensure
       Process.kill("TERM", pid)
       Process.wait(pid)

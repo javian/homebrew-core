@@ -1,14 +1,14 @@
 class JfrogCliGo < Formula
   desc "Command-line interface for Jfrog Artifactory and Bintray"
   homepage "https://github.com/JFrogDev/jfrog-cli-go"
-  url "https://github.com/JFrogDev/jfrog-cli-go/archive/1.11.0.tar.gz"
-  sha256 "7e743d6a203a36bcc2b799412e601963a7c69b13283d5f3de8327492b3f86085"
+  url "https://github.com/JFrogDev/jfrog-cli-go/archive/1.12.1.tar.gz"
+  sha256 "f3d537be1f680fe1701f9abf2adce4b490989f560000cb9aa7feb99d38e4e0f8"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "c23797f601d8d837c8ce32e44e3128985e3aed2c3e63d0915b37953d27ad648b" => :high_sierra
-    sha256 "b7f691574c4170a57faf529565017834c39b78ebb7c95181c2ca2a621bb3fe99" => :sierra
-    sha256 "71dc936601261d8f643610b3e9d91096c48fb89a102329b863d557ba4bb0b29f" => :el_capitan
+    sha256 "21abb1282b1c3cf251cb70ed2d143ad1db8a46046ac6dc10055b2b801d59165a" => :high_sierra
+    sha256 "243a6bd8f0eba37f346f9e99a58954ad20a55ea40f7ff73d3f67c17d39323182" => :sierra
+    sha256 "ec0fdc9463709a60af0552f68b8fd30fb0e9d21b131a51427c170de482d2dba4" => :el_capitan
   end
 
   depends_on "go" => :build

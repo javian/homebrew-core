@@ -5,8 +5,10 @@ class Php < Formula
   url "https://php.net/get/php-7.2.0.tar.gz/from/this/mirror"
   sha256 "801876abd52e0dc58a44701344252035fd50702d8f510cda7fdb317ab79897bc"
 
+  depends_on "pkg-config" => :build
   depends_on "argon2"
   depends_on "aspell"
+  depends_on "berkeley-db@4"
   depends_on "curl" if MacOS.version < :lion
   depends_on "enchant"
   depends_on "freetds"
@@ -19,11 +21,11 @@ class Php < Formula
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libpq"
-  depends_on "libsodium"
   depends_on "libzip"
   depends_on "net-snmp"
   depends_on "openssl"
   depends_on "pcre"
+  depends_on "libsodium"
   depends_on "unixodbc"
   depends_on "webp"
 
@@ -42,9 +44,6 @@ class Php < Formula
 
     ENV.cxx11
 
-    # Fix missing header file during configure for libzip include
-    ENV.append_to_cflags "-I#{Formula["libzip"].opt_prefix}/lib/libzip/include"
-
     config_path = etc/"php/#{php_version}"
     ENV["lt_cv_path_SED"] = "sed"
 
@@ -55,39 +54,49 @@ class Php < Formula
       --with-config-file-path=#{config_path}
       --with-config-file-scan-dir=#{config_path}/conf.d
       --mandir=#{man}
-      --enable-bcmath
-      --enable-calendar
-      --enable-dba
+      --enable-bcmath=shared
+      --enable-calendar=shared
+      --enable-ctype=shared
+      --enable-dba=shared
+      --enable-dom=shared
       --enable-dtrace
-      --enable-exif
-      --enable-ftp
+      --enable-exif=shared
+      --enable-fileinfo=shared
+      --enable-ftp=shared
       --enable-fpm
       --enable-gd-native-ttf
-      --enable-intl
+      --enable-intl=shared
+      --enable-json=shared
       --enable-mbregex
-      --enable-mbstring
-      --enable-mysqlnd
+      --enable-mbstring=shared
+      --enable-mysqlnd=shared
       --enable-pcntl
       --enable-phpdbg
       --enable-phpdbg-webhelper
-      --enable-shmop
-      --enable-soap
-      --enable-sockets
-      --enable-sysvmsg
-      --enable-sysvsem
-      --enable-sysvshm
-      --enable-wddx
-      --enable-zip
-      --libexecdir=#{libexec}
+      --enable-posix=shared
+      --enable-shmop=shared
+      --enable-simplexml=shared
+      --enable-soap=shared
+      --enable-sockets=shared
+      --enable-sysvmsg=shared
+      --enable-sysvsem=shared
+      --enable-sysvshm=shared
+      --enable-tokenizer=shared
+      --enable-wddx=shared
+      --enable-xmlreader=shared
+      --enable-xmlwriter=shared
+      --enable-zip=shared
       --with-apxs2=#{Formula["httpd"].opt_bin}/apxs
-      --with-bz2
-      --with-enchant=#{Formula["enchant"].opt_prefix}
+      --with-bz2=shared
+      --with-db4=#{Formula["berkeley-db@4"].opt_prefix}
+      --with-enchant=shared,#{Formula["enchant"].opt_prefix}
       --with-fpm-user=_www
       --with-fpm-group=_www
       --with-freetype-dir=#{Formula["freetype"].opt_prefix}
-      --with-gd
-      --with-gettext=#{Formula["gettext"].opt_prefix}
-      --with-gmp=#{Formula["gmp"].opt_prefix}
+      --with-gd=shared
+      --with-gettext=shared,#{Formula["gettext"].opt_prefix}
+      --with-gmp=shared,#{Formula["gmp"].opt_prefix}
+      --with-iconv=shared
       --with-icu-dir=#{Formula["icu4c"].opt_prefix}
       --with-imap=shared,#{Formula["imap-uw"].opt_prefix}
       --with-imap-ssl=#{Formula["openssl"].opt_prefix}
@@ -99,93 +108,56 @@ class Php < Formula
       --with-libzip
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
-      --with-mysqli=mysqlnd
+      --with-mysqli=shared,mysqlnd
       --with-ndbm
       --with-openssl=#{Formula["openssl"].opt_prefix}
+      --with-openssl-dir=#{Formula["openssl"].opt_prefix}
       --with-password-argon2=#{Formula["argon2"].opt_prefix}
-      --with-pdo-dblib=#{Formula["freetds"].opt_prefix}
-      --with-pdo-mysql=mysqlnd
-      --with-pdo-odbc=unixODBC,#{Formula["unixodbc"].opt_prefix}
-      --with-pdo-pgsql=#{Formula["libpq"].opt_prefix}
-      --with-pgsql=#{Formula["libpq"].opt_prefix}
+      --with-pdo-dblib=shared,#{Formula["freetds"].opt_prefix}
+      --with-pdo-mysql=shared,mysqlnd
+      --with-pdo-odbc=shared,unixODBC,#{Formula["unixodbc"].opt_prefix}
+      --with-pdo-pgsql=shared,#{Formula["libpq"].opt_prefix}
+      --with-pdo-sqlite=shared
+      --with-pgsql=shared,#{Formula["libpq"].opt_prefix}
       --with-pic
       --with-png-dir=#{Formula["libpng"].opt_prefix}
-      --with-pspell=#{Formula["aspell"].opt_prefix}
-      --with-snmp
-      --with-sodium=#{Formula["libsodium"].opt_prefix}
-      --with-tidy
-      --with-unixODBC=#{Formula["unixodbc"].opt_prefix}
+      --with-pspell=shared,#{Formula["aspell"].opt_prefix}
+      --with-snmp=shared
+      --with-sqlite3=shared
+      --with-sodium=shared,#{Formula["libsodium"].opt_prefix}
+      --with-tidy=shared
+      --with-unixODBC=shared,#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
-      --with-xmlrpc
-      --with-xsl
+      --with-xmlrpc=shared
+      --with-xsl=shared
       --with-zlib
     ]
 
     if MacOS.version < :lion
-      args << "--with-curl=#{Formula["curl"].opt_prefix}"
+      args << "--with-curl=shared,#{Formula["curl"].opt_prefix}"
     else
-      args << "--with-curl"
+      args << "--with-curl=shared"
     end
 
     system "./configure", *args
 
-    inreplace "Makefile" do |s|
-      # Custom location for php module and remove -a (don't touch httpd.conf)
-      s.gsub! /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
-        "INSTALL_IT = $(mkinstalldirs) '#{lib}/httpd/modules' \\2 LIBEXECDIR='#{lib}/httpd/modules' \\4 \\5"
-
-      # Reorder linker flags to put system paths at the end to avoid accidential system linkage
-      %w[EXTRA_LDFLAGS EXTRA_LDFLAGS_PROGRAM].each do |mk_var|
-        system_libs = []
-        other_flags = []
-        s.get_make_var(mk_var).split.each do |f|
-          if f[%r{^-L\/(?:Applications|usr\/lib)\/}]
-            system_libs << f
-            next
-          end
-          other_flags << f
-        end
-        s.change_make_var! mk_var, other_flags.concat(system_libs).join(" ")
-      end
-    end
+    # Custom location for php module and remove -a (don't touch httpd.conf)
+    inreplace "Makefile",
+      /^INSTALL_IT = \$\(mkinstalldirs\) '([^']+)' (.+) LIBEXECDIR=([^\s]+) (.+) -a (.+)$/,
+      "INSTALL_IT = $(mkinstalldirs) '#{lib}/httpd/modules' \\2 LIBEXECDIR='#{lib}/httpd/modules' \\4 \\5"
 
     system "make"
-    ENV.deparallelize
     system "make", "install"
+
+    orig_ext_dir = File.basename `#{bin}/php-config --extension-dir`.chomp
+    inreplace bin/"php-config", lib/"php/extensions", prefix/"pecl-extensions"
+    inreplace "php.ini-development", %r{^; extension_dir = "\./"},
+      "extension_dir = \"#{HOMEBREW_PREFIX}/lib/php/#{php_version}/#{orig_ext_dir}\""
 
     config_path.install "php.ini-development" => "php.ini"
     (config_path/"php-fpm.d").install "sapi/fpm/www.conf"
     config_path.install "sapi/fpm/php-fpm.conf"
     inreplace config_path/"php-fpm.conf", /^;?daemonize\s*=.+$/, "daemonize = no"
-
-    # patch PEAR so it installs extensions outside of the Cellar
-    Dir.chdir prefix do
-      pear_patch = Patch.create :p1, <<-EOS.undent
-        --- a/lib/php/PEAR/Builder.php	2017-09-07 23:46:07.000000000 -0500
-        +++ b/lib/php/PEAR/Builder.php	2017-09-07 23:47:17.000000000 -0500
-        @@ -405,7 +405,7 @@
-                 $prefix = exec($this->config->get('php_prefix')
-                                 . "php-config" .
-                                $this->config->get('php_suffix') . " --prefix");
-        -        $this->_harvestInstDir($prefix, $inst_dir . DIRECTORY_SEPARATOR . $prefix, $built_files);
-        +        $this->_harvestInstDir($this->config->get('ext_dir'), $inst_dir . DIRECTORY_SEPARATOR . $prefix, $built_files);
-                 chdir($old_cwd);
-                 return $built_files;
-             }
-        --- a/lib/php/PEAR/Command/Install.php	2017-09-07 23:45:56.000000000 -0500
-        +++ b/lib/php/PEAR/Command/Install.php	2017-09-07 23:42:22.000000000 -0500
-        @@ -379,7 +379,7 @@
-                     $newini = array();
-                 }
-                 foreach ($binaries as $binary) {
-        -            if ($ini['extension_dir']) {
-        +            if ($ini['extension_dir'] && $ini['extension_dir'] === $this->config->get('ext_dir')) {
-                         $binary = basename($binary);
-                     }
-                     $newini[] = $enable . '="' . $binary . '"' . (OS_UNIX ? "\\n" : "\\r\\n");
-      EOS
-      pear_patch.apply
-    end
 
     unless File.exist? "#{var}/log/php-fpm.log"
       (var/"log").mkpath
@@ -227,15 +199,16 @@ class Php < Formula
       #{lib}/php/.lock
     ]
 
-    php_basename = File.basename `#{bin}/php-config --extension-dir`.chomp
-    php_ext_dir = opt_prefix/"lib/php/extensions/" + php_basename
+    # custom location for extensions installed via pecl
+    pecl_path = HOMEBREW_PREFIX/"lib/php"/php_version
+    pecl_path.mkpath
+    ln_s pecl_path, prefix/"pecl-extensions" unless (prefix/"pecl-extensions").exist?
 
     # fix pear config to use opt paths
     php_lib_path = opt_lib/"php"
     {
       "php_ini" => etc/"php/#{php_version}/php.ini",
       "php_dir" => php_lib_path,
-      "ext_dir" => php_ext_dir,
       "doc_dir" => php_lib_path/"doc",
       "bin_dir" => opt_bin,
       "data_dir" => php_lib_path/"data",
@@ -248,19 +221,74 @@ class Php < Formula
       system bin/"pear", "config-set", key, value, "system"
     end
 
+    orig_ext_dir = File.basename `#{bin}/php-config --extension-dir`.chomp
+    orig_ext_dir = opt_prefix/"lib/php/extensions/#{orig_ext_dir}"
     %w[
-      ldap
+      bcmath
+      bz2
+      calendar
+      ctype
+      curl
+      dba
+      dom
+      enchant
+      exif
+      fileinfo
+      ftp
+      gd
+      gettext
+      gmp
+      iconv
       imap
+      intl
+      json
+      ldap
+      mbstring
+      mysqli
+      mysqlnd
       opcache
+      pdo_dblib
+      pdo_mysql
+      pdo_odbc
+      pdo_pgsql
+      pdo_sqlite
+      pgsql
+      posix
+      pspell
+      shmop
+      simplexml
+      snmp
+      soap
+      sockets
+      sodium
+      sqlite3
+      sysvmsg
+      sysvsem
+      sysvshm
+      tidy
+      tokenizer
+      wddx
+      xmlreader
+      xmlrpc
+      xmlwriter
+      xsl
+      zip
     ].each do |e|
-      config_path = (etc/"php/#{php_version}/conf.d/ext-#{e}.ini")
+      ini_priority = case e
+      when "opcache" then "10"
+      when /pdo_|mysqli|wddx|xmlreader|xmlrpc/ then "30"
+      else "20"
+      end
+      ini_path = etc/"php/#{php_version}/conf.d/#{ini_priority}-ext-#{e}.ini"
       extension_type = (e == "opcache") ? "zend_extension" : "extension"
-      if config_path.exist?
-        inreplace config_path, /#{extension_type}=.*$/, "#{extension_type}=#{php_ext_dir}/#{e}.so"
+      extension_type.prepend("#") if e == "snmp"
+      if ini_path.exist?
+        inreplace ini_path,
+          /#{extension_type}=.*$/, "#{extension_type}=#{orig_ext_dir}/#{e}.so"
       else
-        config_path.write <<-EOS.undent
+        ini_path.write <<-EOS.undent
           [#{e}]
-          #{extension_type}="#{php_ext_dir}/#{e}.so"
+          #{extension_type}="#{orig_ext_dir}/#{e}.so"
         EOS
       end
     end

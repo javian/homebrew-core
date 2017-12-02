@@ -1,15 +1,15 @@
 class Gomplate < Formula
   desc "Command-line Golang template processor"
   homepage "https://gomplate.hairyhenderson.ca/"
-  url "https://github.com/hairyhenderson/gomplate/archive/v2.0.1.tar.gz"
-  sha256 "298da5c8cccb7123cc8d07a08f47386e25e1c6ada92da69acfaee2dff0173084"
+  url "https://github.com/hairyhenderson/gomplate/archive/v2.2.0.tar.gz"
+  sha256 "7a8fe7040226334167ea2810d76e114e9abb576306e249dfb937de3c3c53cc5e"
   head "https://github.com/hairyhenderson/gomplate.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "a47dcde00073a1118c875e4088792c3ae1e229cfe22a3ecf9b536870ff9d679f" => :high_sierra
-    sha256 "b9d5d3e1b513eaf309ab53be77199f52bf0f96e37f51c3976ab52396039ef275" => :sierra
-    sha256 "cbe5d1beb5f39287209382c9b04c0af48188dcbddeeb5cbb8192c92301d062d4" => :el_capitan
+    sha256 "d732f96acaaa00080c3e7773f467e869c643b4d574f61ae1f400aa7337316ea3" => :high_sierra
+    sha256 "e376922fcab28ff7ccc36e7c1dbcf0bb61a8a8773238a75e439f7347b9c86e35" => :sierra
+    sha256 "97431363f058b41d7cc23d61920276b6c2bda572fe235d3f2ecabb3baa6c3a4a" => :el_capitan
   end
 
   depends_on "glide" => :build

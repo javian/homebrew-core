@@ -19,7 +19,7 @@ class Mpich < Formula
   end
 
   head do
-    url "git://git.mpich.org/mpich.git"
+    url "http://git.mpich.org/mpich.git"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -62,7 +62,7 @@ class Mpich < Formula
   end
 
   test do
-    (testpath/"hello.c").write <<-EOS.undent
+    (testpath/"hello.c").write <<~EOS
       #include <mpi.h>
       #include <stdio.h>
 
@@ -83,7 +83,7 @@ class Mpich < Formula
     system "./hello"
     system "#{bin}/mpirun", "-np", "4", "./hello"
     if build.with? "fortran"
-      (testpath/"hellof.f90").write <<-EOS.undent
+      (testpath/"hellof.f90").write <<~EOS
         program hello
         include 'mpif.h'
         integer rank, size, ierror, tag, status(MPI_STATUS_SIZE)

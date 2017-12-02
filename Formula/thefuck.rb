@@ -3,16 +3,15 @@ class Thefuck < Formula
 
   desc "Programatically correct mistyped console commands"
   homepage "https://github.com/nvbn/thefuck"
-  url "https://files.pythonhosted.org/packages/3e/ea/382d0be542567c5a20f39e733be3f6c3ad52ca762ae79b677e4b1be14b50/thefuck-3.23.tar.gz"
-  sha256 "646aa5affc55968d96a6bbef44344e320337f4deebe35627be5c80221053ae4f"
+  url "https://files.pythonhosted.org/packages/ec/20/3f136313c27ea36ba38d31818b9f0a1a4656668fc6747b3bfa04f3debc98/thefuck-3.25.tar.gz"
+  sha256 "70cbe6295d2d2d371a395619216d38eb1666e4b3c3b1a24f67d11b88e65fea78"
   head "https://github.com/nvbn/thefuck.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "c284884e32f248e625a5da45b3e61ca4b21ce783a9346f2cfea3e392a61e1e2d" => :high_sierra
-    sha256 "9eafb555f277a71ac7d74cba4c0d97743586975e90d1c380da3007183bea7674" => :sierra
-    sha256 "ae12c46579ecdd7d7e154a06e7f3f0fd474a837bbd3db78df43c86115d92ba5d" => :el_capitan
-    sha256 "6abce9bef21cdb243b9f57267a9cbae50a1b7ed22df371ed34350bae17731af8" => :yosemite
+    sha256 "081d1d9cf18435961fb62648a1f4fc841e0bc27611f67302ffe11c5576b8d8f3" => :high_sierra
+    sha256 "4f91f880f0050c2301cae9019fa67ee53d367d7fdfafbe6bac11c05bc86289b1" => :sierra
+    sha256 "f222599a8bd17a176d6c77263c604b371e16094c8c5c12517510dcb713cba0b3" => :el_capitan
   end
 
   depends_on :python3
@@ -28,18 +27,18 @@ class Thefuck < Formula
   end
 
   resource "psutil" do
-    url "https://files.pythonhosted.org/packages/57/93/47a2e3befaf194ccc3d05ffbcba2cdcdd22a231100ef7e4cf63f085c900b/psutil-5.2.2.tar.gz"
-    sha256 "44746540c0fab5b95401520d29eb9ffe84b3b4a235bd1d1971cbe36e1f38dd13"
+    url "https://files.pythonhosted.org/packages/fe/17/0f0bf5792b2dfe6003efc5175c76225f7d3426f88e2bf8d360cfab870cd8/psutil-5.4.1.tar.gz"
+    sha256 "42e2de159e3c987435cb3b47d6f37035db190a1499f3af714ba7af5c379b6ba2"
   end
 
   resource "pyte" do
-    url "https://files.pythonhosted.org/packages/20/8b/7d6fc4ccc1dda496ab55b7f4ed1907392d6c2f98057f77be2bd07018987e/pyte-0.6.0.tar.gz"
-    sha256 "cd99a50070dcdb59678e7adc52696e8de8d1972e87808574fd8a243f78a8b462"
+    url "https://files.pythonhosted.org/packages/d2/1c/f65766736e40916b9a27c6cd582313e78092501b68284d44a1b014f30230/pyte-0.7.0.tar.gz"
+    sha256 "873acb47b624b9f30e9c54fab9c06a53be3b6bfa4b3d863ab30f55e93724c5aa"
   end
 
   resource "six" do
-    url "https://files.pythonhosted.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz"
-    sha256 "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a"
+    url "https://files.pythonhosted.org/packages/16/d8/bc6316cf98419719bd59c91742194c111b6f2e85abac88e496adefaf7afe/six-1.11.0.tar.gz"
+    sha256 "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
   end
 
   resource "wcwidth" do
@@ -51,10 +50,10 @@ class Thefuck < Formula
     virtualenv_install_with_resources
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     Add the following to your .bash_profile, .bashrc or .zshrc:
 
-      eval "$(thefuck --alias)"
+      eval $(thefuck --alias)
 
     For other shells, check https://github.com/nvbn/thefuck/wiki/Shell-aliases
     EOS

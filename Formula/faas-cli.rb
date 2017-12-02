@@ -2,14 +2,15 @@ class FaasCli < Formula
   desc "CLI for templating and/or deploying FaaS functions"
   homepage "http://docs.get-faas.com/"
   url "https://github.com/openfaas/faas-cli.git",
-      :tag => "0.4.16",
-      :revision => "8fead1a494318efcc51b97c17334038b8b53d871"
+      :tag => "0.5.0",
+      :revision => "91177ec27037eccaf6e827c265a0e452e772f1ab"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "7d2b45ee8c7972a803e206c99ea3af61f758e0a1fe82f7c3758e34536139a561" => :high_sierra
-    sha256 "1cf1580b7f91d8cf7a51ea15877abed9aa4607ef1f14fe955ac7f1ed683e857c" => :sierra
-    sha256 "0d7cb4ff2cc9d80184982cc25efa4bd701dbe24fd6af3914e4dfcbe25b750f1e" => :el_capitan
+    rebuild 1
+    sha256 "d99296c998fc2ff6297318ea21f33045f06fae7b7fc1901b9631b183772510bc" => :high_sierra
+    sha256 "d089d80543a49c8c65b3714060b7723b600ee5d815adf54263a486866756bc96" => :sierra
+    sha256 "d3c16359a6b3fbb6f7e8255b1110b50cf528f80e3be8cd1b4ff5942c65aee135" => :el_capitan
   end
 
   depends_on "go" => :build
@@ -20,9 +21,13 @@ class FaasCli < Formula
     ENV["GOPATH"] = buildpath
     (buildpath/"src/github.com/openfaas/faas-cli").install buildpath.children
     cd "src/github.com/openfaas/faas-cli" do
-      commit = Utils.popen_read("git rev-list -1 HEAD").chomp
-      system "go", "build", "-ldflags", "-s -w -X github.com/openfaas/faas-cli/commands.GitCommit=#{commit}", "-a",
+      project = "github.com/openfaas/faas-cli"
+      commit = Utils.popen_read("git", "rev-parse", "HEAD").chomp
+      system "go", "build", "-ldflags",
+             "-s -w -X #{project}/version.GitCommit=#{commit}", "-a",
              "-installsuffix", "cgo", "-o", bin/"faas-cli"
+      bin.install_symlink "faas-cli" => "faas"
+      pkgshare.install "template"
       prefix.install_metafiles
     end
   end
@@ -45,7 +50,7 @@ class FaasCli < Formula
       end
     end
 
-    (testpath/"test.yml").write <<-EOF.undent
+    (testpath/"test.yml").write <<~EOS
       provider:
         name: faas
         gateway: http://localhost:#{port}
@@ -56,11 +61,11 @@ class FaasCli < Formula
           lang: python
           handler: ./dummy_function
           image: dummy_image
-    EOF
+    EOS
 
-    expected = <<-EOS.undent
+    expected = <<~EOS
       Deploying: dummy_function.
-      Removing old service.
+      Removing old function.
       Deployed.
       URL: http://localhost:#{port}/function/dummy_function
 
@@ -68,12 +73,25 @@ class FaasCli < Formula
     EOS
 
     begin
+      cp_r pkgshare/"template", testpath
+
       output = shell_output("#{bin}/faas-cli deploy -yaml test.yml")
       assert_equal expected, output
 
-      commit = Utils.popen_read("git rev-list -1 HEAD").chomp
-      output = shell_output("#{bin}/faas-cli version")
-      assert_match commit, output.chomp
+      rm_rf "template"
+
+      output = shell_output("#{bin}/faas-cli deploy -yaml test.yml 2>&1", 1)
+      assert_match "stat ./template/python/template.yml", output
+
+      assert_match "ruby", shell_output("#{bin}/faas-cli template pull 2>&1")
+      assert_match "node", shell_output("#{bin}/faas-cli new --list")
+
+      output = shell_output("#{bin}/faas-cli deploy -yaml test.yml")
+      assert_equal expected, output
+
+      stable_resource = stable.instance_variable_get(:@resource)
+      commit = stable_resource.instance_variable_get(:@specs)[:revision]
+      assert_match commit, shell_output("#{bin}/faas-cli version")
     ensure
       Process.kill("TERM", pid)
       Process.wait(pid)

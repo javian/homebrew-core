@@ -1,21 +1,21 @@
 class Stubby < Formula
   desc "DNS privacy enabled stub resolver service based on getdns"
   homepage "https://getdnsapi.net/blog/dns-privacy-daemon-stubby/"
-  url "https://github.com/getdnsapi/stubby/archive/v0.1.2.tar.gz"
-  sha256 "bdac5dac5873f34a34db8da2538ab7d4f2bd7ff0315eb53db3d5cca5adedabfc"
+  url "https://github.com/getdnsapi/stubby/archive/v0.1.5.tar.gz"
+  sha256 "f909cd56922e861c830ad6fe3c6f18e1100704345f17891368df9f9430aef80c"
   head "https://github.com/getdnsapi/stubby.git", :branch => "develop"
 
   bottle do
-    sha256 "e7dd8c7d5fac81a2f0a372ab4174c3a1942d6907f4b6cafd5f158b9641979d2a" => :high_sierra
-    sha256 "a263e896750cec54cbb829f2e7f8ab26f2b85a2bae989fc6576e0be6818399f0" => :sierra
-    sha256 "c4f115a00e557ad08632d585fdb2b7b8f32c8b20f68622dabe16174e83f73e23" => :el_capitan
-    sha256 "6bdf61c02159995647e5c1c68a46a71f3fa792ad6b438490f4f7c8361f3c3b2f" => :yosemite
+    sha256 "ea9006dcf1a1fdede8b5412d218c97fc2551a6758f0284a36f04fd1e086c9bd2" => :high_sierra
+    sha256 "b358957e60c25c4fa565aeefb133bce9b77868f4d08572cf23dde303f9015f21" => :sierra
+    sha256 "5886b66544b6dea6a4c6096bc04e2c895e25e620604ca310627aebd8fe591ff3" => :el_capitan
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "getdns"
+  depends_on "libyaml"
 
   def install
     system "autoreconf", "-fiv"
@@ -26,9 +26,9 @@ class Stubby < Formula
     system "make", "install"
   end
 
-  plist_options :startup => true, :manual => "sudo stubby -C #{HOMEBREW_PREFIX}/etc/stubby/stubby.conf"
+  plist_options :startup => true, :manual => "sudo stubby -C #{HOMEBREW_PREFIX}/etc/stubby/stubby.yml"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-/Apple/DTD PLIST 1.0/EN" "http:/www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
@@ -43,7 +43,7 @@ class Stubby < Formula
         <array>
           <string>#{opt_bin}/stubby</string>
           <string>-C</string>
-          <string>#{etc}/stubby/stubby.conf</string>
+          <string>#{etc}/stubby/stubby.yml</string>
           <string>-l</string>
         </array>
         <key>StandardErrorPath</key>
@@ -56,22 +56,25 @@ class Stubby < Formula
   end
 
   test do
-    (testpath/"stubby_test.conf").write <<-EOS.undent
-      { resolution_type: GETDNS_RESOLUTION_STUB
-      , dns_transport_list: [ GETDNS_TRANSPORT_TLS, GETDNS_TRANSPORT_UDP, GETDNS_TRANSPORT_TCP ]
-      , listen_addresses: [ 127.0.0.1@5553]
-      , idle_timeout: 0
-      , upstream_recursive_servers:
-        [ { address_data: 145.100.185.15},
-          { address_data: 145.100.185.16},
-          { address_data: 185.49.141.37}
-        ]
-      }
+    assert_predicate etc/"stubby/stubby.yml", :exist?
+    (testpath/"stubby_test.yml").write <<~EOS
+      resolution_type: GETDNS_RESOLUTION_STUB
+      dns_transport_list:
+        - GETDNS_TRANSPORT_TLS
+        - GETDNS_TRANSPORT_UDP
+        - GETDNS_TRANSPORT_TCP
+      listen_addresses:
+        - 127.0.0.1@5553
+      idle_timeout: 0
+      upstream_recursive_servers:
+        - address_data: 145.100.185.15
+        - address_data: 145.100.185.16
+        - address_data: 185.49.141.37
     EOS
-    output = shell_output("#{bin}/stubby -i -C stubby_test.conf")
+    output = shell_output("#{bin}/stubby -i -C stubby_test.yml")
     assert_match "bindata for 145.100.185.15", output
     pid = fork do
-      exec "#{bin}/stubby", "-C", testpath/"stubby_test.conf"
+      exec "#{bin}/stubby", "-C", testpath/"stubby_test.yml"
     end
     begin
       sleep 2

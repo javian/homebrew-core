@@ -1,15 +1,14 @@
 class Rocksdb < Formula
   desc "Embeddable, persistent key-value store for fast storage"
   homepage "http://rocksdb.org"
-  url "https://github.com/facebook/rocksdb/archive/v5.7.3.tar.gz"
-  sha256 "4868cc95ab9b5dafd7c25f7ffb9fc1c70090fad688e339bfd9180ebb0734ea48"
+  url "https://github.com/facebook/rocksdb/archive/v5.8.6.tar.gz"
+  sha256 "d6fe7596d195447749ee5cd9d34d340cd1fb6fa62a04ea07b0aaeeda110e3a49"
 
   bottle do
     cellar :any
-    sha256 "54e8ce55f28eeec3cca0ad920a56e3efd456a99bb2edd31f094ce7164a93b69f" => :high_sierra
-    sha256 "235f7b5618adf58735c5499791a010a8ceadff03044bf9a904a96429cbbd77f8" => :sierra
-    sha256 "ac5a071d75f8a93a784e7f601c827f68b3006e6705e52f5c5d4ddb93470f519a" => :el_capitan
-    sha256 "e0eebc79c484e5581b013236ff10c2578f3f20ba6bd4981609172217f1d29726" => :yosemite
+    sha256 "5d3e8a7d44f602b43fa70e70da7e8673e81da0a029640c420d9594e19dc4cf12" => :high_sierra
+    sha256 "c757e13277aaf8c39672b0ea9b88200c706c6e0f076f8c94a50d6b3a9de3d925" => :sierra
+    sha256 "4ab1184deaea2077ce6395c5a002983459d90420db93e57c6f67417a4d18d972" => :el_capitan
   end
 
   needs :cxx11
@@ -21,6 +20,8 @@ class Rocksdb < Formula
   def install
     ENV.cxx11
     ENV["PORTABLE"] = "1" if build.bottle?
+    ENV["DEBUG_LEVEL"] = "0"
+    ENV["USE_RTTI"] = "1"
 
     # build regular rocksdb
     system "make", "clean"
@@ -48,7 +49,7 @@ class Rocksdb < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<-EOS.undent
+    (testpath/"test.cpp").write <<~EOS
       #include <assert.h>
       #include <rocksdb/options.h>
       #include <rocksdb/memtablerep.h>

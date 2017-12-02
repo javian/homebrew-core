@@ -20,8 +20,8 @@ class Burp < Formula
   end
 
   devel do
-    url "https://downloads.sourceforge.net/project/burp/burp-2.1.18/burp-2.1.18.tar.bz2"
-    sha256 "ad12a38d58ac0608b5e39f67bc57cfaee4c1a3d5712234268a88bcb19fd53904"
+    url "https://downloads.sourceforge.net/project/burp/burp-2.1.22/burp-2.1.22.tar.bz2"
+    sha256 "ad4ff1aa8dd9b1f6f7fc5cdb57129555ca407da19275c364a08b791a2d6d4ec0"
 
     resource "uthash" do
       url "https://github.com/troydhanson/uthash.git",
@@ -69,7 +69,7 @@ class Burp < Formula
     (var/"spool/burp").mkpath
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     Before installing the launchd entry you should configure your burp client in
       #{etc}/burp/burp.conf
     EOS
@@ -77,7 +77,7 @@ class Burp < Formula
 
   plist_options :startup => true
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">

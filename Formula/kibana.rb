@@ -4,19 +4,20 @@ class Kibana < Formula
   desc "Analytics and search dashboard for Elasticsearch"
   homepage "https://www.elastic.co/products/kibana"
   url "https://github.com/elastic/kibana.git",
-      :tag => "v5.6.2",
-      :revision => "864b8719e2814b7667d5831c415a79026d78ea9f"
+      :tag => "v6.0.0",
+      :revision => "f8bc449f5a6b28d0597730b1cf03fefe7e33422e"
   head "https://github.com/elastic/kibana.git"
 
   bottle do
-    sha256 "1ae7057081ef8cff96a73f172aefd00c9d5ab49b39d68b861a3a226e43f067ce" => :high_sierra
-    sha256 "87e5a0430097026106718a86c5474d18a0e28e76fda6991f58653840bd9c1036" => :sierra
-    sha256 "18ef19420a87821c061f0e63aaa8c882d762f1210b714c023072362ab42d8068" => :el_capitan
+    sha256 "d36792a23c71a68e2361ad9ed22ad04c08d15c298d207d470880b6da633a5304" => :high_sierra
+    sha256 "5296f320ffabc02cf521b243f09a811e80184cf4fbe76ae9181b89268b9825c0" => :sierra
+    sha256 "d0ab882df05d1ec930affb76c2b995f91f10a7badfaad260d65df4670aa95524" => :el_capitan
   end
 
   resource "node" do
-    url "https://nodejs.org/dist/v6.11.1/node-v6.11.1.tar.xz"
-    sha256 "6f6655b85919aa54cb045a6d69a226849802fcc26491d0db4ce59873e41cc2b8"
+    url "https://github.com/nodejs/node.git",
+        :tag => "v6.11.5",
+        :revision => "e4f3e73b8cb58291380afbdb333c85789f2a5ce9"
   end
 
   def install
@@ -55,7 +56,7 @@ class Kibana < Formula
     (prefix/"plugins").mkdir
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     Config: #{etc}/kibana/
     If you wish to preserve your plugins upon upgrade, make a copy of
     #{opt_prefix}/plugins before upgrading, and copy it into the
@@ -65,7 +66,7 @@ class Kibana < Formula
 
   plist_options :manual => "kibana"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
     "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

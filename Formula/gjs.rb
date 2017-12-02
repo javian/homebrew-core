@@ -1,13 +1,13 @@
 class Gjs < Formula
   desc "JavaScript Bindings for GNOME"
   homepage "https://wiki.gnome.org/Projects/Gjs"
-  url "https://download.gnome.org/sources/gjs/1.50/gjs-1.50.0.tar.xz"
-  sha256 "2d529d315fc926995c5174d0ac45dacd604e52b9213ba3c4cd77f30bc4aec945"
+  url "https://download.gnome.org/sources/gjs/1.50/gjs-1.50.2.tar.xz"
+  sha256 "2fad902cf7a7806454121c03918755c646fcfd6b08b52d488987db4e2d691ff3"
 
   bottle do
-    sha256 "1ab08b97047374ca0f3998802210b243758c9dd25bed41d98bc6983ab57a2508" => :high_sierra
-    sha256 "dbadc66c92b7c09c95d84a3a2e73e8e4de9daafd673c7721cabff7eb8269c28c" => :sierra
-    sha256 "5287100b8bd6383779b455d80fbb5a488060012437f3213af3f871d47a5da13e" => :el_capitan
+    sha256 "bc5b7944eacc770184f21d5914d22fc4593ac09c8dfb7ac5d27fb7d2db5146ce" => :high_sierra
+    sha256 "4e1067af2725c5eced0bd66b4bf99d1ace28304c552da25ca074855d492c109d" => :sierra
+    sha256 "94ea72061a8d26bc795cd4b0bc0057d0da918db7c1a8037bf3de36e28536b3e9" => :el_capitan
   end
 
   depends_on "pkg-config" => :build
@@ -71,7 +71,7 @@ class Gjs < Formula
   end
 
   test do
-    (testpath/"test.js").write <<-EOS.undent
+    (testpath/"test.js").write <<~EOS
       #!/usr/bin/env gjs
       const GLib = imports.gi.GLib;
     EOS

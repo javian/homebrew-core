@@ -2,16 +2,15 @@
 class Macvim < Formula
   desc "GUI for vim, made for macOS"
   homepage "https://github.com/macvim-dev/macvim"
-  url "https://github.com/macvim-dev/macvim/archive/snapshot-137.tar.gz"
-  version "8.0-137"
-  sha256 "2f2b20c80f887c5f26dad42540f047e43928f8c1cb217b6874c8d5602eceb620"
-  revision 2
+  url "https://github.com/macvim-dev/macvim/archive/snapshot-142.tar.gz"
+  version "8.0-142"
+  sha256 "05582fa5a2180a29676182b339123aea5e45d656f99c0cfb66fe3ffb5640a200"
   head "https://github.com/macvim-dev/macvim.git"
 
   bottle do
-    sha256 "57592a8708921cdab8dff8593996c5dcda3f74c5967332ecea7122ddfa342887" => :high_sierra
-    sha256 "b911830f52056edc945b24533b62662623c2b61af654d2f585c237058bcd91f4" => :sierra
-    sha256 "dcae437c2f051728aadf97a6e0194108179301e700de6ea9c0c1bcc8965d20a3" => :el_capitan
+    sha256 "c959301de1064e05cc9714e0a84ccafeeb5db6501b4a9957fe2e7889f333687e" => :high_sierra
+    sha256 "c295bdac7d63b2f3fb5caec7d16817564ea4c1b9160bbc45c530ea6842a6ad69" => :sierra
+    sha256 "95a294534ada2e4fb6ee89e3a1b2b7c4153008ab881b8bc0755cadb95283575d" => :el_capitan
   end
 
   option "with-override-system-vim", "Override system vim"
@@ -78,7 +77,7 @@ class Macvim < Formula
       # Needed for <= OS X 10.9.2 with Xcode 5.1
       ENV.prepend "CFLAGS", `python-config --cflags`.chomp.gsub(/-mno-fused-madd /, "")
 
-      framework_script = <<-EOS.undent
+      framework_script = <<~EOS
         import sysconfig
         print sysconfig.get_config_var("PYTHONFRAMEWORKPREFIX")
       EOS
@@ -105,7 +104,7 @@ class Macvim < Formula
 
   def caveats
     if build.with?("python") && build.with?("python3")
-      <<-EOS.undent
+      <<~EOS
         MacVim can no longer be brewed with dynamic support for both Python versions.
         Only Python 3 support has been provided.
       EOS

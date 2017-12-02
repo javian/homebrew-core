@@ -1,15 +1,13 @@
 class Mkvtoolnix < Formula
   desc "Matroska media files manipulation tools"
   homepage "https://www.bunkus.org/videotools/mkvtoolnix/"
-  url "https://www.bunkus.org/videotools/mkvtoolnix/sources/mkvtoolnix-15.0.0.tar.xz"
-  sha256 "73dc3b6f0a7147e28c06f44427fa0e824d0a4129e40c942d7642d9f451a51195"
-  revision 2
+  url "https://www.bunkus.org/videotools/mkvtoolnix/sources/mkvtoolnix-18.0.0.tar.xz"
+  sha256 "b8282d6d279caa86038721d2a49471d1dd25a465ee1a779ee9c2a99bc8ff972f"
 
   bottle do
-    sha256 "a83d34d6fc3091de1849b77abf1c1419bfc57724e0cd29cfe9705a594be0b23b" => :high_sierra
-    sha256 "ef473513aa0b128715342a24b7b59933b53730f3f209c3de4691fc14b5f6748d" => :sierra
-    sha256 "ccbccdadf0a0e722552e469a19bc2542077e5f14dd9c621955972daa6b07cbd3" => :el_capitan
-    sha256 "ed00a097343b6fa24ae31db3ccf742eed639fae73b493c353e3994d284b478d1" => :yosemite
+    sha256 "de777359b55b4467f54570f40ee143e6575e5049163c74ed1c383f25c570b5d9" => :high_sierra
+    sha256 "64a0975c2cbbe26b1b012073a3f312e45e0bb90fefbdf944075af122edcfa181" => :sierra
+    sha256 "eac1ed9b45eb5020f7a0d662c71671bb8aa2adade63cd0ff2cc319c5c4661a16" => :el_capitan
   end
 
   head do
@@ -86,7 +84,7 @@ class Mkvtoolnix < Formula
   test do
     mkv_path = testpath/"Great.Movie.mkv"
     sub_path = testpath/"subtitles.srt"
-    sub_path.write <<-EOS.undent
+    sub_path.write <<~EOS
       1
       00:00:10,500 --> 00:00:13,000
       Homebrew

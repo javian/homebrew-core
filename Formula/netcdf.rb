@@ -1,16 +1,14 @@
 class Netcdf < Formula
   desc "Libraries and data formats for array-oriented scientific data"
   homepage "https://www.unidata.ucar.edu/software/netcdf"
-  url "ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.4.1.1.tar.gz"
-  mirror "https://www.gfd-dennou.org/library/netcdf/unidata-mirror/netcdf-4.4.1.1.tar.gz"
-  sha256 "4d44c6f4d02a8faf10ea619bfe1ba8224cd993024f4da12988c7465f663c8cae"
-  revision 6
+  url "ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.5.0.tar.gz"
+  mirror "https://www.gfd-dennou.org/library/netcdf/unidata-mirror/netcdf-4.5.0.tar.gz"
+  sha256 "cbe70049cf1643c4ad7453f86510811436c9580cb7a1684ada2f32b95b00ca79"
 
   bottle do
-    sha256 "b76a81f391da481088359103122bc86e003405b2abfe88da3edc4eddf430b3e8" => :high_sierra
-    sha256 "822e3ee88e46b7af29dd228d8739e8b409feb574279ba99018ed8e8f38b0ca73" => :sierra
-    sha256 "987301f908676c27ff6a8e55b0c6b126ffe79e39ecb8bd074b6218d5aa131a93" => :el_capitan
-    sha256 "8a52314ee59ceab2c182035265de853a88deefda445132d9feaf0f3c4f426943" => :yosemite
+    sha256 "6a9d39204ae9bfbacc985bc082e9d3e6bf522ee78668b4b7adb2ef70081ac381" => :high_sierra
+    sha256 "8264e77321eacb944f6b5ac04622cab6abcd0c6a6138a738fc0d16fec3beb66d" => :sierra
+    sha256 "b1063f36db3172903dcfdb2451e49b710d62bf80174b4e013c29e61a61080d3b" => :el_capitan
   end
 
   depends_on "cmake" => :build
@@ -37,8 +35,7 @@ class Netcdf < Formula
   def install
     ENV.deparallelize
 
-    common_args = std_cmake_args << "-DBUILD_SHARED_LIBS=ON"
-    common_args << "-DBUILD_TESTING=OFF"
+    common_args = std_cmake_args << "-DBUILD_TESTING=OFF"
 
     mkdir "build" do
       args = common_args.dup
@@ -46,9 +43,12 @@ class Netcdf < Formula
       args << "-DNC_EXTRA_DEPS=-lmpi" if Tab.for_name("hdf5").with? "mpi"
       args << "-DENABLE_DAP_AUTH_TESTS=OFF" << "-DENABLE_NETCDF_4=ON" << "-DENABLE_DOXYGEN=OFF"
 
-      system "cmake", "..", *args
-      system "make"
+      system "cmake", "..", "-DBUILD_SHARED_LIBS=ON", *args
       system "make", "install"
+      system "make", "clean"
+      system "cmake", "..", "-DBUILD_SHARED_LIBS=OFF", *args
+      system "make"
+      lib.install "liblib/libnetcdf.a"
     end
 
     # Add newly created installation to paths so that binding libraries can
@@ -59,9 +59,12 @@ class Netcdf < Formula
     cxx_args << "-DNCXX_ENABLE_TESTS=OFF"
     resource("cxx").stage do
       mkdir "build-cxx" do
-        system "cmake", "..", *cxx_args
-        system "make"
+        system "cmake", "..", "-DBUILD_SHARED_LIBS=ON", *cxx_args
         system "make", "install"
+        system "make", "clean"
+        system "cmake", "..", "-DBUILD_SHARED_LIBS=OFF", *cxx_args
+        system "make"
+        lib.install "cxx4/libnetcdf-cxx4.a"
       end
     end
 
@@ -69,9 +72,12 @@ class Netcdf < Formula
     fortran_args << "-DENABLE_TESTS=OFF"
     resource("fortran").stage do
       mkdir "build-fortran" do
-        system "cmake", "..", *fortran_args
-        system "make"
+        system "cmake", "..", "-DBUILD_SHARED_LIBS=ON", *fortran_args
         system "make", "install"
+        system "make", "clean"
+        system "cmake", "..", "-DBUILD_SHARED_LIBS=OFF", *fortran_args
+        system "make"
+        lib.install "fortran/libnetcdff.a"
       end
     end
 
@@ -79,22 +85,25 @@ class Netcdf < Formula
     ENV.prepend "LDFLAGS", "-L#{lib}"
     resource("cxx-compat").stage do
       system "./configure", "--disable-dependency-tracking",
+                            "--enable-shared",
+                            "--enable-static",
                             "--prefix=#{prefix}"
       system "make"
       system "make", "install"
     end
 
     # SIP causes system Python not to play nicely with @rpath
+    libnetcdf = (lib/"libnetcdf.dylib").readlink
     %w[libnetcdf-cxx4.dylib libnetcdf_c++.dylib].each do |f|
       macho = MachO.open("#{lib}/#{f}")
-      macho.change_dylib("@rpath/libnetcdf.11.dylib",
-                         "#{lib}/libnetcdf.11.dylib")
+      macho.change_dylib("@rpath/#{libnetcdf}",
+                         "#{lib}/#{libnetcdf}")
       macho.write!
     end
   end
 
   test do
-    (testpath/"test.c").write <<-EOS.undent
+    (testpath/"test.c").write <<~EOS
       #include <stdio.h>
       #include "netcdf_meta.h"
       int main()
@@ -107,7 +116,7 @@ class Netcdf < Formula
     assert_equal `./test`, version.to_s
 
     ENV.fortran
-    (testpath/"test.f90").write <<-EOS.undent
+    (testpath/"test.f90").write <<~EOS
       program test
         use netcdf
         integer :: ncid, varid, dimids(2)

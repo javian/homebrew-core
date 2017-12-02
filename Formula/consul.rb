@@ -2,18 +2,17 @@ class Consul < Formula
   desc "Tool for service discovery, monitoring and configuration"
   homepage "https://www.consul.io"
   url "https://github.com/hashicorp/consul.git",
-      :tag => "v0.9.3",
-      :revision => "112c0603d3d6fb23ab5f15e8fdb1a761da8eaf9a"
+      :tag => "v1.0.1",
+      :revision => "9564c2978b59c060aed0657e662a4eb1c6f35356"
 
   head "https://github.com/hashicorp/consul.git",
        :shallow => false
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "50cf2c2e86fcc50e250bfb2bc10777525ba9a7e9f234fcb53998599eba5f48d6" => :high_sierra
-    sha256 "116c2a66ce62414ce9829c1e8ec93db61c8eb071dfb5832470f542b727a72b77" => :sierra
-    sha256 "8598f078a558ecc6d2f23804280b8f8d692b40f340a387730497e2e5fc6877b0" => :el_capitan
-    sha256 "8a3aa00a1e75e2524af83d1d2ff2cc71c5fc7e2ce0f0785ce1065acf85d4080b" => :yosemite
+    sha256 "8309a80869940f544b761bc79b938fe310412f2da6c467183faaafec44fc0b2f" => :high_sierra
+    sha256 "b5ea4a3d5827b49a3b255a65fcbbfe79b799dae700dc585917805f1c7e7c69e3" => :sierra
+    sha256 "e9e34d44bac38d028b91011f2bfedb6ed30e104e879715cbadc3489ac41d0286" => :el_capitan
   end
 
   depends_on "go" => :build
@@ -29,13 +28,14 @@ class Consul < Formula
     cd gopath/"src/github.com/hashicorp/consul" do
       system "make"
       bin.install "bin/consul"
+      prefix.install_metafiles
       zsh_completion.install "contrib/zsh-completion/_consul"
     end
   end
 
   plist_options :manual => "consul agent -dev -advertise 127.0.0.1"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">

@@ -1,15 +1,14 @@
 class Tippecanoe < Formula
   desc "Build vector tilesets from collections of GeoJSON features"
   homepage "https://github.com/mapbox/tippecanoe"
-  url "https://github.com/mapbox/tippecanoe/archive/1.24.1.tar.gz"
-  sha256 "9caff598cec1863e51c1425429a4eaea113d2846f79b1d0538860388b00a3cd5"
+  url "https://github.com/mapbox/tippecanoe/archive/1.27.1.tar.gz"
+  sha256 "b967af98bd02e4c6a26f38b48a095e3445d98e50d6074cce2d2f573c89b58d4f"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "fbbbd8956875f7ab0e870752a16dfea8a83631b981082fb700b0e5a69ce8a3e3" => :high_sierra
-    sha256 "17700f27297e1264597d68674b3e09da2cccfdca95c5311e262a6af956794ef4" => :sierra
-    sha256 "c8ddb0af2ea45d10936aaa8fb36119ca1ae4f4b5126896d93b32bc0b69065452" => :el_capitan
-    sha256 "e2e5e885c1530c45a32e77a0739c769b7f94fd43181b85a6e9c4117126ed7779" => :yosemite
+    sha256 "fd8640517f2524e78dff765935f326b6d45be8130e16fd1fa39d4b72a69de71b" => :high_sierra
+    sha256 "6da102d391d4082aab831b72e9792cb4ddc62efa4a7da3fd20ff6fa2d628a0cf" => :sierra
+    sha256 "07dd1348e7b8d7f61da8333176edfcef2efff50b3fe055330525a3de522b0fd2" => :el_capitan
   end
 
   def install
@@ -18,10 +17,10 @@ class Tippecanoe < Formula
   end
 
   test do
-    (testpath/"test.json").write <<-EOS.undent
+    (testpath/"test.json").write <<~EOS
       {"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[0,0]}}
     EOS
     safe_system "#{bin}/tippecanoe", "-o", "test.mbtiles", "test.json"
-    assert File.exist?("#{testpath}/test.mbtiles"), "tippecanoe generated no output!"
+    assert_predicate testpath/"test.mbtiles", :exist?, "tippecanoe generated no output!"
   end
 end

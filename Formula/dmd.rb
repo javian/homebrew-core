@@ -3,30 +3,29 @@ class Dmd < Formula
   homepage "https://dlang.org/"
 
   stable do
-    url "https://github.com/dlang/dmd/archive/v2.076.0.tar.gz"
-    sha256 "5c65be56012d352f204cc692c6517c95f09518bde92d136e8f9ca5a75700e188"
+    url "https://github.com/dlang/dmd/archive/v2.077.0.tar.gz"
+    sha256 "15cf389248c41744fdc382154a95dfd92056f2af7c2c3153ce5f4e52f041f43c"
 
     resource "druntime" do
-      url "https://github.com/dlang/druntime/archive/v2.076.0.tar.gz"
-      sha256 "8696070aa7d1e92e7ec130d58ff18b5ab35d701dc5299f1fb604140dee979c78"
+      url "https://github.com/dlang/druntime/archive/v2.077.0.tar.gz"
+      sha256 "d0d4c8f8b5c2084718091bb3f599888063a40e29cb3a9cca6f294386f45a6cc0"
     end
 
     resource "phobos" do
-      url "https://github.com/dlang/phobos/archive/v2.076.0.tar.gz"
-      sha256 "7e9ca04f18bc8711c7bfd0b44b0ba30d1c6356eaadeb54c812c3d9241200ad19"
+      url "https://github.com/dlang/phobos/archive/v2.077.0.tar.gz"
+      sha256 "41c1de92adb95facaddea0013d25391fc966494592b6c3255dc3118df6175b38"
     end
 
     resource "tools" do
-      url "https://github.com/dlang/tools/archive/v2.076.0.tar.gz"
-      sha256 "5f58dc6492e1abb539291a5fbf2bfb06eed818bd158912f090b55cd712c2a34a"
+      url "https://github.com/dlang/tools/archive/v2.077.0.tar.gz"
+      sha256 "422985a812301e3c25e663d9816be27c5985ff6d300b952e2a4805c8792a7dfa"
     end
   end
 
   bottle do
-    sha256 "8117f71c4744d92226827bd7f2e71e55ff34490bd2b8890edf2deccdcb8e6cad" => :high_sierra
-    sha256 "c58da079861e25df56ef88da13189f029fe93de528c1ad2ac66533fa97d8482d" => :sierra
-    sha256 "13789fff9c570ffcad532fcac9ebafa59ea97f0e5dd65158436ed7d2d5ae5108" => :el_capitan
-    sha256 "20461131f122509ceaccac8ab988aa88fa7f0411d332c3877b23c6152a9ad74b" => :yosemite
+    sha256 "6ccd402fc38b4913a18ae743b213e1932217fd2aad6e7f640fd68679be0e97fe" => :high_sierra
+    sha256 "90f298ed85cb2bce3bad4e1cc90ceb04b43f451f350086dac660d05d7daa621c" => :sierra
+    sha256 "69171480cfbc66a8567aec052ab7db8d3d7ad236063084d290688d69da0e5d29" => :el_capitan
   end
 
   head do
@@ -69,7 +68,7 @@ class Dmd < Formula
     cp_r ["phobos/std", "phobos/etc"], include/"dlang/dmd"
     lib.install Dir["druntime/lib/*", "phobos/**/libphobos2.a"]
 
-    (buildpath/"dmd.conf").write <<-EOS.undent
+    (buildpath/"dmd.conf").write <<~EOS
       [Environment]
       DFLAGS=-I#{opt_include}/dlang/dmd -L-L#{opt_lib}
     EOS

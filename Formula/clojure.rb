@@ -1,13 +1,13 @@
 class Clojure < Formula
   desc "The Clojure Programming Language"
   homepage "https://clojure.org"
-  url "https://download.clojure.org/install/brew/clojure-scripts-1.8.0.171.tar.gz"
-  sha256 "fa53481e6f5998f2f0dd38ec3d67383e1c8fe05ffdfeff92d677b1bc32a4087c"
+  url "https://download.clojure.org/install/brew/clojure-scripts-1.8.0.190.tar.gz"
+  sha256 "8dc36eb4a720c65b1a284e4d838ea5ce30b4bae4640bfb526aa6ea785814fb9c"
 
   devel do
-    url "https://download.clojure.org/install/brew/clojure-scripts-1.9.0-beta1.225.tar.gz"
-    sha256 "dc505f7ca36979a6c3fdc5819e8c46c52476477af1cb6d2f70440e92a8c022f2"
-    version "1.9.0-beta1.225"
+    url "https://download.clojure.org/install/brew/clojure-scripts-1.9.0-RC1.257.tar.gz"
+    sha256 "064c9d09448beb7fc4b1027d893cff43a6319a441db3dc5da8737258e4c39805"
+    version "1.9.0-RC1.257"
   end
 
   bottle :unneeded

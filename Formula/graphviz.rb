@@ -1,7 +1,7 @@
 class Graphviz < Formula
   desc "Graph visualization software from AT&T and Bell Labs"
-  homepage "http://graphviz.org/"
-  url "http://graphviz.org/pub/graphviz/stable/SOURCES/graphviz-2.40.1.tar.gz"
+  homepage "https://graphviz.org/"
+  url "https://graphviz.org/pub/graphviz/stable/SOURCES/graphviz-2.40.1.tar.gz"
   sha256 "ca5218fade0204d59947126c38439f432853543b0818d9d728c589dfe7f3a421"
   version_scheme 1
 
@@ -71,6 +71,7 @@ class Graphviz < Formula
       --prefix=#{prefix}
       --without-qt
       --with-quartz
+      --disable-php
     ]
     args << "--with-gts" if build.with? "gts"
     args << "--disable-swig" if build.without? "bindings"
@@ -98,10 +99,10 @@ class Graphviz < Formula
   end
 
   test do
-    (testpath/"sample.dot").write <<-EOS.undent
-    digraph G {
-      a -> b
-    }
+    (testpath/"sample.dot").write <<~EOS
+      digraph G {
+        a -> b
+      }
     EOS
 
     system "#{bin}/dot", "-Tpdf", "-o", "sample.pdf", "sample.dot"

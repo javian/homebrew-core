@@ -1,14 +1,14 @@
 class Prometheus < Formula
   desc "Service monitoring system and time series database"
   homepage "https://prometheus.io/"
-  url "https://github.com/prometheus/prometheus/archive/v1.7.2.tar.gz"
-  sha256 "84ac61c522b3a491556b50bf262da88ccfd0a37d4f710a6b6a5707737acbdba8"
+  url "https://github.com/prometheus/prometheus/archive/v2.0.0.tar.gz"
+  sha256 "6947ae9b2d414d49304034a2635f0e1ecd45ac83a4f4592ea5bcca40d6f7951b"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "7ea86d2ee61bbebcbace5019cb149b8e17cbcf427d3150b9a916e9a50f38df7e" => :high_sierra
-    sha256 "b1e2a6ac69eada09853f4535d010453eec92add29c8eae92ce616818a7ea6b83" => :sierra
-    sha256 "142c03dd9d5e401e99de6719adc69c164bd3ef56d0db87ab53ab6ec30b8b9466" => :el_capitan
+    sha256 "731aa1f90c43b93c31741c61c9b08b15b029071aa313e7cad7b5ae1f7b6bb933" => :high_sierra
+    sha256 "a2aa039b2c59c6b6086e508af0ba9e079e4ce5649dcfea4f94e1276fc9f2f11b" => :sierra
+    sha256 "85a0e86e1db83ed586af1a87539773dbf50de86abec8cd9212b4c26025410f1d" => :el_capitan
   end
 
   depends_on "go" => :build
@@ -24,10 +24,13 @@ class Prometheus < Formula
   end
 
   test do
-    (testpath/"rules.example").write <<-EOS.undent
-    # Saving the per-job HTTP in-progress request count as a new set of time series:
-      job:http_inprogress_requests:sum = sum(http_inprogress_requests) by (job)
+    (testpath/"rules.example").write <<~EOS
+      groups:
+      - name: http
+        rules:
+        - record: job:http_inprogress_requests:sum
+          expr: sum(http_inprogress_requests) by (job)
     EOS
-    system "#{bin}/promtool", "check-rules", testpath/"rules.example"
+    system "#{bin}/promtool", "check", "rules", testpath/"rules.example"
   end
 end

@@ -1,6 +1,6 @@
 class Tig < Formula
   desc "Text interface for Git repositories"
-  homepage "http://jonas.nitro.dk/tig/"
+  homepage "https://jonas.github.io/tig/"
   url "https://github.com/jonas/tig/releases/download/tig-2.3.0/tig-2.3.0.tar.gz"
   sha256 "686f0386927904dc6410f0b1a712cb8bd7fff3303f688d7dc43162f4ad16c0ed"
 
@@ -38,7 +38,7 @@ class Tig < Formula
     cp "#{bash_completion}/tig-completion.bash", zsh_completion
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     A sample of the default configuration has been installed to:
       #{opt_pkgshare}/examples/tigrc
     to override the system-wide default configuration, copy the sample to:

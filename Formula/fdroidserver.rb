@@ -191,7 +191,7 @@ class Fdroidserver < Formula
     doc.install "examples"
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     In order to function, fdroidserver requires that the Android SDK's
     "Build-tools" and "Platform-tools" are installed.  Also, it is best if the
     base path of the Android SDK is set in the standard environment variable
@@ -228,11 +228,11 @@ class Fdroidserver < Formula
       # ENV["ANDROID_HOME"] = Formula["android-sdk"].opt_prefix
       # system "#{bin}/fdroid", "readmeta", "--verbose"
       # system "#{bin}/fdroid", "init", "--verbose"
-      # assert File.exist?("config.py")
-      # assert File.exist?("keystore.jks")
+      # assert_predicate Pathname.pwd/"config.py", :exist?
+      # assert_predicate Pathname.pwd/"keystore.jks", :exist?
       # system "#{bin}/fdroid", "update", "--create-metadata", "--verbose"
-      # assert File.exist?("metadata")
-      # assert File.exist?("repo/index.jar")
+      # assert_predicate Pathname.pwd/"metadata", :exist?
+      # assert_predicate Pathname.pwd/"repo/index.jar", :exist?
     end
   end
 end

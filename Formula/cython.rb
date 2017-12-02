@@ -1,17 +1,17 @@
 class Cython < Formula
   desc "Compiler for writing C extensions for the Python language"
   homepage "http://cython.org"
-  url "https://files.pythonhosted.org/packages/94/63/f54920c2ddbe3e1341a4c268f7091bf1bf53c3d84f4b115aa5beea64aef9/Cython-0.27.tar.gz"
-  sha256 "b932b5194e87a8b853d493dc1b46e38632d6846a86f55b8346eb9c6ec3bdc00b"
+  url "https://files.pythonhosted.org/packages/ee/2a/c4d2cdd19c84c32d978d18e9355d1ba9982a383de87d0fcb5928553d37f4/Cython-0.27.3.tar.gz"
+  sha256 "6a00512de1f2e3ce66ba35c5420babaef1fe2d9c43a8faab4080b0dbcc26bc64"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "7c686cee7b44c203626c5cc45aee3e4294a57fe40f7d3159ed4e4dbb88e9d811" => :high_sierra
-    sha256 "86473587bb530454989fb9c6b6a4425a18355110721abc5fe76c50ffdef1c316" => :sierra
-    sha256 "5bb8db8c4bd88e55916ffc82e847acd89ae432afb60e6a6cb97eac9f3515f50a" => :el_capitan
+    sha256 "50a5f8928e750f0f51572265550b680b75def6b2bff16847c3fee4fe968ee1f0" => :high_sierra
+    sha256 "e0e1da2e224c839e0fa93fee56e92261b4fc33c286a7c6b9decbc09d5995e5c3" => :sierra
+    sha256 "68500af222ef5dc5f50686731cc31360ab11e4a3c2467e51d88b1075ffe35b38" => :el_capitan
   end
 
-  keg_only <<-EOS.undent
+  keg_only <<~EOS
     this formula is mainly used internally by other formulae.
     Users are advised to use `pip` to install cython
   EOS
@@ -31,7 +31,7 @@ class Cython < Formula
 
     phrase = "You are using Homebrew"
     (testpath/"package_manager.pyx").write "print '#{phrase}'"
-    (testpath/"setup.py").write <<-EOS.undent
+    (testpath/"setup.py").write <<~EOS
       from distutils.core import setup
       from Cython.Build import cythonize
 

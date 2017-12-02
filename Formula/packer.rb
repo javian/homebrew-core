@@ -4,15 +4,15 @@ class Packer < Formula
   desc "Tool for creating identical machine images for multiple platforms"
   homepage "https://packer.io"
   url "https://github.com/hashicorp/packer.git",
-      :tag => "v1.1.0",
-      :revision => "84b9b07901fabfeab1325eb2d8d207aeefa944c7"
+      :tag => "v1.1.2",
+      :revision => "14183e6bc442559cd401618ff58293c29455b87c"
   head "https://github.com/hashicorp/packer.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "adc8bedcabed46064989b01e2bb52fac501f0f1cccaa594c785fcf414cd02b51" => :high_sierra
-    sha256 "7396853fddb717cbd128220fabd1baee4c624f650593835a71b0720d32643ab5" => :sierra
-    sha256 "cd88d9ba693523f460431db56d6c91ee24a5a5c789436459edcea749529b52d3" => :el_capitan
+    sha256 "fd03e8f9900a940a6c5be2a5467ee12004d507bc56f30cd2bdf87d45a3f2454c" => :high_sierra
+    sha256 "4376c0f43f18a80736cd848291ddbeef81bedc7300ce968dc240aaf0bc554671" => :sierra
+    sha256 "0fd07eae1489def22b4d0e3307a91bf1ea87ac8d86db57649f2cb4a3ea480e4e" => :el_capitan
   end
 
   depends_on "go" => :build
@@ -67,7 +67,7 @@ class Packer < Formula
 
   test do
     minimal = testpath/"minimal.json"
-    minimal.write <<-EOS.undent
+    minimal.write <<~EOS
       {
         "builders": [{
           "type": "amazon-ebs",

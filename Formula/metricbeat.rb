@@ -1,45 +1,48 @@
 class Metricbeat < Formula
-  desc "Collect metrics from your systems and services."
+  desc "Collect metrics from your systems and services"
   homepage "https://www.elastic.co/products/beats/metricbeat"
-  url "https://github.com/elastic/beats/archive/v5.6.2.tar.gz"
-  sha256 "72e247d6ec3586883cd58bc6465d18b7eb0857763ff422259205abf090557e45"
+  url "https://github.com/elastic/beats/archive/v6.0.0.tar.gz"
+  sha256 "c4a8130934eb132f637e0a76ed4d764b92e7ed469abc97587a3625a61668744e"
 
   head "https://github.com/elastic/beats.git"
 
   bottle do
-    sha256 "b943cac4bf5057a5a80e58a8bf3006d650f10864170d493faa57cf8c10360906" => :high_sierra
-    sha256 "a8ee72df2282fcc124a3c3797b90bad75c4e33a770e3cf338f6931c2c8fee591" => :sierra
-    sha256 "924986fc31044f67754ac5a249f791249f962a53df2e7b4dbfaebf080b69cf96" => :el_capitan
+    cellar :any_skip_relocation
+    sha256 "ffec3156e5fbe019cc14bf4a178abffdd395584f6003ddbb10839d05959f3ea0" => :high_sierra
+    sha256 "30663833a9af219adc9dcf423ff64ddddf80407508b64139fdc18d176053ebf4" => :sierra
+    sha256 "314bc6aa68d317d98cf18780600d73e81cb441c1f60a26b0b71b76b3d55e8d94" => :el_capitan
   end
 
   depends_on "go" => :build
 
   def install
-    gopath = buildpath/"gopath"
-    (gopath/"src/github.com/elastic/beats").install Dir["{*,.git,.gitignore}"]
+    ENV["GOPATH"] = buildpath
+    (buildpath/"src/github.com/elastic/beats").install buildpath.children
 
-    ENV["GOPATH"] = gopath
-
-    cd gopath/"src/github.com/elastic/beats/metricbeat" do
+    cd "src/github.com/elastic/beats/metricbeat" do
       system "make"
-      libexec.install "metricbeat"
+      system "make", "kibana"
+      (libexec/"bin").install "metricbeat"
+      libexec.install "_meta/kibana"
 
-      (etc/"metricbeat").install "metricbeat.full.yml"
-      (etc/"metricbeat").install "metricbeat.yml"
-      (etc/"metricbeat").install "metricbeat.template.json"
-      (etc/"metricbeat").install "metricbeat.template-es2x.json"
-      (etc/"metricbeat").install "metricbeat.template-es6x.json"
+      (etc/"metricbeat").install Dir["metricbeat*.yml"]
+      prefix.install_metafiles
     end
 
-    (bin/"metricbeat").write <<-EOS.undent
+    (bin/"metricbeat").write <<~EOS
       #!/bin/sh
-      exec "#{libexec}/metricbeat" --path.config "#{etc}/metricbeat" --path.home="#{prefix}" --path.logs="#{var}/log/metricbeat" --path.data="#{opt_prefix}" "$@"
+      exec "#{libexec}/bin/metricbeat" \
+        --path.config "#{etc}/metricbeat" \
+        --path.home="#{prefix}" \
+        --path.logs="#{var}/log/metricbeat" \
+        --path.data="#{var}/lib/metricbeat" \
+        "$@"
     EOS
   end
 
   plist_options :manual => "metricbeat"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
     "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -57,7 +60,7 @@ class Metricbeat < Formula
   end
 
   test do
-    (testpath/"metricbeat.yml").write <<-EOS.undent
+    (testpath/"config/metricbeat.yml").write <<~EOS
       metricbeat.modules:
       - module: system
         metricsets: ["load"]
@@ -71,16 +74,17 @@ class Metricbeat < Formula
     (testpath/"logs").mkpath
     (testpath/"data").mkpath
 
-    metricbeat_pid = fork do
-      exec bin/"metricbeat", "-c", testpath/"metricbeat.yml",
-      "--path.data=#{testpath}/data", "--path.logs=#{testpath}/logs"
+    pid = fork do
+      exec bin/"metricbeat", "-path.config", testpath/"config", "-path.data",
+                             testpath/"data"
     end
 
     begin
-      sleep 2
-      assert File.exist? testpath/"data/metricbeat"
+      sleep 30
+      assert_predicate testpath/"data/metricbeat", :exist?
     ensure
-      Process.kill("TERM", metricbeat_pid)
+      Process.kill "SIGINT", pid
+      Process.wait pid
     end
   end
 end

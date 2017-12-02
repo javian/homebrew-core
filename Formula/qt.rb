@@ -3,23 +3,21 @@
 class Qt < Formula
   desc "Cross-platform application and UI framework"
   homepage "https://www.qt.io/"
-  url "https://download.qt.io/official_releases/qt/5.9/5.9.1/single/qt-everywhere-opensource-src-5.9.1.tar.xz"
-  mirror "https://www.mirrorservice.org/sites/download.qt-project.org/official_releases/qt/5.9/5.9.1/single/qt-everywhere-opensource-src-5.9.1.tar.xz"
-  sha256 "7b41a37d4fe5e120cdb7114862c0153f86c07abbec8db71500443d2ce0c89795"
+  url "https://download.qt.io/official_releases/qt/5.9/5.9.3/single/qt-everywhere-opensource-src-5.9.3.tar.xz"
+  mirror "https://www.mirrorservice.org/sites/download.qt-project.org/official_releases/qt/5.9/5.9.3/single/qt-everywhere-opensource-src-5.9.3.tar.xz"
+  sha256 "57acd8f03f830c2d7dc29fbe28aaa96781b2b9bdddce94196e6761a0f88c6046"
   head "https://code.qt.io/qt/qt5.git", :branch => "5.9", :shallow => false
 
   bottle do
-    sha256 "6025b2f949f71265f63847783acb49ddb0cee75f2e10ae232c7987ddf71211b6" => :high_sierra
-    sha256 "1039cfe8be8e0c9d0610a41fd0795cd7433f49d1d6bc2c675f4919bb0e8eb501" => :sierra
-    sha256 "be6aa6b237f1a179bebd1dfde9f857c75c7b5775ac841270ec3a2224b2888d1e" => :el_capitan
-    sha256 "2bc3289b6c1d961363a655f311955315f651661b92354342014a2f08d9e2e209" => :yosemite
+    sha256 "570ca1b244dbcecc74d2b7813e5659024eba1500640c84b1b6eedcd96dd1ba6f" => :high_sierra
+    sha256 "a05e2f102433b8e0eee1c8cbd0f27949c9314f7ebf237766bcf191ffdb4b6940" => :sierra
+    sha256 "42eae12f322119d24b695fdb29678b50b020dfde0a24bdd8caf4a952649ac2d0" => :el_capitan
   end
 
   keg_only "Qt 5 has CMake issues when linked"
 
   option "with-docs", "Build documentation"
   option "with-examples", "Build examples"
-  option "with-qtwebkit", "Build with QtWebkit module"
 
   # OS X 10.7 Lion is still supported in Qt 5.5, but is no longer a reference
   # configuration and thus untested in practice. Builds on OS X 10.7 have been
@@ -30,12 +28,6 @@ class Qt < Formula
   depends_on :xcode => :build
   depends_on :mysql => :optional
   depends_on :postgresql => :optional
-
-  # http://lists.qt-project.org/pipermail/development/2016-March/025358.html
-  resource "qt-webkit" do
-    url "https://download.qt.io/official_releases/qt/5.9/5.9.1/submodules/qtwebkit-opensource-src-5.9.1.tar.xz"
-    sha256 "28a560becd800a4229bfac317c2e5407cd3cc95308bc4c3ca90dba2577b052cf"
-  end
 
   # Restore `.pc` files for framework-based build of Qt 5 on OS X. This
   # partially reverts <https://codereview.qt-project.org/#/c/140954/> merged
@@ -59,15 +51,6 @@ class Qt < Formula
     sha256 "b18e4715fcef2992f051790d3784a54900508c93350c25b0f2228cb058567142"
   end
 
-  # Patch fixing bugs QTBUG-62266 and QTBUG-62658 on macOS 10.13 High Sierra
-  # https://github.com/Homebrew/homebrew-core/issues/17075
-  if MacOS.version >= :high_sierra
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/45282b5b48/qt/high-sierra.diff"
-      sha256 "d8589d747a9ce0b7b7ddf1b59c4d999bbf8a02261e047a602cff39bea151eb42"
-    end
-  end
-
   def install
     args = %W[
       -verbose
@@ -89,7 +72,7 @@ class Qt < Formula
 
     if build.with? "mysql"
       args << "-plugin-sql-mysql"
-      (buildpath/"brew_shim/mysql_config").write <<-EOS.undent
+      (buildpath/"brew_shim/mysql_config").write <<~EOS
         #!/bin/sh
         if [ x"$1" = x"--libs" ]; then
           mysql_config --libs | sed "s/-lssl -lcrypto//"
@@ -102,11 +85,6 @@ class Qt < Formula
     end
 
     args << "-plugin-sql-psql" if build.with? "postgresql"
-
-    if build.with? "qtwebkit"
-      (buildpath/"qtwebkit").install resource("qt-webkit")
-      inreplace ".gitmodules", /.*status = obsolete\n((\s*)project = WebKit\.pro)/, "\\1\n\\2initrepo = true"
-    end
 
     system "./configure", *args
     system "make"
@@ -136,14 +114,14 @@ class Qt < Formula
     Pathname.glob("#{bin}/*.app") { |app| mv app, libexec }
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
     We agreed to the Qt opensource license for you.
     If this is unacceptable you should uninstall.
     EOS
   end
 
   test do
-    (testpath/"hello.pro").write <<-EOS.undent
+    (testpath/"hello.pro").write <<~EOS
       QT       += core
       QT       -= gui
       TARGET = hello
@@ -153,7 +131,7 @@ class Qt < Formula
       SOURCES += main.cpp
     EOS
 
-    (testpath/"main.cpp").write <<-EOS.undent
+    (testpath/"main.cpp").write <<~EOS
       #include <QCoreApplication>
       #include <QDebug>
 
@@ -167,8 +145,8 @@ class Qt < Formula
 
     system bin/"qmake", testpath/"hello.pro"
     system "make"
-    assert File.exist?("hello")
-    assert File.exist?("main.o")
+    assert_predicate testpath/"hello", :exist?
+    assert_predicate testpath/"main.o", :exist?
     system "./hello"
   end
 end

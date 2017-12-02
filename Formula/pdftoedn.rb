@@ -3,14 +3,13 @@ class Pdftoedn < Formula
   homepage "https://github.com/edporras/pdftoedn"
   url "https://github.com/edporras/pdftoedn/archive/v0.34.3.tar.gz"
   sha256 "7ff6d097d1a53246b3c71d9fdaeb58e43aac14291f647d76855c62769c585f25"
-  revision 3
+  revision 6
 
   bottle do
     cellar :any
-    sha256 "4a345cdb1689d16c02c37ed834bc53e264dba8dc4ce9f7c6eb243ca75aded2d8" => :high_sierra
-    sha256 "2ff40b256a61a485728401d370e7c6b1670c5100a0f069463005c53dd5638d8f" => :sierra
-    sha256 "b5e5c8c04acf1d1ee8e679779492c0a1db134c494bd1aa4d762ede4a6b0ddcd3" => :el_capitan
-    sha256 "5c7f365a103ff540951e22185f1c73a7c5bc43ccb5280b28b9bf870042fe52d9" => :yosemite
+    sha256 "0971390fb279ec2e9a83cbbd9c96ac3581f287a38ca873b6279d1432d774e4ac" => :high_sierra
+    sha256 "1f8db5ce3d87da185c95df9f69a7f84c8771448504f3ae1df14c9f4d6f22cf28" => :sierra
+    sha256 "418404339226b21e44c07c8a553f30a0a28e9f0442ad079dcaa3feaadf04ee8d" => :el_capitan
   end
 
   needs :cxx11

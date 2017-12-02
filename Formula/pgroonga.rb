@@ -1,16 +1,14 @@
 class Pgroonga < Formula
   desc "PostgreSQL plugin to use Groonga as index"
   homepage "https://pgroonga.github.io/"
-  url "https://packages.groonga.org/source/pgroonga/pgroonga-1.1.9.tar.gz"
-  sha256 "4f19b2ac3fef7299a9324ec84d521a5c4a9f01df190f1eff59ae5b44297f4e1d"
-  revision 1
+  url "https://packages.groonga.org/source/pgroonga/pgroonga-2.0.2.tar.gz"
+  sha256 "4d644f9e59661e5aa8b1cd372d5aa345f976b0aae850523e287274110f394300"
 
   bottle do
     cellar :any
-    sha256 "8658cffecf94bf8dcc8646a1d4c77f1f7decc6585237d53c4579cdaf031c1a36" => :high_sierra
-    sha256 "cf09b1a5298840c222507f58f12eae4945d94dfb7a525d989f2dee2a9a17f9cc" => :sierra
-    sha256 "b3f2459cab54faffbd03ec745cff048c920c76ee4d53631e5a2b9fdbd18937ec" => :el_capitan
-    sha256 "80755812f6f164b1421915e8fe46454ff21d3deb73b3b6491a04cdc4d1d3bf1b" => :yosemite
+    sha256 "11bff1f45d9e6f1f633285c071da9d71ca441e74e1638d67bf37c3705b8eeff8" => :high_sierra
+    sha256 "1e43cf3e31c4517f71dfc661895fb0b94ddf6addb25b4841171674f89675f680" => :sierra
+    sha256 "ef3ec18dc482103a27c1777b9385d9deea506ebc22b496aae334a7660b4f14a4" => :el_capitan
   end
 
   depends_on "pkg-config" => :build

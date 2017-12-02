@@ -3,7 +3,7 @@ class Camlp5TransitionalModeRequirement < Requirement
 
   satisfy(:build_env => false) { !Tab.for_name("camlp5").with?("strict") }
 
-  def message; <<-EOS.undent
+  def message; <<~EOS
     camlp5 must be compiled in transitional mode (instead of --strict mode):
       brew install camlp5
     EOS
@@ -13,22 +13,22 @@ end
 class Coq < Formula
   desc "Proof assistant for higher-order logic"
   homepage "https://coq.inria.fr/"
-  url "https://coq.inria.fr/distrib/8.6.1/files/coq-8.6.1.tar.gz"
-  sha256 "32f8aa92853483dec18030def9f0857a708fee56cf4287e39c9a260f08138f9d"
+  url "https://github.com/coq/coq/archive/V8.7.0.tar.gz"
+  sha256 "f376207ed051b3fd27c519f44b25eb25f8dddbce22715f68c3cedfd2e4b39297"
   revision 1
-  head "git://scm.gforge.inria.fr/coq/coq.git"
+  head "https://github.com/coq/coq.git"
 
   bottle do
-    sha256 "0b8d2c22b383dab49d00916b1a23f8e5172c94989f7e481d8d85b649f0a2c31b" => :high_sierra
-    sha256 "275c1d6a33704757eb283ec5d2562193387f093e7dbe7c2cb4a4e96264d3aedf" => :sierra
-    sha256 "7c8e6073149ee473fbeb7801975e6b57e1297ef113292504ac120556fdec1dc6" => :el_capitan
-    sha256 "d6b4b69e7c3ae0f5b6aed761dd552ad35c9f7b7eac8646909e483b8940268f74" => :yosemite
+    sha256 "b563698a0e0a24eb00d31c51d359c7d2cb8c98c06e4d6be8aa820e5681f22521" => :high_sierra
+    sha256 "1d6368d1adaa92623dc097e01aade459209be15d6a63914be468d26aec6fa4be" => :sierra
+    sha256 "3d0af18bc77bb482d1234b373270288cc5088d4a8e922a262dbc10bc45f9dad1" => :el_capitan
   end
 
   depends_on "opam" => :build
   depends_on Camlp5TransitionalModeRequirement
   depends_on "camlp5"
   depends_on "ocaml"
+  depends_on "ocaml-num"
 
   def install
     ENV["OPAMYES"] = "1"
@@ -50,7 +50,7 @@ class Coq < Formula
   end
 
   test do
-    (testpath/"testing.v").write <<-EOS.undent
+    (testpath/"testing.v").write <<~EOS
       Require Coq.omega.Omega.
       Require Coq.ZArith.ZArith.
 

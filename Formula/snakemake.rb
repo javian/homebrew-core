@@ -1,16 +1,15 @@
 class Snakemake < Formula
   desc "Pythonic workflow system"
   homepage "https://bitbucket.org/snakemake/snakemake/wiki/Home"
-  url "https://files.pythonhosted.org/packages/7e/ba/017268fdb04d9360c4cf1374cb38ddbf4151076811a3278bddb5e509f6c6/snakemake-4.1.0.tar.gz"
-  sha256 "0876797aeb633be7129ac943d9ff5643d491f9115a19484cbe8594c3e87912e5"
+  url "https://files.pythonhosted.org/packages/fa/b7/d9bf8592c7cce420b3f95b403e1daecbcc3b2cbb0677a59b2da45fe38953/snakemake-4.3.1.tar.gz"
+  sha256 "b819501fa583789708c5aa1ecd7645b2ab5522dd96f309c4b7ef60b318abf588"
   head "https://bitbucket.org/snakemake/snakemake.git"
 
   bottle do
     cellar :any_skip_relocation
-    rebuild 1
-    sha256 "e42db2699816542102ace24c9c93624a7236f56ec4141c9a229292f97b266006" => :high_sierra
-    sha256 "8e4cad7e146d65b4847dd21b6711c2f9ca7704c8cc35c80b01947ee8401520d0" => :sierra
-    sha256 "d74a7a7e0ee69c6b2a4e6f8a6f54f31eb367844285a7ddda943f27ec6cbc6c9c" => :el_capitan
+    sha256 "8bdebdcb3e1f0d3d081be95591b762aff8d9bd3fffac58e535dc169cfcf12950" => :high_sierra
+    sha256 "7387565f79e0819b1cd9e034e453413be5a2102bf1059d2d81637064ac39c949" => :sierra
+    sha256 "165eba0a8b3813ee9cfff4d642af007d1efaab55712880b4351742f98bc828cc" => :el_capitan
   end
 
   depends_on :python3
@@ -21,8 +20,8 @@ class Snakemake < Formula
   end
 
   resource "certifi" do
-    url "https://files.pythonhosted.org/packages/20/d0/3f7a84b0c5b89e94abbd073a5f00c7176089f526edb056686751d5064cbd/certifi-2017.7.27.1.tar.gz"
-    sha256 "40523d2efb60523e113b44602298f0960e900388cf3bb6043f645cf57ea9e3f5"
+    url "https://files.pythonhosted.org/packages/23/3f/8be01c50ed24a4bd6b8da799839066ce0288f66f5e11f0367323467f0cbc/certifi-2017.11.5.tar.gz"
+    sha256 "5ec74291ca1136b40f0379e1128ff80e866597e4e2c1e755739a913bbc3613c0"
   end
 
   resource "chardet" do
@@ -82,7 +81,7 @@ class Snakemake < Formula
   end
 
   test do
-    (testpath/"Snakefile").write <<-EOS.undent
+    (testpath/"Snakefile").write <<~EOS
       rule testme:
           output:
                "test.out"

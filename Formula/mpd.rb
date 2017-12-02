@@ -1,18 +1,17 @@
 class Mpd < Formula
   desc "Music Player Daemon"
   homepage "https://www.musicpd.org/"
-  url "https://www.musicpd.org/download/mpd/0.20/mpd-0.20.10.tar.xz"
-  sha256 "52fbc1125cdba41ba999add2820d45f3ce7cf493006bb04d8f0b2937204d3121"
+  url "https://www.musicpd.org/download/mpd/0.20/mpd-0.20.12.tar.xz"
+  sha256 "e159ac0608fb85c891bd19375ed7056d5f9ec4ba492b052f24820513e774f709"
 
   bottle do
-    sha256 "98f7b1a2e829807335748e5d965c4079d3583d8d82e972359edf38967c7535a8" => :high_sierra
-    sha256 "f6345152b193dd53a6a581f76437d49542ce222f354eab21d719b24374c67a36" => :sierra
-    sha256 "cb105eeda689e1ad3c9478baccc39caa8377d78a64eef9b468126a7d301af332" => :el_capitan
-    sha256 "f04e8651642cf8bf72d21d5250cfc0afb51c360e3df4bb218bd0d4a9b5a301bd" => :yosemite
+    sha256 "9af9175386f836d2b631d56701146047129412be3b12ffa4a1d569e971caba83" => :high_sierra
+    sha256 "9517313567153a7bf7ee3481e631ee35109de0fb0b5655085381ebe0f54d2de1" => :sierra
+    sha256 "915c27d566754f97df3a346e761c375a7756b750becee342da4ea77a2d405f0f" => :el_capitan
   end
 
   head do
-    url "git://git.musicpd.org/master/mpd.git"
+    url "https://github.com/MusicPlayerDaemon/MPD.git"
     depends_on "autoconf" => :build
     depends_on "automake" => :build
   end
@@ -113,7 +112,7 @@ class Mpd < Formula
 
   plist_options :manual => "mpd"
 
-  def plist; <<-EOS.undent
+  def plist; <<~EOS
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
@@ -131,6 +130,8 @@ class Mpd < Formula
         <true/>
         <key>KeepAlive</key>
         <true/>
+        <key>ProcessType</key>
+        <string>Interactive</string>
     </dict>
     </plist>
     EOS
