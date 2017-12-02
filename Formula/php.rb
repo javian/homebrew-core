@@ -2,23 +2,11 @@ class Php < Formula
   desc "General-purpose scripting language"
   homepage "https://php.net/"
 
-  stable do
-    url "https://php.net/get/php-7.1.12.tar.gz/from/this/mirror"
-    sha256 "188c67d8e424ce7a6fe93475aa64f53182c1d80ca3ac99439651ca91569d969c"
-
-    depends_on "libtool" => :run
-    depends_on "mcrypt"
-  end
-
-  devel do
-    url "https://downloads.php.net/~pollita/php-7.2.0RC6.tar.gz"
-    sha256 "ad528a8db319e444ce4ca259dec5afeb9d39287e9a6b214e11397cd985207b1d"
-
-    depends_on "argon2"
-    depends_on "libsodium"
-  end
+  url "https://php.net/get/php-7.2.0.tar.gz/from/this/mirror"
+  sha256 "801876abd52e0dc58a44701344252035fd50702d8f510cda7fdb317ab79897bc"
 
   depends_on "pkg-config" => :build
+  depends_on "argon2"
   depends_on "aspell"
   depends_on "berkeley-db@4"
   depends_on "curl" if MacOS.version < :lion
@@ -39,6 +27,7 @@ class Php < Formula
   depends_on "net-snmp"
   depends_on "openssl"
   depends_on "pcre"
+  depends_on "libsodium"
   depends_on "unixodbc"
   depends_on "webp"
 
@@ -126,6 +115,7 @@ class Php < Formula
       --with-ndbm
       --with-openssl=#{Formula["openssl"].opt_prefix}
       --with-openssl-dir=#{Formula["openssl"].opt_prefix}
+      --with-password-argon2=#{Formula["argon2"].opt_prefix}
       --with-pdo-dblib=shared,#{Formula["freetds"].opt_prefix}
       --with-pdo-mysql=shared,mysqlnd
       --with-pdo-odbc=shared,unixODBC,#{Formula["unixodbc"].opt_prefix}
@@ -137,6 +127,7 @@ class Php < Formula
       --with-pspell=shared,#{Formula["aspell"].opt_prefix}
       --with-snmp=shared
       --with-sqlite3=shared
+      --with-sodium=shared,#{Formula["libsodium"].opt_prefix}
       --with-tidy=shared
       --with-unixODBC=shared,#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
@@ -149,15 +140,6 @@ class Php < Formula
       args << "--with-curl=shared,#{Formula["curl"].opt_prefix}"
     else
       args << "--with-curl=shared"
-    end
-
-    if build.devel?
-      args += %W[
-        --with-password-argon2=#{Formula["argon2"].opt_prefix}
-        --with-sodium=shared,#{Formula["libsodium"].opt_prefix}
-      ]
-    else
-      args << "--with-mcrypt=shared,#{Formula["mcrypt"].opt_prefix}"
     end
 
     system "./configure", *args
@@ -265,7 +247,6 @@ class Php < Formula
       json
       ldap
       mbstring
-      mcrypt
       mysqli
       mysqlnd
       opcache
@@ -296,8 +277,6 @@ class Php < Formula
       xsl
       zip
     ].each do |e|
-      next if build.devel? && e == "mcrypt"
-      next if !build.devel? && e == "sodium"
       ini_priority = case e
       when "opcache" then "10"
       when /pdo_|mysqli|wddx|xmlreader|xmlrpc/ then "30"
