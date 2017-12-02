@@ -21,8 +21,6 @@ class Php < Formula
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libpq"
-  depends_on "libxml2"
-  depends_on "libxslt"
   depends_on "libzip"
   depends_on "net-snmp"
   depends_on "openssl"
@@ -107,7 +105,6 @@ class Php < Formula
       --with-ldap=shared
       --with-ldap-sasl
       --with-libedit
-      --with-libxml-dir=#{Formula["libxml2"].opt_prefix}
       --with-libzip
       --with-mhash
       --with-mysql-sock=/tmp/mysql.sock
@@ -132,7 +129,7 @@ class Php < Formula
       --with-unixODBC=shared,#{Formula["unixodbc"].opt_prefix}
       --with-webp-dir=#{Formula["webp"].opt_prefix}
       --with-xmlrpc=shared
-      --with-xsl=shared,#{Formula["libxslt"].opt_prefix}
+      --with-xsl=shared
       --with-zlib
     ]
 
