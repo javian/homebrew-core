@@ -8,26 +8,22 @@ class WpCli < Formula
   bottle :unneeded
 
   def install
-    libexec.install "wp-cli-1.5.0.phar"
-
-    # This script is required to set 2 necessary runtime PHP options
-    # automatically every time composer is run. Tools like Ansible, expect the
-    # composer executable to be a PHP script.
+    libexec.install "wp-cli-#{version}.phar"
+    
+    # We want to prevent the self update functionality in the script and
+    # Tools like Ansible, expect the wrapper to be a PHP script.
     # https://github.com/Homebrew/homebrew-php/issues/3590
     (bin/"wp").write <<~EOS
       #!/usr/bin/env php
       <?php
       $arguments = implode(" ", $argv);
       if (preg_match('(cli update)', $arguments) == true ) {
-        print <<<'EOT'
-          Homebrew wp-cli does not support selfupdate.
-          Please submit a pull request to homebrew-core and have the formula updated
- 
-      EOT;
+        echo "Homebrew wp-cli does not support selfupdate.\n";
+        echo "Please submit a pull request to homebrew-core and have the formula updated\n";
         exit;
       };
-      Phar::loadPhar('#{libexec}/wp-cli-1.5.0.phar');
-      require 'phar://wp-cli-1.5.0.phar/bin/wp';
+      Phar::loadPhar('#{libexec}/wp-cli-#{version}.phar');
+      require 'phar://wp-cli.phar/php/boot-phar.php';
     EOS
   end
 
