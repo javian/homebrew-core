@@ -11,8 +11,8 @@ class WpCli < Formula
   end
 
   test do
-    assert_match /^Success: WordPress downloaded.$/, \
-      shell_output("#{bin}/wp core download --path=wptest"), \
+    assert_match /^Success: WordPress downloaded.$/,
+      shell_output("#{bin}/wp core download --path=wptest"),
       "Unable to download Wordpress core"
   end
 end
