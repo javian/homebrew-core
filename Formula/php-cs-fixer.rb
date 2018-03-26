@@ -7,6 +7,8 @@ class PhpCsFixer < Formula
 
   bottle :unneeded
 
+  depends_on "php" if MacOS.version <= :el_capitan
+
   def install
     bin.install "php-cs-fixer.phar" => "php-cs-fixer"
   end
