@@ -15,11 +15,10 @@ class PhpCsFixer < Formula
 
   test do
     (testpath/"test.php").write <<~EOS
-      <?php $a = new    class(2){};
+      <?php $this->foo(   'homebrew rox'   );
     EOS
     (testpath/"correct_test.php").write <<~EOS
-      <?php $a = new class(2) {
-      };
+      <?php $this->foo('homebrew rox');
     EOS
 
     system "#{bin}/php-cs-fixer", "fix", "test.php"
