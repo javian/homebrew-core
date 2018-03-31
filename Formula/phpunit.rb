@@ -6,6 +6,8 @@ class Phpunit < Formula
 
   bottle :unneeded
 
+  depends_on "php" => :test
+
   def install
     bin.install "phpunit-#{version}.phar" => "phpunit"
   end
