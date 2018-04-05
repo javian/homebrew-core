@@ -5,6 +5,8 @@ class Phplint < Formula
   version "3.0-20160307"
   sha256 "7a361166d1a6de707e6728828a6002a6de69be886501853344601ab1da922e7b"
 
+  bottle :unneeded
+
   depends_on "php@7.1"
 
   def install
@@ -13,13 +15,9 @@ class Phplint < Formula
     inreplace "phplint.tcl", "\"MISSING_PHP_CLI_EXECUTABLE\"", "#{opt_bin}/php"
     inreplace "phplint.tcl", "set opts(phplint_dir) [pwd]", "set opts(phplint_dir) #{opt_prefix}"
 
-    prefix.install "modules"
-    prefix.install "stdlib"
-    prefix.install "utils"
-    prefix.install "php"
+    prefix.install "modules", "stdlib", "utils", "php"
 
-    bin.install "phpl"
-    bin.install "phplint.tcl"
+    bin.install "phpl", "phplint.tcl"
   end
 
   test do
