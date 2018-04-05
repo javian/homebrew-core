@@ -11,11 +11,12 @@ class Phplint < Formula
 
   def install
     inreplace "php", "/opt/php/bin/php", "#{Formula["php@7.1"].opt_bin}/php"
-    inreplace "phpl", "$__DIR__/", "$__DIR__/../"
-    inreplace "phplint.tcl", "\"MISSING_PHP_CLI_EXECUTABLE\"", "#{opt_bin}/php"
+    inreplace "php", "-c$__DIR__/stdlib", "-c$__DIR__/../libexec/stdlib"
+    inreplace "phpl", "$__DIR__/", "$__DIR__/../libexec/"
+    inreplace "phplint.tcl", "\"MISSING_PHP_CLI_EXECUTABLE\"", "#{opt_libexec}/php"
     inreplace "phplint.tcl", "set opts(phplint_dir) [pwd]", "set opts(phplint_dir) #{opt_prefix}"
 
-    prefix.install "modules", "stdlib", "utils", "php"
+    libexec.install "modules", "stdlib", "utils", "php"
 
     bin.install "phpl", "phplint.tcl"
   end
