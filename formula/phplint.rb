@@ -16,8 +16,7 @@ class Phplint < Formula
 
     libexec.install "modules", "stdlib", "utils", "php", "phpl", "phplint.tcl"
 
-    bin.install_symlink libexec/"phpl"
-    bin.install_symlink libexec/"phplint.tcl"
+    bin.install_symlink libexec/"phpl", libexec/"phplint.tcl"
   end
 
   test do
