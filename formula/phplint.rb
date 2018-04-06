@@ -56,6 +56,6 @@ class Phplint < Formula
             }
         }
     EOS
-    assert_match /Overall test results: 20 errors, 0 warnings./, shell_output("#{bin}/phpl Email.php", 1)
+    assert_match "Overall test results: 20 errors, 0 warnings.", shell_output("#{bin}/phpl Email.php", 1)
   end
 end
