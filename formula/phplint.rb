@@ -10,10 +10,8 @@ class Phplint < Formula
   depends_on "php@7.1"
 
   def install
-    inreplace "php", "/opt/php/bin/php", "#{Formula["php@7.1"].opt_bin}/php"
-
-    libexec.install "modules", "stdlib", "utils", "php", "phpl"
-
+    inreplace "php", "/opt/php/bin/php", Formula["php@7.1"].opt_bin/"php"
+    libexec.install "modules", "php", "phpl", "stdlib", "utils"
     bin.install_symlink libexec/"phpl"
   end
 
@@ -56,6 +54,7 @@ class Phplint < Formula
             }
         }
     EOS
-    assert_match "Overall test results: 20 errors, 0 warnings.", shell_output("#{bin}/phpl Email.php", 1)
+    output = shell_output("#{bin}/phpl Email.php", 1)
+    assert_match "Overall test results: 20 errors, 0 warnings.", output
   end
 end
