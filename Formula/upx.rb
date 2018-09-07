@@ -19,7 +19,7 @@ class Upx < Formula
   # and ought to be included in the next release
   patch do
     url "https://github.com/upx/upx/commit/0dac6b7be3339ac73051d40ed4d268cd2bb0dc7c.patch?full_index=1"
-    sha256 "71f4048ba4edc4c4530ebdce63193503430d75110f35f0989726b7cfb00867f7"
+    sha256 "957de8bab55bb71156a1ae59fa66c67636acd265a4c6fa43d12e8793bafebb22"
   end
 
   def install
